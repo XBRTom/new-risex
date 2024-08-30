@@ -64,6 +64,8 @@ const fetchTransactions = async (address) => {
         marker: marker || undefined, // Pass marker only if defined
       });
 
+      console.log('Response:', response);
+
       if (response.result.transactions) {
         transactions = transactions.concat(response.result.transactions);
       } else {
@@ -77,10 +79,12 @@ const fetchTransactions = async (address) => {
     } while (marker);
 
     return transactions.map(tx => {
+    console.log('TX MAP:', tx);
+        const txData = tx.tx || tx.tx_json;
       let type = 'Unknown';
       let amount = '0';
-      let sender = tx.tx.Account;
-      let recipient = tx.tx.Destination || 'N/A';
+      let sender = txData.Account;
+      let recipient = txData.Destination || 'N/A';
       let lpTokens = '0';
       let totalLpTokens = '0';
       let ammOwnership = '0';
@@ -88,14 +92,14 @@ const fetchTransactions = async (address) => {
       let issuer1 = '';
       let issuer2 = '';
 
-      if (tx.tx.TransactionType === 'Payment') {
+      if (txData.TransactionType === 'Payment' && txData.Amount && txData.Amount.currency && txData.Amount.value) {
         type = 'Payment';
-        amount = typeof tx.tx.Amount === 'string' ? dropsToXrp(tx.tx.Amount) + ' XRP' : `${tx.tx.Amount.value} ${tx.tx.Amount.currency}`;
-      } else if (tx.tx.TransactionType === 'AMMDeposit' || tx.tx.TransactionType === 'AMMWithdraw') {
-        type = tx.tx.TransactionType;
-        amount = `${dropsToXrp(tx.tx.Amount)} XRP, ${tx.tx.Amount2.value} ${tx.tx.Amount2.currency}`;
-        issuer1 = tx.tx.Amount.issuer || 'N/A';
-        issuer2 = tx.tx.Amount2.issuer || 'N/A';
+        amount = typeof txData.Amount === 'string' ? dropsToXrp(txData.Amount) + ' XRP' : `${txData.Amount.value} ${txData.Amount.currency}`;
+      } else if (txData.TransactionType === 'AMMDeposit' || txData.TransactionType === 'AMMWithdraw') {
+        type = txData.TransactionType;
+        amount = `${dropsToXrp(txData.Amount)} XRP, ${txData.Amount2.value} ${txData.Amount2.currency}`;
+        issuer1 = txData.Amount.issuer || 'N/A';
+        issuer2 = txData.Amount2.issuer || 'N/A';
 
         tx.meta.AffectedNodes.forEach(node => {
           if (node.ModifiedNode && node.ModifiedNode.LedgerEntryType === 'AMM') {
@@ -114,10 +118,10 @@ const fetchTransactions = async (address) => {
         recipient = ammAccount;
       }
 
-      const timestamp = tx.tx.date + 946684800; // Correct the Ripple epoch (January 1, 2000) to Unix epoch (January 1, 1970)
+      const timestamp = txData.date + 946684800; // Correct the Ripple epoch (January 1, 2000) to Unix epoch (January 1, 1970)
       const date = new Date(timestamp * 1000).toLocaleString();
       return {
-        id: tx.tx.hash,
+        id: txData.hash,
         date: date,
         sender: sender,
         recipient: recipient,

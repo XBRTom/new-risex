@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { fetchTransactions } from '../xrpl';
+import { fetchTransactions } from '@/libs/xrpl';
 import { Link } from 'react-router-dom';
 import { useWallet } from './WalletContext';
 import ProvideLiquidity from './ProvideLiquidity';
@@ -15,6 +15,7 @@ const AmmDeposits = () => {
       if (account) {
         try {
           const txs = await fetchTransactions(account);
+
           const ammDeposits = txs.filter(tx => tx.type === 'AMMDeposit');
           setTransactions(ammDeposits);
         } catch (error) {

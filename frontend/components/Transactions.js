@@ -1,12 +1,18 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
-import { fetchTransactions } from '../xrpl';
-import { Link } from 'react-router-dom';
-import { useWallet } from './WalletContext';
+import { fetchTransactions } from '@/libs/xrpl';
+import { Link } from 'next/link';
+import { useWallet } from '@/providers/Wallet';
 
 const Transactions = () => {
   const { account } = useWallet();
   const [transactions, setTransactions] = useState([]);
   const [error, setError] = useState(null);
+
+  console.log('account:', account);
+
+  
 
   useEffect(() => {
     const getTransactions = async () => {
@@ -45,14 +51,17 @@ const Transactions = () => {
             </tr>
           </thead>
           <tbody>
-            {transactions.map(tx => (
+            {transactions.map(tx => {
+              console.log('tx:', tx);
+              console.log('tx.recipient:', tx.recipient);
+              return (
               <tr key={tx.id}>
                 <td style={{ border: '1px solid black', padding: '8px' }}>{tx.date}</td>
                 <td style={{ border: '1px solid black', padding: '8px' }}>{tx.type}</td>
                 <td style={{ border: '1px solid black', padding: '8px' }}>{tx.sender}</td>
                 <td style={{ border: '1px solid black', padding: '8px' }}>
-                  {tx.type === 'AMMDeposit' || tx.type === 'AMMWithdraw' ? (
-                    <Link to={`/pool/${tx.recipient.split(' ')[2].slice(1, -1)}`}>{tx.recipient}</Link>
+                  {(tx.type === 'AMMDeposit' || tx.type === 'AMMWithdraw') && tx.recipient ? (
+                    <Link to={`/pool/${tx.recipient}`}>{tx.recipient}</Link>
                   ) : (
                     tx.recipient
                   )}
@@ -61,7 +70,7 @@ const Transactions = () => {
                 <td style={{ border: '1px solid black', padding: '8px' }}>{tx.lpTokens}</td>
                 <td style={{ border: '1px solid black', padding: '8px' }}>{tx.ammOwnership}</td>
               </tr>
-            ))}
+            )})}
           </tbody>
         </table>
       )}
