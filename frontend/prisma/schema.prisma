@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Pool {
+  id              Int              @id @default(autoincrement())
+  account         String           @unique
+  asset_currency  String
+  asset2_currency String
+  asset2_issuer   String
+  balance         Float
+  tradingFee      Int
+  updatedAt       DateTime         @updatedAt
+  createdAt       DateTime         @default(now())
+  asset_issuer    String?
+  auctionSlots    AuctionSlot[]
+  dailyVolumes    DailyVolume[]
+  lpTokenBalances LPTokenBalance[]
+  voteSlots       VoteSlot[]
+  dailyTradingFees  DailyTradingFees[]
+  ammInfos          AmmInfo[]
+  metrics         GlobalPoolMetrics[]
+}
+
+model AuctionSlot {
+  id             Int    @id @default(autoincrement())
+  account        String
+  discountedFee  Int
+  expiration     String
+  price_currency String
+  price_issuer   String
+  price_value    Float
+  poolId         Int
+  pool           Pool   @relation(fields: [poolId], references: [id])
+
+  @@index([poolId], map: "AuctionSlot_poolId_fkey")
+}
+
+model LPTokenBalance {
+  id       Int    @id @default(autoincrement())
+  currency String
+  issuer   String
+  value    Float
+  poolId   Int
+  pool     Pool   @relation(fields: [poolId], references: [id])
+
+  @@index([poolId], map: "LPTokenBalance_poolId_fkey")
+}
+
+model VoteSlot {
+  id         Int    @id @default(autoincrement())
+  account    String
+  tradingFee Int
+  voteWeight Int
+  poolId     Int
+  pool       Pool   @relation(fields: [poolId], references: [id])
+
+  @@index([poolId], map: "VoteSlot_poolId_fkey")
+}
+
+model DailyVolume {
+  id                Int      @id @default(autoincrement())
+  dateFrom          DateTime
+  dateTo            DateTime
+  base              String
+  counter           String
+  baseVolume        Float
+  baseVolumeBuy     Float
+  baseVolumeSell    Float
+  counterVolume     Float
+  counterVolumeBuy  Float
+  counterVolumeSell Float
+  first             Float
+  high              Float
+  last              Float
+  low               Float
+  uniqueBuyers      Int
+  uniqueSellers     Int
+  trendInterval     Float
+  trendLatestTrades Float
+  exchanges         Int
+  poolId            Int
+  pool              Pool     @relation(fields: [poolId], references: [id])
+
+  @@index([poolId], map: "DailyVolume_poolId_fkey")
+}
+
+model ExchangeRate {
+  id             Int      @id @default(autoincrement())
+  issuer         String?
+  rate           Float
+  timestamp      DateTime 
+  targetCurrency String
+}
+
+model DailyTradingFees {
+  id        Int      @id @default(autoincrement())
+  poolId    Int
+  pool      Pool     @relation(fields: [poolId], references: [id])
+  tradingFee Int
+  timestamp DateTime @default(now())
+}
+
+model AmmInfo {
+  id                Int       @id @default(autoincrement())
+  account           String    @unique
+  amount            Float?
+  amount_issuer     String?
+  amount_currency   String?
+  amount2_currency  String
+  amount2_issuer    String
+  amount2_value     Float
+  poolId            Int
+  pool              Pool      @relation(fields: [poolId], references: [id])
+  createdAt         DateTime  @default(now())
+  @@index([poolId], map: "AmmInfo_poolId_fkey")
+}
+
+model GlobalPoolMetrics {
+  id              Int       @id @default(autoincrement())
+  date            DateTime  @default(now())
+  totalPoolVolume  Decimal   @db.Decimal(20, 6)
+  feesGenerated    Decimal?  @db.Decimal(20, 6)
+  relativeAPR      Decimal?  @db.Decimal(12, 8) // Increase precision if needed
+  grossAPR         Decimal?  @db.Decimal(12, 8) // Increase precision if needed
+  totalValueLocked Decimal?  @db.Decimal(20, 8) // Increase precision and scale here
+  poolYield        Decimal?  @db.Decimal(12, 8) // Increase precision if needed
+  createdAt       DateTime   @default(now())
+
+  // Relationship to Pool
+  pool            Pool       @relation(fields: [poolId], references: [id])
+  poolId          Int
+}

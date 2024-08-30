@@ -1,0 +1,11 @@
+-- CreateTable
+CREATE TABLE `ExchangeRate` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `currency` VARCHAR(191) NOT NULL,
+    `issuer` VARCHAR(191) NULL,
+    `rate` DOUBLE NOT NULL,
+    `base` VARCHAR(191) NOT NULL DEFAULT 'USD',
+    `timestamp` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
