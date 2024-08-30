@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/libs/prisma';
 
 type Params = {
-    limit: number;
+    limit: string;
     };
 
-export async function GET(req: NextRequest, context: {params:Params}) {
+export async function GET(req: NextRequest, context: {params: Params}) {
   try {
     const page = 1;
-    const limit = context.params.limit || 10;
+    const limit = parseInt(context.params.limit || '10', 10);
 
     // Calculate the number of items to skip
     const skip = (page - 1) * limit;

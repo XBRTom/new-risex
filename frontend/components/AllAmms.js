@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link } from 'next/link';
 
 const AllAmms = ({ setPools }) => { 
   const [localPools, setLocalPools] = useState([]);

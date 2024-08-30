@@ -43,22 +43,22 @@ const Pools = () => {
         const cachedPools = localStorage.getItem('poolsData');
         const cachedExchangeRates = localStorage.getItem('exchangeRatesData');
 
-        if (cachedPools && cachedExchangeRates) {
-          const parsedPools = JSON.parse(cachedPools);
-          const parsedExchangeRates = JSON.parse(cachedExchangeRates);
+        // if (cachedPools && cachedExchangeRates) {
+        //   const parsedPools = JSON.parse(cachedPools);
+        //   const parsedExchangeRates = JSON.parse(cachedExchangeRates);
 
-          setPools(parsedPools);
-          setFilteredPools(parsedPools);
-          setExchangeRates(parsedExchangeRates);
-          setTotalItems(parsedPools.length);
+        //   setPools(parsedPools);
+        //   setFilteredPools(parsedPools);
+        //   setExchangeRates(parsedExchangeRates);
+        //   setTotalItems(parsedPools.length);
 
-          // Fetch volume data based on cached pools
-          await fetchVolumeData(parsedPools);
+        //   // Fetch volume data based on cached pools
+        //   await fetchVolumeData(parsedPools);
 
-        } else {
+        // } else {
           // Fetch all pools data without pagination
-          const { data } = await apiClient.get(`/fetch-pools/${10000}`);
-
+          const data = await apiClient.get(`/fetch-pools/${10000}`);
+          console.log('Fetched Pools:', data); // Log the pools directly after fetching
           const { pools } = data;
           // console.log('Fetched Pools:', pools); // Log the pools directly after fetching
 
@@ -97,7 +97,7 @@ const Pools = () => {
 
           // Fetch volume data last
           await fetchVolumeData(updatedPools);
-        }
+        // }
 
       } catch (err) {
         console.error('Failed to fetch initial data:', err);
