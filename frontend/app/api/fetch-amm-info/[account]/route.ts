@@ -5,8 +5,11 @@ type Params = {
   account: string
 }
 
-export async function GET(req: NextRequest, res: NextResponse, context: { params: Params }) {
-  const account = context.params.account;
+export async function GET(req: NextRequest, context: { params: Params }) {
+  console.log('Fetching AMM info from the database', context);
+
+   const { account } = context.params;
+  
   // Extract 'base' and 'counter' from the query parameters
   if (!account) {
     return NextResponse.json({ error: 'Missing required query parameters' }, {status: 400});
@@ -77,7 +80,7 @@ export async function GET(req: NextRequest, res: NextResponse, context: { params
     // res.status(500).json({ error: 'Failed to fetch AMM info' });
     return NextResponse.json({ error: 'Failed to fetch AMM info' }, {status: 500});
   } finally {
-    await prisma.$disconnect();
+    // await prisma.$disconnect();
   }
 };
 

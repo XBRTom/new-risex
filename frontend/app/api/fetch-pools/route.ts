@@ -6,10 +6,10 @@ type Params = {
     limit: number;
     };
 
-export async function GET(req: NextRequest, context: Params) {
-  try {
-    const page = context.page || 1;
-    const limit = context.limit || 10;
+export async function GET(req: NextRequest, context: {params:Params}) {
+    try {
+        const page = 1;
+        const limit = 10;
 
     // Calculate the number of items to skip
     const skip = (page - 1) * limit;

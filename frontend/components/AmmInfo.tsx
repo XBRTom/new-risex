@@ -29,7 +29,7 @@ const AmmInfo = ({account}: { account: string }) => {
     const fetchAmmInfo = async () => {
       try {
         console.log(`Fetching AMM info for account: ${account}`);
-        const response: any = await apiClient.get(`/fetch-amm-info?account=${account}`);
+        const response: any = await apiClient.get(`/fetch-amm-info/${account}`);
         setAmmInfo(response);
 
         // Fetch the latest metrics data
