@@ -3,7 +3,7 @@
 import React, { useContext } from 'react';
 import ProvideLiquidity from "@/components/ProvideLiquidity";
 import { WalletContext } from "@/providers/Wallet";
-import SendXRP from "@/components/SendXRP";
+import SendXRP from "@/components/SendXrp";
 
 export default function Home() {
   
