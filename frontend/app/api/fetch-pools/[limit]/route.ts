@@ -42,7 +42,6 @@ export async function GET(req: NextRequest, context: {params: Params}) {
       },
     });
 
-    console.log('Fetched pools with metrics:', pools);
     const totalPools = await prisma.pool.count(); // To calculate total pages
 
     return NextResponse.json({ pools, totalPools });

@@ -63,7 +63,7 @@ const AmmInfo = ({account}: { account: string }) => {
     };
 
     if (account) {
-      fetchAmmInfo();
+      // fetchAmmInfo();
     }
   }, [account]);
 
