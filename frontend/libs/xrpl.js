@@ -51,7 +51,7 @@ const fetchTransactions = async (address) => {
     let response;
 
     do {
-      console.log(`Fetching transactions for ${address} with marker:`, marker);
+      // console.log(`Fetching transactions for ${address} with marker:`, marker);
 
       response = await client.request({
         command: 'account_tx',
@@ -79,7 +79,7 @@ const fetchTransactions = async (address) => {
     } while (marker);
 
     return transactions.map(tx => {
-    console.log('TX MAP:', tx);
+    // console.log('TX MAP:', tx);
         const txData = tx.tx || tx.tx_json;
       let type = 'Unknown';
       let amount = '0';

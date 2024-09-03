@@ -18,8 +18,8 @@ const Transactions = () => {
     const getTransactions = async () => {
       if (account) {
         try {
-          const txs = await fetchTransactions(account);
-          setTransactions(txs);
+        //   const txs = await fetchTransactions(account);
+        //   setTransactions(txs);
         } catch (error) {
           setError(error.message || 'Failed to fetch transactions');
         }

@@ -14,8 +14,8 @@ const timeRanges = [
   { value: 'alltime', label: 'All Time' },
 ];
 
-const AmmInfo = ({account}: { account: string }) => {
-  const [ammInfo, setAmmInfo] = useState<any>(null);
+const AmmInfo = ({account, ammInfo}: { account: string, ammInfo: any }) => {
+  // const [ammInfo, setAmmInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [latestMetrics, setLatestMetrics] = useState<any>(null);
   const [historicalMetrics, setHistoricalMetrics] = useState<any[]>([]);
@@ -29,16 +29,16 @@ const AmmInfo = ({account}: { account: string }) => {
     const fetchAmmInfo = async () => {
       try {
         console.log(`Fetching AMM info for account: ${account}`);
-        const response: any = await apiClient.get(`/fetch-amm-info/${account}`);
-        setAmmInfo(response);
+        // const response: any = await apiClient.get(`/fetch-amm-info/${account}`);
+        // setAmmInfo(response);
 
         // Fetch the latest metrics data
-        console.log(`Fetching latest metrics for poolId: ${response.poolId}`);
-        const metricsResponse: any = await apiClient.get(`/latest-metrics?poolId=${response.poolId}`);
+        console.log(`Fetching latest metrics for poolId: ${ammInfo.poolId}`);
+        const metricsResponse: any = await apiClient.get(`/latest-metrics?poolId=${ammInfo.poolId}`);
         console.log('Fetched Latest Metrics:', metricsResponse); // Add this log to verify the fetched data
 
         // Filter the metrics for the current poolId
-        const currentPoolMetrics = metricsResponse.find((metric: any) => metric.poolId === response.poolId);
+        const currentPoolMetrics = metricsResponse.find((metric: any) => metric.poolId === ammInfo.poolId);
 
         // Ensure that you found the correct metrics for the pool
         if (currentPoolMetrics) {
@@ -49,8 +49,8 @@ const AmmInfo = ({account}: { account: string }) => {
         }
 
         // Fetch historical metrics data
-        console.log(`Fetching historical metrics for poolId: ${response.poolId}`);
-        const historicalResponse: any = await apiClient.get(`/historical-metrics?poolId=${response.poolId}`);
+        console.log(`Fetching historical metrics for poolId: ${ammInfo.poolId}`);
+        const historicalResponse: any = await apiClient.get(`/historical-metrics?poolId=${ammInfo.poolId}`);
         console.log('Fetched Historical Metrics:', historicalResponse);
         setHistoricalMetrics(historicalResponse);
 
@@ -63,9 +63,9 @@ const AmmInfo = ({account}: { account: string }) => {
     };
 
     if (account) {
-      // fetchAmmInfo();
+      fetchAmmInfo();
     }
-  }, [account]);
+  }, [account, ammInfo.poolId]);
 
   // Filter and aggregate data based on the selected time range
   useEffect(() => {

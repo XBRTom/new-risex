@@ -74,8 +74,8 @@ const Pools = () => {
             const baseCurrencyRate = exchangeRatesMap[pool.asset_currency] || 1;
             const counterCurrencyRate = exchangeRatesMap[pool.asset2_currency] || 1;
             // Log to confirm the data
-            console.log(`Pool ID: ${pool.id}, Metrics from API:`, pool.metrics);
-            console.log(`Pool ID: ${pool.id}, Latest Metrics:`, latestMetrics);
+            // console.log(`Pool ID: ${pool.id}, Metrics from API:`, pool.metrics);
+            // console.log(`Pool ID: ${pool.id}, Latest Metrics:`, latestMetrics);
             return {
               ...pool,
               latestMetrics,
@@ -128,8 +128,8 @@ const Pools = () => {
         const latestMetrics = pool.metrics && pool.metrics.length > 0 ? pool.metrics[0] : {}; // Ensure metrics is not empty
   
         // // // Log the pool metrics to ensure they are being populated correctly
-        console.log(`Pool ID: ${pool.id}, Metrics from API:`, pool.metrics);
-        console.log(`Pool ID: ${pool.id}, Latest Metrics:`, latestMetrics);
+        // console.log(`Pool ID: ${pool.id}, Metrics from API:`, pool.metrics);
+        // console.log(`Pool ID: ${pool.id}, Latest Metrics:`, latestMetrics);
   
         return {
           ...pool,
