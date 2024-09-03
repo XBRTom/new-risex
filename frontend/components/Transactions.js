@@ -18,8 +18,8 @@ const Transactions = () => {
     const getTransactions = async () => {
       if (account) {
         try {
-        //   const txs = await fetchTransactions(account);
-        //   setTransactions(txs);
+          const txs = await fetchTransactions(account);
+          setTransactions(txs);
         } catch (error) {
           setError(error.message || 'Failed to fetch transactions');
         }
@@ -60,11 +60,11 @@ const Transactions = () => {
                 <td style={{ border: '1px solid black', padding: '8px' }}>{tx.type}</td>
                 <td style={{ border: '1px solid black', padding: '8px' }}>{tx.sender}</td>
                 <td style={{ border: '1px solid black', padding: '8px' }}>
-                  {(tx.type === 'AMMDeposit' || tx.type === 'AMMWithdraw') && tx.recipient ? (
+                  {/* {(tx.type === 'AMMDeposit' || tx.type === 'AMMWithdraw') && tx.recipient ? (
                     <Link to={`/pool/${tx.recipient}`}>{tx.recipient}</Link>
                   ) : (
                     tx.recipient
-                  )}
+                  )} */}
                 </td>
                 <td style={{ border: '1px solid black', padding: '8px' }}>{tx.amount}</td>
                 <td style={{ border: '1px solid black', padding: '8px' }}>{tx.lpTokens}</td>
