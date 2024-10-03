@@ -26,6 +26,9 @@ model Pool {
   dailyTradingFees  DailyTradingFees[]
   ammInfos          AmmInfo[]
   metrics         GlobalPoolMetrics[]
+
+  @@index([asset_issuer])
+  @@index([asset2_issuer])
 }
 
 model AuctionSlot {
@@ -89,6 +92,7 @@ model DailyVolume {
   pool              Pool     @relation(fields: [poolId], references: [id])
 
   @@index([poolId], map: "DailyVolume_poolId_fkey")
+  @@index([dateTo])
 }
 
 model ExchangeRate {
@@ -97,6 +101,9 @@ model ExchangeRate {
   rate           Float
   timestamp      DateTime 
   targetCurrency String
+
+  @@index([issuer])
+  @@index([timestamp])
 }
 
 model DailyTradingFees {
@@ -136,4 +143,7 @@ model GlobalPoolMetrics {
   // Relationship to Pool
   pool            Pool       @relation(fields: [poolId], references: [id])
   poolId          Int
+
+  @@index([poolId])
+  @@index([date])
 }
