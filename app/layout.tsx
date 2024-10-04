@@ -96,69 +96,70 @@ export default function RootLayout(
           </Script>
           <WalletProvider>
             {/* <Navbar /> */}
-            <NavigationMenu>
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                      <li className="row-span-3">
-                        <NavigationMenuLink asChild>
-                          <a
-                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                            href="/"
-                          >
-                            <div className="h-6 w-6" />
-                            <div className="mb-2 mt-4 text-lg font-medium">
-                              LIQUID
-                            </div>
-                            <p className="text-sm leading-tight text-muted-foreground">
-                              Value transfer like never before. We help you understand.
-                            </p>
-                          </a>
+            <div className="sticky top-0 z-50 bg-white shadow-md">
+                <NavigationMenu>
+                  <NavigationMenuList>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                          <li className="row-span-3">
+                            <NavigationMenuLink asChild>
+                              <a
+                                className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                                href="/"
+                              >
+                                <div className="h-6 w-6" />
+                                <div className="mb-2 mt-4 text-lg font-medium">
+                                  LIQUID
+                                </div>
+                                <p className="text-sm leading-tight text-muted-foreground">
+                                  Value transfer like never before. We help you understand.
+                                </p>
+                              </a>
+                            </NavigationMenuLink>
+                          </li>
+                          <ListItem href="/docs" title="Introduction">
+                            Why Liquid ? 
+                          </ListItem>
+                          <ListItem href="/docs/installation" title="Access">
+                            How to install dependencies and structure your app.
+                          </ListItem>
+                          <ListItem href="/docs/primitives/typography" title="Typography">
+                            Styles for headings, paragraphs, lists...etc
+                          </ListItem>
+                        </ul>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger>Features</NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                          {components.map((component) => (
+                            <ListItem
+                              key={component.title}
+                              title={component.title}
+                              href={component.href}
+                            >
+                              {component.description}
+                            </ListItem>
+                          ))}
+                        </ul>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                      <Link href="/docs" legacyBehavior passHref>
+                        <NavigationMenuLink>
+                          Partner
                         </NavigationMenuLink>
-                      </li>
-                      <ListItem href="/docs" title="Introduction">
-                        Why Liquid ? 
-                      </ListItem>
-                      <ListItem href="/docs/installation" title="Access">
-                        How to install dependencies and structure your app.
-                      </ListItem>
-                      <ListItem href="/docs/primitives/typography" title="Typography">
-                        Styles for headings, paragraphs, lists...etc
-                      </ListItem>
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger>Features</NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                      {components.map((component) => (
-                        <ListItem
-                          key={component.title}
-                          title={component.title}
-                          href={component.href}
-                        >
-                          {component.description}
-                        </ListItem>
-                      ))}
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Link href="/docs" legacyBehavior passHref>
-                    <NavigationMenuLink>
-                      Partner
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
+                      </Link>
+                    </NavigationMenuItem>
+                  </NavigationMenuList>
+                </NavigationMenu>
+            </div>
            {children}
           </WalletProvider>
         </body>
-      
     </html>
   );
 }
