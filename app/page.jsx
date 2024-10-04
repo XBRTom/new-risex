@@ -26,11 +26,13 @@
 //   );
 // }
 
-import Image from "next/image"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+'use client';
+
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { 
   Card,
   CardContent,
@@ -41,18 +43,18 @@ import {
 } from "@/components/ui/card";
 
 export const description =
-  "A login page with two vertically stacked sections. The first section has the login form with email and password. There's a Forgot your password link and a link to sign up if you do not have an account. The second section has a cover image."
+  "A login page with two vertically stacked sections. The first section has the login form with email and password. There's a Forgot your password link and a link to sign up if you do not have an account. The second section has a cover image.";
 
 export default function Dashboard() {
   return (
     <div className="w-full min-h-screen flex flex-col lg:flex-row">
       {/* First vertical section: Login form */}
-      <div className="flex flex-col items-center justify-center py-12 w-full lg:w-1/2">
+      <div className="flex flex-col items-center justify-center py-12 w-full lg:w-1/2 h-screen overflow-y-auto">
         <Card className="mx-auto grid w-[350px] gap-6">
           <CardHeader className="grid gap-2 text-center">
             <CardTitle className="text-3xl font-bold">Login</CardTitle>
-            <CardDescription className="text-balance text-muted-foreground">
-              Enter your email below to login to your account
+            <CardDescription className="text-muted-foreground">
+              Please enter your credentials to login to your account.
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
@@ -84,25 +86,24 @@ export default function Dashboard() {
               Login with Google
             </Button>
           </CardContent>
-          <CardFooter className="">
-              <div className="flex items-center">
-                <CardDescription className="text-balance text-muted-foreground">
-                  Don't have an account ?  
-                  <Link
+          <CardFooter>
+            <div className="flex items-center">
+              <CardDescription className="text-muted-foreground">
+                Don't have an account?  
+                <Link
                   href="/"
                   className="ml-auto inline-block text-sm underline"
                 >
                   Sign up
                 </Link>
-                </CardDescription>
-              </div>
-              
+              </CardDescription>
+            </div>
           </CardFooter>
         </Card>
-        </div>
+      </div>
 
       {/* Second vertical section: Cover image */}
-      <div className="hidden lg:block bg-muted w-full lg:w-1/2">
+      <div className="hidden lg:block bg-muted w-full lg:w-1/2 h-screen overflow-y-auto">
         <Image
           src="/placeholder.svg"
           alt="Cover Image"
