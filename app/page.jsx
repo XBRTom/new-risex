@@ -1,9 +1,7 @@
 'use client';
 
 import React, { useContext } from 'react';
-import ProvideLiquidity from "@/components/ProvideLiquidity";
 import { WalletContext } from "@/providers/Wallet";
-import SendXRP from "@/components/SendXrp";
 
 export default function Home() {
   
@@ -19,8 +17,6 @@ export default function Home() {
         <div>
           <p>Connected account: <b>{account}</b></p>
           <button onClick={handleLogout}>Logout</button>
-          <ProvideLiquidity account={account}/>
-          <SendXRP account={account} />
         </div>
       ) : (
         <button onClick={handleLogin}>Connect to XUMM</button>
