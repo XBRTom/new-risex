@@ -47,9 +47,9 @@ export const description =
 
 export default function Dashboard() {
   return (
-    <div className="w-full min-h-screen flex flex-col lg:flex-row">
+    <div className="w-full min-h-screen flex flex-col lg:flex-row no-scrollbar">
       {/* First vertical section: Login form */}
-      <div className="flex flex-col items-center justify-center py-12 w-full lg:w-1/2 h-screen overflow-y-auto">
+      <div className="flex flex-col items-center justify-center py-12 w-full lg:w-1/2 h-screen overflow-y-auto no-scrollbar">
         <Card className="mx-auto grid w-[350px] gap-6">
           <CardHeader className="grid gap-2 text-center">
             <CardTitle className="text-3xl font-bold">Login</CardTitle>
@@ -103,15 +103,45 @@ export default function Dashboard() {
       </div>
 
       {/* Second vertical section: Cover image */}
-      <div className="hidden lg:block bg-muted w-full lg:w-1/2 h-screen overflow-y-auto">
-        <Image
-          src="/placeholder.svg"
-          alt="Cover Image"
-          width="1920"
-          height="1080"
-          className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-        />
+      <div className="hidden lg:block bg-muted w-full lg:w-1/2 h-screen overflow-y-auto no-scrollbar">
+        <div className="space-y-8 p-8">
+          {/* Liquid-Flow Section */}
+          <section id="liquid-flow">
+            <h2 className="text-2xl font-bold mb-4">Liquid-Flow</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur et libero ut leo ullamcorper volutpat nec a urna. Fusce in mauris turpis. Phasellus euismod felis vel ligula feugiat tincidunt.</p>
+          </section>
+
+          {/* Liquid-Sync Section */}
+          <section id="liquid-sync">
+            <h2 className="text-2xl font-bold mb-4">Liquid-Sync</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum malesuada, metus nec laoreet mollis, lectus ipsum pretium dui, sed ultricies ligula ligula et ex.</p>
+          </section>
+
+          {/* Liquid-O2 Section */}
+          <section id="liquid-o2">
+            <h2 className="text-2xl font-bold mb-4">Liquid-O2</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent euismod magna in metus finibus, id tincidunt sapien tristique. Cras volutpat facilisis augue.</p>
+          </section>
+
+          {/* Liquid-Pool Section */}
+          <section id="liquid-pool">
+            <h2 className="text-2xl font-bold mb-4">Liquid-Pool</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed a ligula vel augue ullamcorper egestas. Aliquam erat volutpat. Sed vitae posuere lectus.</p>
+          </section>
+
+          {/* Liquid-X Section */}
+          <section id="liquid-x">
+            <h2 className="text-2xl font-bold mb-4">Liquid-X</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ut urna non nulla vehicula volutpat vel sed magna. Vivamus fermentum orci sed magna malesuada, at vulputate velit blandit.</p>
+          </section>
+
+          {/* Liquid-Labs Section */}
+          <section id="liquid-labs">
+            <h2 className="text-2xl font-bold mb-4">Liquid-Labs</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam sed sapien magna. Mauris id dui vehicula, auctor ex vitae, convallis magna.</p>
+          </section>
+        </div>
       </div>
     </div>
-  )
+  );
 }

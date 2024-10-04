@@ -434,3 +434,14 @@ a {
   background-color: white;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.043);
 }
+
+/* Add this in your global stylesheet */
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
