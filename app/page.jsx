@@ -55,7 +55,14 @@ export default function Dashboard() {
   return (
     <div className="w-full min-h-screen flex flex-col lg:flex-row no-scrollbar">
       {/* First vertical section: Login form */}
-      <div className="flex flex-col items-center justify-center py-12 w-full lg:w-1/2 h-screen overflow-y-auto no-scrollbar">
+      <div 
+      className="flex flex-col items-center justify-center py-12 w-full lg:w-1/2 h-screen overflow-y-auto no-scrollbar"
+      style={{
+        backgroundImage: "url('/astronaut-exploring-a-new-planet-2023-11-27-05-35-27-utc.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+      >
         <Tabs defaultValue="Login" className="w-[400px]">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="Login">Login</TabsTrigger>
