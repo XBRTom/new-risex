@@ -445,3 +445,11 @@ a {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+.scroll-snap-start {
+  scroll-snap-align: start;
+}
+
+.scroll-snap-mandatory {
+  scroll-snap-type: y mandatory;
+}
