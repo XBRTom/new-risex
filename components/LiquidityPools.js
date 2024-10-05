@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { createRoot } from 'react-dom/client'; // Import createRoot
 import { fetchAmmDetails, fetchTransactions } from '../xrpl';
 import { useWallet } from './WalletContext';
-import ProvideLiquidity from '../components/ProvideLiquidity';
+import ProvideLiquidity from './ProvideLiquidity';
 
 const LiquidityPools = () => {
   const { ammAccount } = useParams();

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Table from '../components/Table'; // Import the existing Table component for consistency
-import AddLiquidityModal from '../components/AddLiquidityModal';
-import WithdrawLiquidityModal from '../components/WithdrawLiquidityModal';
+import Table from './Table'; // Import the existing Table component for consistency
+import AddLiquidityModal from './AddLiquidityModal';
+import WithdrawLiquidityModal from './WithdrawLiquidityModal';
 import { useWallet } from '../context/WalletContext';
 
 const LPTokensTable = () => {
