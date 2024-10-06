@@ -1,7 +1,5 @@
 'use client';
 
-
-
 import Login from "@/components/homepage/login";
 import Sections from "@/components/homepage/sections";
 
@@ -13,16 +11,11 @@ const HomePage = () => {
     <div className="w-full min-h-screen flex flex-col lg:flex-row no-scrollbar">
       {/* First vertical section: Login form */}
       <div 
-        className="flex flex-col items-center justify-center py-12 w-full lg:w-2/5 h-screen overflow-y-auto no-scrollbar"
-        style={{
-          backgroundImage: "url('/astronaut-exploring-a-new-planet-2023-11-27-05-35-27-utc.jpg')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
+        className="flex flex-col items-center justify-center py-12 w-full lg:w-2/5 h-screen overflow-y-auto no-scrollbar bg-astronaut bg-cover bg-center"
       >
         <Login />
       </div>
-      
+
       <div className="bg-slate-900 text-white w-full lg:w-3/5 h-screen overflow-y-auto no-scrollbar scroll-snap-mandatory scroll-snap-y">
         <div className="space-y-16 p-8">
           <Sections />
