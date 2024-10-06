@@ -57,46 +57,20 @@ const Pools = () => {
 
         // } else {
           // Fetch all pools data without pagination
-          const data = await apiClient.get(`/fetch-pools/${10000}`);
+          const data = await apiClient.get(`/fetch-pools/${1100}`);
           console.log('Fetched Pools:', data); // Log the pools directly after fetching
           const { pools } = data;
           // console.log('Fetched Pools:', pools); // Log the pools directly after fetching
 
           
-          // Fetch exchange rates
-          const exchangeRatesRes = await apiClient.get('/fetch-exchange-rates-from-db');
-          const ratesData = exchangeRatesRes.exchangeRates;
-
-          // Map exchange rates to pools
-          const exchangeRatesMap = ratesData;
-          const updatedPools = pools.map(pool => {
-            const latestMetrics = pool.metrics?.[0] || {};
-            const baseCurrencyRate = exchangeRatesMap[pool.asset_currency] || 1;
-            const counterCurrencyRate = exchangeRatesMap[pool.asset2_currency] || 1;
-            // Log to confirm the data
-            // console.log(`Pool ID: ${pool.id}, Metrics from API:`, pool.metrics);
-            // console.log(`Pool ID: ${pool.id}, Latest Metrics:`, latestMetrics);
-            return {
-              ...pool,
-              latestMetrics,
-              baseCurrencyRate,
-              counterCurrencyRate,
-              account: pool.account || pool.id
-            };
-          });
 
           // Store fetched data in state
-          setPools(updatedPools);
-          setFilteredPools(updatedPools);
-          setExchangeRates(exchangeRatesMap);
-          setTotalItems(updatedPools.length);
+          setPools(pools);
+          setFilteredPools(pools);
+          setTotalItems(pools.length);
 
           // Save the fetched data to localStorage
-          localStorage.setItem('poolsData', JSON.stringify(updatedPools));
-          localStorage.setItem('exchangeRatesData', JSON.stringify(exchangeRatesMap));
-
-          // Fetch volume data last
-          await fetchVolumeData(updatedPools);
+          localStorage.setItem('poolsData', JSON.stringify(pools));
         // }
 
       } catch (err) {
@@ -117,36 +91,6 @@ const Pools = () => {
     }
   }, [currentPage, isInitializing]);
 
-  const fetchVolumeData = async (initialPools) => {
-    try {
-      const response = await apiClient.get('/fetch-volume-data-from-db');
-      const volumeData = response;
-      console.log('Fetched Volume Data:', response, volumeData); // Log the volume data to confirm it was fetched
-  
-      const updatedPools = initialPools.map(pool => {
-        const poolVolume = volumeData.find(volume => volume.poolId === pool.id) || { baseVolume: 0, counterVolume: 0 };
-        const latestMetrics = pool.metrics && pool.metrics.length > 0 ? pool.metrics[0] : {}; // Ensure metrics is not empty
-  
-        // // // Log the pool metrics to ensure they are being populated correctly
-        // console.log(`Pool ID: ${pool.id}, Metrics from API:`, pool.metrics);
-        // console.log(`Pool ID: ${pool.id}, Latest Metrics:`, latestMetrics);
-  
-        return {
-          ...pool,
-          latestMetrics, // Add a field for easy access in PoolsTable
-          baseVolume: poolVolume.baseVolume,
-          counterVolume: poolVolume.counterVolume
-        };
-      });
-  
-      if (JSON.stringify(pools) !== JSON.stringify(updatedPools)) {
-        setPools(updatedPools);
-        setFilteredPools(updatedPools);
-      }
-    } catch (err) {
-      console.error('Failed to fetch volume data:', err);
-    }
-  };
   
 
   useEffect(() => {

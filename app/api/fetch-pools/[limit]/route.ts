@@ -1,50 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/libs/prisma';
+import { getPools } from '@prisma/client/sql'
 
 type Params = {
     limit: string;
-    };
+};
 
 export async function GET(req: NextRequest, context: {params: Params}) {
   try {
-    const page = 1;
     const limit = parseInt(context.params.limit || '10', 10);
 
-    // Calculate the number of items to skip
-    const skip = (page - 1) * limit;
+    // TODO: find a better way to get the last cron datetime, because the simple date is not enough, we can have multilpe crons in one day
+    const currentDate = new Date().toISOString().split('T')[0] + '%';
+    //const currentDate = '2024-10-09 20%';
+    const pools = await prisma.$queryRawTyped(getPools(currentDate, currentDate, currentDate, currentDate, limit));
 
-    const pools = await prisma.pool.findMany({
-      skip,
-      take: limit,
-      select: {
-        id: true,
-        account: true,
-        asset_currency: true,
-        asset2_currency: true,
-        balance: true,
-        tradingFee: true,
-        metrics: {
-          orderBy: {
-            date: 'desc', // Order metrics by date to get the latest
-          },
-          take: 1, // Take only the latest metric
-          select: {
-            totalPoolVolume: true,
-            feesGenerated: true,
-            relativeAPR: true,
-            grossAPR: true,
-            totalValueLocked: true,
-            poolYield: true,
-            date: true, // Include the date to know when it was recorded
-          },
-        },
-        // Only select necessary fields to minimize response size
-      },
-    });
-
-    const totalPools = await prisma.pool.count(); // To calculate total pages
-
-    return NextResponse.json({ pools, totalPools });
+    return NextResponse.json({ pools, totalPools: pools.length });
   } catch (error) {
     console.error('Failed to fetch pools from the database:', error);
     return NextResponse.json({ error: 'Failed to fetch pools' }, { status: 500 });
