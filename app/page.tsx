@@ -9,7 +9,6 @@ export const description =
 const HomePage = () => {
   return (
     <div className="w-full min-h-[calc(100vh-2.5rem)] flex flex-col lg:flex-row no-scrollbar">
-      {/* First vertical section: Login form */}
       <div 
         className="flex flex-col items-center justify-center py-12 w-full lg:w-2/5 h-[calc(100vh-2.5rem)] overflow-y-auto no-scrollbar bg-astronaut bg-cover bg-center"
       >
