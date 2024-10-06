@@ -78,9 +78,19 @@ ListItem.displayName = "ListItem"
 
 const Navbar = () => {
     return (
-        <div className="sticky top-0 z-50 bg-white shadow-md no-scrollbar flex justify-center items-center h-10">
+        <div className="sticky top-0 z-50 bg-white shadow-md no-scrollbar flex justify-left items-center h-10">
             <NavigationMenu>
                 <NavigationMenuList>
+                <NavigationMenuItem>
+                        <NavigationMenuLink asChild>
+                            <a
+                                className="flex items-center h-full px-4 text-lg font-medium text-gray-900 no-underline"
+                                href="/"
+                            >
+                                LIQUID
+                            </a>
+                        </NavigationMenuLink>
+                    </NavigationMenuItem>
                 <NavigationMenuItem>
                     <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
                     <NavigationMenuContent>
