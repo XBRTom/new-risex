@@ -10,6 +10,7 @@ import {
     NavigationMenuViewport,
   } from "@/components/ui/navigation-menu"
 import Link from "next/link"
+import { cn } from "@/lib/utils"
 
 const components: { title: string; href: string; description: string }[] = [
     {
