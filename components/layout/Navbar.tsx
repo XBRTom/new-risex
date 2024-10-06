@@ -9,6 +9,7 @@ import {
     NavigationMenuTrigger,
     NavigationMenuViewport,
   } from "@/components/ui/navigation-menu"
+import { Button } from "../ui/button"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 
@@ -78,104 +79,121 @@ ListItem.displayName = "ListItem"
 
 const Navbar = () => {
     return (
-        <div className="sticky top-0 z-50 bg-white shadow-md no-scrollbar flex justify-left items-center h-10">
-            <NavigationMenu>
-                <NavigationMenuList>
-                <NavigationMenuItem>
+        <div className="sticky top-0 z-50 bg-white shadow-md no-scrollbar flex items-center h-10 px-4 sm:px-6 lg:px-16">
+            <div className="w-full flex justify-between items-center">
+                <NavigationMenu>
+                    <NavigationMenuList className="flex items-center space-x-4">
+                    {/* App Name Menu Item */}
+                    <NavigationMenuItem>
                         <NavigationMenuLink asChild>
                             <a
-                                className="flex items-center h-full px-4 text-lg font-medium text-gray-900 no-underline"
+                                className="flex items-center h-full text-lg font-medium text-gray-900 no-underline"
                                 href="/"
                             >
                                 LIQUID
                             </a>
                         </NavigationMenuLink>
                     </NavigationMenuItem>
-                <NavigationMenuItem>
-                    <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                    <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                        <li className="row-span-3">
+
+                    {/* Getting Started Menu Item */}
+                    <NavigationMenuItem>
+                        <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
+                        <NavigationMenuContent>
+                            <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                                <li className="row-span-3">
+                                    <NavigationMenuLink asChild>
+                                        <a
+                                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                                            href="/"
+                                        >
+                                            <div className="h-6 w-6" />
+                                            <div className="mb-2 mt-4 text-lg font-medium">
+                                                LIQUID
+                                            </div>
+                                            <p className="text-sm leading-tight text-muted-foreground">
+                                                Value transfer like never before. We help you understand.
+                                            </p>
+                                        </a>
+                                    </NavigationMenuLink>
+                                </li>
+                                <ListItem href="/docs" title="Introduction">
+                                    Why Liquid?
+                                </ListItem>
+                                <ListItem href="/docs/installation" title="Access">
+                                    How to install dependencies and structure your app.
+                                </ListItem>
+                                <ListItem href="/docs/primitives/typography" title="Typography">
+                                    Styles for headings, paragraphs, lists...etc
+                                </ListItem>
+                            </ul>
+                        </NavigationMenuContent>
+                    </NavigationMenuItem>
+
+                    {/* Features Menu Item */}
+                    <NavigationMenuItem>
+                        <NavigationMenuTrigger>Features</NavigationMenuTrigger>
+                        <NavigationMenuContent>
+                            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                                {components.map((component) => (
+                                    <ListItem
+                                        key={component.title}
+                                        title={component.title}
+                                        href={component.href}
+                                    >
+                                        {component.description}
+                                    </ListItem>
+                                ))}
+                            </ul>
+                        </NavigationMenuContent>
+                    </NavigationMenuItem>
+
+                    {/* Partners Menu Item */}
+                    <NavigationMenuItem>
+                        <NavigationMenuTrigger>Partners</NavigationMenuTrigger>
+                        <NavigationMenuContent>
+                            <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                                <li className="row-span-3">
+                                    <NavigationMenuLink asChild>
+                                        <a
+                                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                                            href="/"
+                                        >
+                                            <div className="h-6 w-6" />
+                                            <div className="mb-2 mt-4 text-lg font-medium">
+                                                Become a partner
+                                            </div>
+                                            <p className="text-sm leading-tight text-muted-foreground">
+                                                Join our forces to improve FinTech
+                                            </p>
+                                        </a>
+                                    </NavigationMenuLink>
+                                </li>
+                                <ListItem href="/docs" title="Quantitative">
+                                    QuantX Vancouver
+                                </ListItem>
+                            </ul>
+                        </NavigationMenuContent>
+                    </NavigationMenuItem>
+
+                    {/* API Documentation Menu Item */}
+                    <NavigationMenuItem className="hidden md:block">
                         <NavigationMenuLink asChild>
                             <a
-                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                            href="/"
+                            className="flex items-center h-full px-4 text-sm font-medium text-gray-900 no-underline"
+                            href="/docs"
                             >
-                            <div className="h-6 w-6" />
-                            <div className="mb-2 mt-4 text-lg font-medium">
-                                LIQUID
-                            </div>
-                            <p className="text-sm leading-tight text-muted-foreground">
-                                Value transfer like never before. We help you understand.
-                            </p>
+                            API documentation
                             </a>
                         </NavigationMenuLink>
-                        </li>
-                        <ListItem href="/docs" title="Introduction">
-                        Why Liquid ? 
-                        </ListItem>
-                        <ListItem href="/docs/installation" title="Access">
-                        How to install dependencies and structure your app.
-                        </ListItem>
-                        <ListItem href="/docs/primitives/typography" title="Typography">
-                        Styles for headings, paragraphs, lists...etc
-                        </ListItem>
-                    </ul>
-                    </NavigationMenuContent>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                    <NavigationMenuTrigger>Features</NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                        {components.map((component) => (
-                        <ListItem
-                            key={component.title}
-                            title={component.title}
-                            href={component.href}
-                        >
-                            {component.description}
-                        </ListItem>
-                        ))}
-                    </ul>
-                    </NavigationMenuContent>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                    <NavigationMenuTrigger>Partners</NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                    <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                        <li className="row-span-3">
-                        <NavigationMenuLink asChild>
-                            <a
-                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                            href="/"
-                            >
-                            <div className="h-6 w-6" />
-                            <div className="mb-2 mt-4 text-lg font-medium">
-                                Become a partner
-                            </div>
-                            <p className="text-sm leading-tight text-muted-foreground">
-                                Join up our forces to improve FinTech
-                            </p>
-                            </a>
-                        </NavigationMenuLink>
-                        </li>
-                        <ListItem href="/docs" title="Quantitative">
-                        QuantX Vancouver 
-                        </ListItem>
-                    </ul>
-                    </NavigationMenuContent>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                    <Link href="/docs" legacyBehavior passHref>
-                    <NavigationMenuLink>
-                        docs
-                    </NavigationMenuLink>
-                    </Link>
-                </NavigationMenuItem>
+                    </NavigationMenuItem>
                 </NavigationMenuList>
             </NavigationMenu>
-        </div>
+            <Button className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 no-underline">
+          Login
+        </Button>
+      </div>
+    </div>
     )
 }
 
-export default Navbar
+export default Navbar;
