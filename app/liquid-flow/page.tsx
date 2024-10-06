@@ -5,6 +5,7 @@ import { Check, ChevronRight, CloudUpload, LockKeyhole, Server } from "lucide-re
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 const features = [
@@ -92,8 +93,9 @@ function HeroSection() {
             Ac euismod vel sit maecenas id pellentesque eu sed consectetur. Malesuada adipiscing sagittis vel nulla.
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
+            <Input></Input>
             <Button asChild>
-              <Link href="#">Get started</Link>
+              <Link href="#">Get your FREE API token</Link>
             </Button>
             <Button variant="link" className="text-gray-900" asChild>
               <Link href="#">

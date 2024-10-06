@@ -186,6 +186,15 @@ const Navbar = () => {
                             </a>
                         </NavigationMenuLink>
                     </NavigationMenuItem>
+
+                    <NavigationMenuItem className="hidden md:block">
+                        <NavigationMenuLink asChild>
+                        <a className="flex items-center h-full px-4 text-sm font-medium text-gray-900 no-underline">
+            not logged
+            <span className="ml-2 h-2 w-2 rounded-full bg-red-600"></span> {/* Red patch */}
+        </a>
+                        </NavigationMenuLink>
+                    </NavigationMenuItem>
                 </NavigationMenuList>
             </NavigationMenu>
             <Button className="px-3 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 no-underline">
