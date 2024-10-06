@@ -1,0 +1,35 @@
+'use client';
+
+
+
+import Login from "@/components/homepage/login";
+import Sections from "@/components/homepage/sections";
+
+export const description =
+  "A login page with two vertically stacked sections. The first section has the login form with email and password. There's a Forgot your password link and a link to sign up if you do not have an account. The second section has a cover image.";
+
+const HomePage = () => {
+  return (
+    <div className="w-full min-h-screen flex flex-col lg:flex-row no-scrollbar">
+      {/* First vertical section: Login form */}
+      <div 
+        className="flex flex-col items-center justify-center py-12 w-full lg:w-2/5 h-screen overflow-y-auto no-scrollbar"
+        style={{
+          backgroundImage: "url('/astronaut-exploring-a-new-planet-2023-11-27-05-35-27-utc.jpg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <Login />
+      </div>
+      
+      <div className="bg-slate-900 text-white w-full lg:w-3/5 h-screen overflow-y-auto no-scrollbar scroll-snap-mandatory scroll-snap-y">
+        <div className="space-y-16 p-8">
+          <Sections />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default HomePage;
