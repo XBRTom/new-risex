@@ -1,12 +1,35 @@
 import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Check, ChevronRight, CloudUpload, LockKeyhole, Server } from "lucide-react"
+import { Check, ChevronRight, CloudUpload, LockKeyhole, Server, Minus } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
+
+interface Tier {
+    name: string;
+    id: string;
+    href: string;
+    priceMonthly: string;
+    mostPopular: boolean;
+  }
+  
+  interface FeatureTier {
+    [key: string]: boolean | string;
+  }
+  
+  interface Feature {
+    name: string;
+    tiers: FeatureTier;
+  }
+  
+  interface Section {
+    name: string;
+    features: Feature[];
+  }
 
 const features = [
   {
@@ -27,40 +50,30 @@ const features = [
   },
 ]
 
-const tiers = [
-  {
-    name: 'Personal',
-    id: 'tier-personal',
-    href: '#',
-    priceMonthly: '$29',
-    description: "The perfect plan if you're just getting started with our product.",
-    features: [
-      '25 products',
-      'Up to 10,000 subscribers',
-      'Audience segmentation',
-      'Advanced analytics',
-      'Email support',
-      'Marketing automations',
-    ],
-    featured: true,
-  },
-  {
-    name: 'Team',
-    id: 'tier-team',
-    href: '#',
-    priceMonthly: '$99',
-    description: 'A plan that scales with your rapidly growing business.',
-    features: ['Priority support', 'Single sign-on', 'Enterprise integrations', 'Custom reporting tools'],
-    featured: false,
-  },
+const tiers: Tier[] = [
+    { name: 'Starter', id: 'tier-starter', href: '#', priceMonthly: 'Free', mostPopular: false },
+    { name: 'Growth', id: 'tier-growth', href: '#', priceMonthly: '$49', mostPopular: true },
+    { name: 'Scale', id: 'tier-scale', href: '#', priceMonthly: '$99', mostPopular: false },
 ]
+
+const sections: Section[] = [
+    {
+      name: 'Features',
+      features: [
+        { name: 'Historical Data', tiers: { Starter: true, Growth: true, Scale: true } },
+        { name: 'Real-time', tiers: { Starter: false, Growth: '10,000 request / month', Scale: '30,000 request / month' } },
+        { name: 'Advanced Analytics', tiers: { Starter: false, Growth: true, Scale: true } },
+        { name: 'Support', tiers: { Starter: 'email', Growth: 'email', Scale: 'email' } },
+      ],
+    },
+  ]
 
 export default function LandingPage() {
   return (
     <div className="bg-black text-white">
       <HeroSection />
       <FeaturesSection />
-      <PricingSection />
+      <DetailedPricingSection />
       <CtaSection />
     </div>
   )
@@ -158,76 +171,178 @@ function FeaturesSection() {
   )
 }
 
-function PricingSection() {
-  return (
-    <div className="relative isolate bg-background px-6 py-24 sm:py-32 lg:px-8">
-      <div
-        aria-hidden="true"
-        className="absolute inset-x-0 -top-3 -z-10 transform-gpu overflow-hidden px-36 blur-3xl"
-      >
-        <div
-          className="mx-auto aspect-[1155/678] w-[72.1875rem] bg-gradient-to-tr from-primary to-primary-foreground opacity-30"
-          style={{
-            clipPath:
-              'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-          }}
-        />
-      </div>
-      <div className="mx-auto max-w-2xl text-center lg:max-w-4xl">
-        <h2 className="text-base font-semibold leading-7 text-primary">Pricing</h2>
-        <p className="mt-2 text-4xl font-bold tracking-tight text-primary sm:text-5xl">
-          The right price for you, whoever you are
-        </p>
-      </div>
-      <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-muted-foreground">
-        Qui iusto aut est earum eos quae. Eligendi est at nam aliquid ad quo reprehenderit in aliquid fugiat dolorum
-        voluptatibus.
-      </p>
-      <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 items-center gap-y-6 sm:mt-20 sm:gap-y-0 lg:max-w-4xl lg:grid-cols-2">
-        {tiers.map((tier, tierIdx) => (
-          <Card
-            key={tier.id}
-            className={cn(
-              tier.featured ? 'relative shadow-2xl' : 'bg-background/60 sm:mx-8 lg:mx-0',
-              tier.featured
-                ? ''
-                : tierIdx === 0
-                ? 'rounded-t-3xl sm:rounded-b-none lg:rounded-bl-3xl lg:rounded-tr-none'
-                : 'sm:rounded-t-none lg:rounded-bl-none lg:rounded-tr-3xl',
-              'rounded-3xl ring-1 ring-muted'
-            )}
-          >
-            <CardHeader>
-              <CardTitle className="text-base font-semibold leading-7 text-primary">{tier.name}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="mt-4 flex items-baseline gap-x-2">
-                <span className="text-5xl font-bold tracking-tight text-primary">{tier.priceMonthly}</span>
-                <span className="text-base text-muted-foreground">/month</span>
-              </p>
-              <p className="mt-6 text-base leading-7 text-muted-foreground">{tier.description}</p>
-              <ul role="list" className="mt-8 space-y-3 text-sm leading-6 text-muted-foreground sm:mt-10">
-                {tier.features.map((feature) => (
-                  <li key={feature} className="flex gap-x-3">
-                    <Check className="h-6 w-5 flex-none text-primary" aria-hidden="true" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <Button
-                variant={tier.featured ? "default" : "outline"}
-                className="mt-8 w-full sm:mt-10"
-                asChild
-              >
-                <Link href={tier.href}>Get started today</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
-  )
+function DetailedPricingSection() {
+    return (
+        <div className="bg-black py-16 sm:py-16"> {/* Changed to bg-black */}
+            <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                <div className="mx-auto max-w-4xl text-center">
+                    <h2 className="text-base font-semibold leading-7 text-white">Pricing</h2> {/* Changed to white */}
+                    <p className="mt-2 text-4xl font-bold tracking-tight text-white sm:text-5xl">
+                        Pricing Plans 
+                    </p>
+                </div>
+                <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-400"> {/* Adjusted text color */}
+                    
+                </p>
+
+                {/* xs to lg */}
+                <div className="mx-auto mt-12 max-w-md space-y-8 sm:mt-16 lg:hidden">
+                    {tiers.map((tier) => (
+                        <Card
+                            key={tier.id}
+                            className={cn(
+                                tier.mostPopular ? 'ring-2 ring-primary' : 'ring-1 ring-gray-600', // Updated muted color
+                                'rounded-3xl p-8 bg-gray-800' // Set card background to a darker shade
+                            )}
+                        >
+                            <CardHeader>
+                                <CardTitle className="text-sm font-semibold leading-6 text-white">{tier.name}</CardTitle> {/* Changed to white */}
+                            </CardHeader>
+                            <CardContent>
+                                <p className="mt-4 flex items-baseline gap-x-2">
+                                    <span className="text-4xl font-bold tracking-tight text-white">{tier.priceMonthly}</span> {/* Changed to white */}
+                                    <span className="text-sm font-semibold text-gray-400">/month</span> {/* Adjusted text color */}
+                                </p>
+                                <Button
+                                    variant={tier.mostPopular ? "default" : "outline"}
+                                    className={cn("mt-6 w-full", tier.mostPopular && "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90")}
+                                    asChild
+                                >
+                                    <Link href={tier.href}>Buy plan</Link>
+                                </Button>
+                                <ul role="list" className="mt-10 space-y-4 text-sm leading-6 text-gray-400"> {/* Adjusted text color */}
+                                    {sections.map((section) => (
+                                        <li key={section.name}>
+                                            <ul role="list" className="space-y-4">
+                                                {section.features.map((feature) =>
+                                                    feature.tiers[tier.name] ? (
+                                                        <li key={feature.name} className="flex gap-x-3">
+                                                            <Check className="h-6 w-5 flex-none text-primary" aria-hidden="true" />
+                                                            <span>
+                                                                {feature.name}{' '}
+                                                                {typeof feature.tiers[tier.name] === 'string' ? (
+                                                                    <span className="text-sm leading-6 text-gray-500">({feature.tiers[tier.name]})</span>
+                                                                ) : null}
+                                                            </span>
+                                                        </li>
+                                                    ) : null
+                                                )}
+                                            </ul>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+
+                {/* lg+ */}
+                <div className="isolate mt-20 hidden lg:block">
+                    <div className="relative -mx-8">
+                        {tiers.some((tier) => tier.mostPopular) ? (
+                            <div className="absolute inset-x-4 inset-y-0 -z-10 flex">
+                                <div
+                                    className="flex w-1/4 px-4"
+                                    style={{ marginLeft: `${(tiers.findIndex((tier) => tier.mostPopular) + 1) * 25}%` }}
+                                    aria-hidden="true"
+                                >
+                                    <div className="w-full rounded-t-xl border-x border-t border-gray-900/10 bg-gray-400/5" />
+                                </div>
+                            </div>
+                        ) : null}
+                        <table className="w-full table-fixed border-separate border-spacing-x-8 text-left">
+                            <caption className="sr-only">Pricing plan comparison</caption>
+                            <colgroup>
+                                <col className="w-1/4" />
+                                <col className="w-1/4" />
+                                <col className="w-1/4" />
+                                <col className="w-1/4" />
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <td />
+                                    {tiers.map((tier) => (
+                                        <th key={tier.id} scope="col" className="px-6 pt-6 xl:px-8 xl:pt-8">
+                                            <div className="text-sm font-semibold leading-7 text-white">{tier.name}</div> {/* Changed to white */}
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">
+                                        <span className="sr-only">Price</span>
+                                    </th>
+                                    {tiers.map((tier) => (
+                                        <td key={tier.id} className="px-6 pt-2 xl:px-8">
+                                            <div className="flex items-baseline gap-x-1 text-gray-400"> {/* Adjusted text color */}
+                                                <span className="text-4xl font-bold text-white">{tier.priceMonthly}</span> {/* Changed to white */}
+                                                <span className="text-sm font-semibold leading-6">/month</span>
+                                            </div>
+                                            <Button
+                                                variant={tier.mostPopular ? "default" : "outline"}
+                                                className={cn("mt-8 w-full", tier.mostPopular && "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90")}
+                                                asChild
+                                            >
+                                                <Link href={tier.href}>Buy plan</Link>
+                                            </Button>
+                                        </td>
+                                    ))}
+                                </tr>
+                                {sections.map((section, sectionIdx) => (
+                                    <React.Fragment key={section.name}>
+                                        <tr>
+                                            <th
+                                                scope="colgroup"
+                                                colSpan={4}
+                                                className={cn(
+                                                    sectionIdx === 0 ? 'pt-8' : 'pt-16',
+                                                    'pb-4 text-sm font-semibold leading-6 text-white' // Changed to white
+                                                )}
+                                            >
+                                                {section.name}
+                                                <div className="absolute inset-x-8 mt-4 h-px bg-gray-900/10" />
+                                            </th>
+                                        </tr>
+                                        {section.features.map((feature) => (
+                                            <tr key={feature.name}>
+                                                <th scope="row" className="py-4 text-sm font-normal leading-6 text-white"> {/* Changed to white */}
+                                                    {feature.name}
+                                                    <div className="absolute inset-x-8 mt-4 h-px bg-gray-900/5" />
+                                                </th>
+                                                {tiers.map((tier) => (
+                                                    <td key={tier.id} className="px-6 py-4 xl:px-8">
+                                                        {typeof feature.tiers[tier.name] === 'string' ? (
+                                                            <div className="text-center text-sm leading-6 text-gray-400">
+                                                                {feature.tiers[tier.name] as string}
+                                                            </div>
+                                                        ) : (
+                                                            <>
+                                                                {feature.tiers[tier.name] === true ? (
+                                                                    <Check className="mx-auto h-5 w-5 text-primary" aria-hidden="true" />
+                                                                ) : (
+                                                                    <Minus className="mx-auto h-5 w-5 text-gray-400" aria-hidden="true" />
+                                                                )}
+                                                                <span className="sr-only">
+                                                                    {feature.tiers[tier.name] === true ? 'Included' : 'Not included'} in {tier.name}
+                                                                </span>
+                                                            </>
+                                                        )}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                        ))}
+                                    </React.Fragment>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
 }
+
 
 function CtaSection() {
   return (
