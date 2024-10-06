@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils"
 const components: { title: string; href: string; description: string }[] = [
     {
         title: "Liquid-Flow",
-        href: "/docs/primitives/alert-dialog",
+        href: "/liquid-flow",
         description:
         "Receive real-time, historical and added value data to navigate Blockchain liquidity. Our data services for your need.",
     },
@@ -180,7 +180,7 @@ const Navbar = () => {
                         <NavigationMenuLink asChild>
                             <a
                             className="flex items-center h-full px-4 text-sm font-medium text-gray-900 no-underline"
-                            href="/docs"
+                            href="https://protocol.tailwindui.com/"
                             >
                             API documentation
                             </a>
@@ -188,8 +188,8 @@ const Navbar = () => {
                     </NavigationMenuItem>
                 </NavigationMenuList>
             </NavigationMenu>
-            <Button className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 no-underline">
-          Login
+            <Button className="px-3 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 no-underline">
+          Dashboard
         </Button>
       </div>
     </div>
