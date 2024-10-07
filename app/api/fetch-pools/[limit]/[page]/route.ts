@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/libs/prisma';
+import { getPoolsMax } from '@prisma/client/sql'
 
 type Params = {
     page: string;
@@ -10,40 +11,11 @@ export async function GET(req: NextRequest, context: {params:Params}) {
   try {
     const page = parseInt(context.params.page || '1', 10);
     const limit = parseInt(context.params.limit || '10', 10);
-
     // Calculate the number of items to skip
     const skip = (page - 1) * limit;
 
-    const pools = await prisma.pool.findMany({
-      skip,
-      take: limit,
-      select: {
-        id: true,
-        account: true,
-        asset_currency: true,
-        asset2_currency: true,
-        balance: true,
-        tradingFee: true,
-        metrics: {
-          orderBy: {
-            date: 'desc', // Order metrics by date to get the latest
-          },
-          take: 1, // Take only the latest metric
-          select: {
-            totalPoolVolume: true,
-            feesGenerated: true,
-            relativeAPR: true,
-            grossAPR: true,
-            totalValueLocked: true,
-            poolYield: true,
-            date: true, // Include the date to know when it was recorded
-          },
-        },
-        // Only select necessary fields to minimize response size
-      },
-    });
-
     const totalPools = await prisma.pool.count(); // To calculate total pages
+    const pools = await prisma.$queryRawTyped(getPoolsMax(limit, skip));
 
     return NextResponse.json({ pools, totalPools });
   } catch (error) {
