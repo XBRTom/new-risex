@@ -197,9 +197,13 @@ const Navbar = () => {
                     </NavigationMenuItem>
                 </NavigationMenuList>
             </NavigationMenu>
-            <Button className="px-3 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 no-underline">
+                           <a className="flex items-center h-full px-4 text-sm font-medium text-gray-900 no-underline">
+                           DASHBOARD
+                           <span className="ml-2 h-2 w-2 rounded-full bg-blue-600"></span> {/* Red patch */}
+                       </a>
+            {/* <Button className="px-3 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 no-underline">
           Dashboard
-        </Button>
+        </Button> */}
       </div>
     </div>
     )

@@ -1,4 +1,4 @@
-import Pools from '@/components/Pools';
+import Pools from '@/components/dashboard/liquidity/Pools';
 
 const Liquidity = () => {
   return (

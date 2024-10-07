@@ -5,6 +5,22 @@ import PoolsTable from '@/components/PoolsTable';
 import Pagination from '@/components/Pagination';
 import SearchBar from '@/components/SearchBar';
 import apiClient from '@/libs/api';
+import { Progress } from "@/components/ui/progress";
+
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
 
 interface Pool {
   id: number;
@@ -110,7 +126,11 @@ const Pools: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
         <div className="text-center">
           <h1 className="text-4xl font-bold">Loading...</h1>
-          <p className="mt-2 text-lg">Please wait while we fetch the data.</p>
+
+          <br/>
+          <Progress value={50} />
+
+          {/* <p className="mt-2 text-lg">Please wait while we fetch the data.</p> */}
         </div>
       </div>
     );
@@ -121,9 +141,20 @@ const Pools: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto mt-16 p-4">
+    <div className="mx-auto p-4 bg-black text-white min-h-screen">
       <div className="flex justify-between items-center mb-2">
-        <h3 className="text-lg font-light text-left text-white">Liquidity Pools</h3>
+      <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="">Dashboard</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/liquidity">Liquidity Pools</BreadcrumbLink>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        {/* <h3 className="text-lg font-light text-left text-white">Liquidity Pools</h3> */}
         <SearchBar handleSearch={handleSearch} />
       </div>
       <PoolsTable 
