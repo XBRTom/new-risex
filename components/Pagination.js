@@ -10,20 +10,20 @@ const Pagination = ({ itemsPerPage, totalItems, paginate, currentPage }) => {
           <li>
             <button
               onClick={() => paginate(currentPage - 1)}
-              className="text-xs text-white"
+              className="text-xs text-black"
             >
               &lt; Previous
             </button>
           </li>
         )}
-        <li className="text-xs text-white">
+        <li className="text-xs text-black">
           Page {currentPage} of {totalPages}
         </li>
         {currentPage < totalPages && (
           <li>
             <button
               onClick={() => paginate(currentPage + 1)}
-              className="text-xs text-white"
+              className="text-xs text-black"
             >
               Next &gt;
             </button>

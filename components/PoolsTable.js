@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import AddLiquidityModal from '@/components/AddLiquidityModal';
 import WithdrawLiquidityModal from '@/components/WithdrawLiquidityModal';
-import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
+
+import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const PoolsTable = ({ pools = [] }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
@@ -60,9 +62,9 @@ const PoolsTable = ({ pools = [] }) => {
 
   const getSortIcon = (key) => {
     if (sortConfig.key === key) {
-      return sortConfig.direction === 'asc' ? <FaSortUp /> : <FaSortDown />;
+      return sortConfig.direction === 'asc' ? <ChevronUp /> : <ChevronDown />;
     }
-    return <FaSort />;
+    return <ChevronsUpDown />;
   };
 
   const openAddLiquidityModal = (pool) => {
@@ -86,58 +88,57 @@ const PoolsTable = ({ pools = [] }) => {
   };
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full bg-transparent">
-        <thead className="bg-transparent">
-          <tr>
+    <div className="">
+      <Table className="">
+        <TableHeader>
+          <TableRow>
             {headers.map((header, index) => (
-              <th
+              <TableHead
                 key={index}
-                className="py-1 px-3 text-left text-xs font-light cursor-pointer"
+                className="cursor-pointer"
                 onClick={() => header.sortable && requestSort(header.key)}
               >
-                {header.label} {header.sortable && getSortIcon(header.key)}
-              </th>
+                <div className="w-full flex justify-between">
+                  {header.label} {header.sortable && getSortIcon(header.key)}
+                </div>
+              </TableHead>
             ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-white">
+          </TableRow>
+        </TableHeader>
+        <TableBody className="divide-y divide-white">
           {sortedPools.map((pool, index) => {
-    // console.log('Pool account:', pool); // Log the account value here
-    return (
-      <tr
-        key={index}
-        className="bg-transparent hover:bg-gray-700 hover:bg-opacity-25 cursor-pointer"
-        onClick={() => window.location.href = `/pool/${pool.account}`}
-      >
-        <td className="py-1 px-3 text-xs">{pool.asset_currency} / {pool.asset2_currency}</td>
-        <td className="py-1 px-3 text-xs">{(pool.tradingFee / 1000).toFixed(2)}%</td>
-        <td className="py-1 px-3 text-xs">{parseFloat(pool.totalValueLocked || 0).toFixed(2)} XRP</td>
-        <td className="py-1 px-3 text-xs">{parseFloat(pool.totalPoolVolume || 0).toFixed(2)} XRP</td>
-        {/* <td className="py-1 px-3 text-xs">{(pool.balance / exchangeRates[pool.asset_currency] || 1).toFixed(2)} USD</td> */}
-        <td className="py-1 px-3 text-xs">{(pool.baseVolume ?? 0).toFixed(2)} {pool.asset_currency}</td>
-        {/* <td className="py-1 px-3 text-xs">{(pool.counterVolume).toFixed(2)} {pool.asset2_currency}</td> */}
-        <td className="py-1 px-3 text-xs">{(pool.counterVolume ?? 0).toFixed(2)}</td>
-        <td className="py-1 px-3 text-xs">{parseFloat(pool.relativeAPR || 0).toFixed(4)}%</td> 
-        <td className="py-1 px-3 text-xs">
-          <span
-            className="text-green-500 cursor-pointer mr-2"
-            onClick={(e) => { e.stopPropagation(); openAddLiquidityModal(pool); }}
-          >
-            Add Liquidity
-          </span>
-          <span
-            className="text-red-500 cursor-pointer"
-            onClick={(e) => { e.stopPropagation(); openWithdrawLiquidityModal(pool); }}
-          >
-            Withdraw
-          </span>
-        </td>
-      </tr>
-    );
-  })}
-</tbody>
-      </table>
+            return (
+              <TableRow
+                key={index}
+                className="cursor-pointer"
+                onClick={() => window.location.href = `/pool/${pool.account}`}
+              >
+                <TableCell className="">{pool.asset_currency} / {pool.asset2_currency}</TableCell>
+                <TableCell className="">{(pool.tradingFee / 1000).toFixed(2)}%</TableCell>
+                <TableCell className="">{parseFloat(pool.totalValueLocked || 0).toFixed(2)} XRP</TableCell>
+                <TableCell className="">{parseFloat(pool.totalPoolVolume || 0).toFixed(2)} XRP</TableCell>
+                <TableCell className="">{(pool.baseVolume ?? 0).toFixed(2)} {pool.asset_currency}</TableCell>
+                <TableCell className="">{(pool.counterVolume ?? 0).toFixed(2)}</TableCell>
+                <TableCell className="">{parseFloat(pool.relativeAPR || 0).toFixed(4)}%</TableCell> 
+                <TableCell className="">
+                  <span
+                    className="text-green-500 cursor-pointer mr-2"
+                    onClick={(e) => { e.stopPropagation(); openAddLiquidityModal(pool); }}
+                  >
+                    Add Liquidity
+                  </span>
+                  <span
+                    className="text-red-500 cursor-pointer"
+                    onClick={(e) => { e.stopPropagation(); openWithdrawLiquidityModal(pool); }}
+                  >
+                    Withdraw
+                  </span>
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
       {isAddLiquidityModalOpen && (
         <AddLiquidityModal
           pool={selectedPool}
