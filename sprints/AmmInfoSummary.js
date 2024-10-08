@@ -2,17 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { useWallet } from '@/providers/Wallet';
-import AmmActions from '@/components/AmmActions';
-import VoteSlotsGauge from '@/components/VoteSlotsGauge';
-import CurrencyAmounts from '@/components/AmmInfoCurrencyAmounts';
-import AmmInfoTable from '@/components/AmmInfoTable';
+import AmmActions from '@/sprints/AmmActions';
+import VoteSlotsGauge from '@/sprints/VoteSlotsGauge';
+import CurrencyAmounts from '@/sprints/AmmInfoCurrencyAmounts';
+import AmmInfoTable from '@/sprints/AmmInfoTable';
 // import Card from './Card';
-import WalletPoolHoldingTable from '@/components/WalletPoolHoldingTable';
+import WalletPoolHoldingTable from '@/sprints/WalletPoolHoldingTable';
 // import FeesEarnedChart from './FeesEarnedChart';
 // import EarningsChart from './EarningsChart';
 // import LPTokensChart from './LPTokensChart';
 // import { aggregateHistoricalData } from '../libs/dataAggregation';
-import TransactionTable from '@/components/TransactionTable';
+import TransactionTable from '@/sprints/TransactionTable';
 import apiClient from '@/libs/api';
 
 const Summary = ({

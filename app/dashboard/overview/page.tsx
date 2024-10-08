@@ -1,7 +1,7 @@
 import Overview from '@/components/dashboard/Overview';
-import Navigation from '@/components/dashboard/layout/Navigation';
 
-const Liquidity = () => {
+
+const UserPanel = () => {
   return (
     <div>
       {/* <Navigation/> */}
@@ -10,4 +10,4 @@ const Liquidity = () => {
   );
 };
 
-export default Liquidity;
+export default UserPanel;

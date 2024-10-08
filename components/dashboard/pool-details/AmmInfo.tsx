@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Header from '@/components/AmmInfoHeader';
-import Summary from '@/components/AmmInfoSummary';
-import GlobalPoolMetricsTable from '@/components/GlobalPoolMetricsTable';
-import GlobalPoolMetricsChart from '@/components/GlobalPoolMetricsChart';
+import Header from '@/sprints/AmmInfoHeader';
+import Summary from '@/sprints/AmmInfoSummary';
+import GlobalPoolMetricsTable from '@/sprints/GlobalPoolMetricsTable';
+import GlobalPoolMetricsChart from '@/sprints/GlobalPoolMetricsChart';
 import apiClient from '@/libs/api';
 
 const timeRanges = [

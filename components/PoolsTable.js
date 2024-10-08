@@ -111,7 +111,7 @@ const PoolsTable = ({ pools = [] }) => {
               <TableRow
                 key={index}
                 className="cursor-pointer"
-                onClick={() => window.location.href = `/pool/${pool.account}`}
+                onClick={() => window.location.href = `/dashboard/pool/${pool.account}`}
               >
                 <TableCell className="">{pool.asset_currency} / {pool.asset2_currency}</TableCell>
                 <TableCell className="">{(pool.tradingFee / 1000).toFixed(2)}%</TableCell>

@@ -1,4 +1,4 @@
-//import AmmInfo from '@/components/AmmInfo';
+import AmmInfo from '@/components/dashboard/pool-details/AmmInfo';
 import { fetchAmmInfo } from '@/libs/db';
 
 const PoolDetailPage = async ({ params }: any) => {
@@ -6,7 +6,7 @@ const PoolDetailPage = async ({ params }: any) => {
     const ammInfo = await fetchAmmInfo(account);
   return (
     <div>
-      {/*<AmmInfo account={account} ammInfo={ammInfo}/>*/}
+      <AmmInfo account={account} ammInfo={ammInfo}/>
     </div>
   );
 };
