@@ -6,21 +6,20 @@ import Pagination from '@/components/Pagination';
 import SearchBar from '@/components/SearchBar';
 import apiClient from '@/libs/api';
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+// import { Bar, BarChart } from "recharts";
+// import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
+import { Package2, LayoutDashboard, Wallet, History, LogOut, Settings, File, Database, User } from "lucide-react";
 
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
 
 interface Pool {
   id: number;
@@ -44,7 +43,7 @@ interface Pool {
   date: string;
 }
 
-const Pools: React.FC = () => {
+const Dashboard: React.FC = () => {
   const [pools, setPools] = useState<Pool[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -126,11 +125,8 @@ const Pools: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
         <div className="text-center">
           <h1 className="text-4xl font-bold">Loading...</h1>
-
           <br/>
           <Progress value={50} />
-
-          {/* <p className="mt-2 text-lg">Please wait while we fetch the data.</p> */}
         </div>
       </div>
     );
@@ -141,33 +137,93 @@ const Pools: React.FC = () => {
   }
 
   return (
-    <div className="mx-auto p-4 bg-black text-white min-h-screen">
-      <div className="flex justify-between items-center mb-2">
-      <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="">Dashboard</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/liquidity">Liquidity Pools</BreadcrumbLink>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-        {/* <h3 className="text-lg font-light text-left text-white">Liquidity Pools</h3> */}
-        <SearchBar handleSearch={handleSearch} />
+    <div className="flex h-screen bg-black text-white">
+      {/* Sidebar */}
+      <div className="w-16 md:w-64 bg-gray-900 border-r border-gray-800 flex flex-col py-4 pb-12">
+        <div className="flex-grow space-y-2 px-2 md:px-4">
+          <div className="hidden md:block mb-4">
+            <SearchBar handleSearch={handleSearch} />
+          </div>
+          <Button variant="ghost" className="w-full justify-start p-2 md:p-3">
+            <LayoutDashboard className="h-5 w-5 md:mr-2" />
+            <span className="hidden md:inline">Overview</span>
+          </Button>
+          <Button variant="ghost" className="w-full justify-start p-2 md:p-3">
+            <Package2 className="h-5 w-5 md:mr-2" />
+            <span className="hidden md:inline">Pools</span>
+          </Button>
+          <Button variant="ghost" className="w-full justify-start p-2 md:p-3">
+            <Wallet className="h-5 w-5 md:mr-2" />
+            <span className="hidden md:inline">Holdings</span>
+          </Button>
+          <Button variant="ghost" className="w-full justify-start p-2 md:p-3">
+            <History className="h-5 w-5 md:mr-2" />
+            <span className="hidden md:inline">Transactions</span>
+          </Button>
+          <Button variant="ghost" className="w-full justify-start p-2 md:p-3">
+            <Database className="h-5 w-5 md:mr-2" />
+            <span className="hidden md:inline">Stacking</span>
+          </Button>
+          <Button variant="ghost" className="w-full justify-start p-2 md:p-3">
+            <Settings className="h-5 w-5 md:mr-2" />
+            <span className="hidden md:inline">APIs</span>
+          </Button>
+          <Button variant="ghost" className="w-full justify-start p-2 md:p-3">
+            <File className="h-5 w-5 md:mr-2" />
+            <span className="hidden md:inline">Documentation</span>
+          </Button>
+          <Button variant="ghost" className="w-full justify-start p-2 md:p-3">
+            <User className="h-5 w-5 md:mr-2" />
+            <span className="hidden md:inline">Account</span>
+          </Button>
+        </div>
+        <div className="mt-auto px-2 md:px-4">
+          <Separator className="my-2" />
+          <Button variant="ghost" className="w-full justify-start p-2 md:p-3">
+            <LogOut className="h-5 w-5 md:mr-2" />
+            <span className="hidden md:inline">Logout</span>
+          </Button>
+        </div>
       </div>
-      <PoolsTable 
-        pools={filteredPools.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)}
-      />
-      <Pagination
-        currentPage={currentPage}
-        itemsPerPage={itemsPerPage}
-        totalItems={totalItems}
-        paginate={paginate}
-      />
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <header className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4 border-b border-gray-800">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="">Dashboard</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/liquidity">Liquidity Pools</BreadcrumbLink>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          <div className="md:hidden">
+            <SearchBar handleSearch={handleSearch} />
+          </div>
+        </header>
+        <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
+          {/* <ChartContainer>
+            <BarChart data={data}>
+              <Bar dataKey="value" />
+              <ChartTooltip content={<ChartTooltipContent />} />
+            </BarChart>
+          </ChartContainer> */}
+          <PoolsTable 
+            pools={filteredPools.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)}
+          />
+          <Pagination
+            currentPage={currentPage}
+            itemsPerPage={itemsPerPage}
+            totalItems={totalItems}
+            paginate={paginate}
+          />
+        </main>
+      </div>
     </div>
   );
 };
 
-export default Pools;
+export default Dashboard;
