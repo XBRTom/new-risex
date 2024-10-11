@@ -12,6 +12,20 @@ import {
 import { Button } from "../ui/button"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuPortal,
+    DropdownMenuSeparator,
+    DropdownMenuShortcut,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+  } from "@/components/ui/dropdown-menu"
 
 const components: { title: string; href: string; description: string }[] = [
     {
@@ -198,7 +212,56 @@ const Navbar = () => {
                 </NavigationMenuList>
             </NavigationMenu>
                            <a className="flex items-center h-full px-4 text-sm font-medium text-gray-900 no-underline">
-                           DASHBOARD
+                           <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline">Account</Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-56">
+                                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuGroup>
+                                    <DropdownMenuItem>
+                                    <a href="/dashboard/overview">
+                                        Dashboard</a>
+                                        <DropdownMenuShortcut></DropdownMenuShortcut>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                        Billing
+                                        <DropdownMenuShortcut></DropdownMenuShortcut>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                        Settings
+                                        <DropdownMenuShortcut></DropdownMenuShortcut>
+                                    </DropdownMenuItem>
+                                    </DropdownMenuGroup>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuGroup>
+                                    <DropdownMenuItem disabled>Reward
+                                    <DropdownMenuShortcut>coming soon</DropdownMenuShortcut>
+                                    </DropdownMenuItem>
+                                    
+                                    <DropdownMenuSub>
+                                        <DropdownMenuSubTrigger>Invite users</DropdownMenuSubTrigger>
+                                        <DropdownMenuPortal>
+                                        <DropdownMenuSubContent>
+                                            <DropdownMenuItem>Email</DropdownMenuItem>
+                                            <DropdownMenuItem>Message</DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem>More...</DropdownMenuItem>
+                                        </DropdownMenuSubContent>
+                                        </DropdownMenuPortal>
+                                    </DropdownMenuSub>
+                                    </DropdownMenuGroup>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem>Support</DropdownMenuItem>
+                                    <DropdownMenuItem disabled>API</DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem>
+                                    Log out
+                                    <DropdownMenuShortcut></DropdownMenuShortcut>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                            <span className="ml-2 h-2 w-2 rounded-full bg-blue-600"></span> {/* Red patch */}
                        </a>
             {/* <Button className="px-3 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 no-underline">

@@ -1,4 +1,5 @@
-import AmmInfo from '@/components/dashboard/pool-details/AmmInfo';
+import AmmDashboard from '@/components/dashboard/AmmDashboard';
+import AmmInfo from '@/components/dashboard/AmmInfo';
 import { fetchAmmInfo } from '@/libs/db';
 
 const PoolDetailPage = async ({ params }: any) => {
