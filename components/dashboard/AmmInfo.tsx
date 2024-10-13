@@ -1,12 +1,11 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import PoolInfoCard from './AmmInfo/PoolInfoCard'
 import GlobalPoolMetricsTable from './pool-details/GlobalPoolMetricsTable'
 import GlobalPoolMetricsChart from './pool-details/GlobalPoolMetricsChart'
 import apiClient from '@/libs/api'
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { Package2, LayoutDashboard, Wallet, History, LogOut, Settings, File, Database, User } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useWallet } from '@/providers/Wallet'
 import { Input } from "@/components/ui/input"
@@ -391,47 +390,15 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
           <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
             <div className="max-w-full mx-auto px-4 md:px-6 lg:px-8">
               <div className="flex flex-wrap gap-4 mb-6">
-              <Card className="bg-black mb-6 w-full md:w-1/3">
-                <CardHeader>
-                  <CardTitle className='text-white'>{amountCurrency}/{amount2Currency}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-white">Pool Address</p>
-                      <p className="font-medium text-white break-words">{ammInfo.account}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-white">Total Value Locked</p>
-                      <p className="font-medium text-white">${latestMetrics?.totalValueLocked.toFixed(2) || '0.00'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-white">Trading fees</p>
-                      <p className="font-medium text-white">{(ammInfo.trading_fee / 1000).toFixed(2)}%</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-white">24h Trading Volume</p>
-                      <p className="font-medium text-white"> {latestMetrics?.totalPoolVolume.toFixed(2) || '0.00'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-white">APR</p>
-                      <p className="font-medium text-white">{latestMetrics?.relativeAPR.toFixed(2) || '0.00'}%</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-white">Pool Balance ({amountCurrency})</p>
-                      <p className="font-medium text-white">{poolBalance1.toFixed(6)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-white">Pool Balance ({amount2Currency})</p>
-                      <p className="font-medium text-white">{poolBalance2.toFixed(6)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-400">Your LP Tokens</p>
-                      <p className="font-medium">{currentTokenAmount}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <PoolInfoCard
+                  amountCurrency={amountCurrency}
+                  amount2Currency={amount2Currency}
+                  ammInfo={ammInfo}
+                  latestMetrics={latestMetrics}
+                  poolBalance1={poolBalance1}
+                  poolBalance2={poolBalance2}
+                  currentTokenAmount={currentTokenAmount}
+                />
               <Card className="bg-black mb-6 w-full md:w-1/3">
                   <CardHeader>
                     <CardTitle>AMM Actions</CardTitle>
