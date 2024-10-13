@@ -1,0 +1,38 @@
+/* components/dashboard/Sidebar.module.css */
+.sidebar {
+    width: 250px; /* Default width */
+    background-color: #333;
+    color: #fff;
+    height: 100vh; /* Full height */
+    padding: 0px;
+    display: flex;
+    flex-direction: column;
+    transition: width 0.3s ease-in-out; /* Smooth collapse transition */
+}
+
+.sidebar.collapsed {
+    width: 80px; /* Collapsed width */
+}
+
+.sidebarFooter {
+    margin-top: auto;
+    padding: 0 8px 16px;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    margin: 20px 0;
+}
+
+.sidebar ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.sidebar ul li a:hover {
+    text-decoration: underline;
+}

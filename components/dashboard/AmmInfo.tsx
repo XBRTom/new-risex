@@ -15,6 +15,7 @@ import VoteSlotsGauge from './pool-details/VoteSlotsGauge'
 import AmmInfoTable from './pool-details/AmmInfoTable'
 import WalletPoolHoldingTable from './pool-details/WalletPoolHoldingTable'
 import TransactionTable from './pool-details/TransactionTable'
+import DashboardLayout from './Layout/DashboardLayout'
 
 import {
   Breadcrumb,
@@ -369,267 +370,225 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
   ]
 
   return (
-    <div className="flex h-screen bg-black text-white">
-      {/* Sidebar */}
-      <div className="w-16 md:w-64 bg-gray-900 border-r border-gray-800 flex flex-col py-4 pb-12">
-        <div className="flex-grow space-y-2 px-2 md:px-4">
-          <Button variant="ghost" className="w-full justify-start p-2 md:p-3">
-            <LayoutDashboard className="h-5 w-5 md:mr-2" />
-            <span className="hidden md:inline">Overview</span>
-          </Button>
-          <Button variant="ghost" className="w-full justify-start p-2 md:p-3">
-            <Package2 className="h-5 w-5 md:mr-2" />
-            <span className="hidden md:inline">Pools</span>
-          </Button>
-          <Button variant="ghost" className="w-full justify-start p-2 md:p-3">
-            <Wallet className="h-5 w-5 md:mr-2" />
-            <span className="hidden md:inline">Holdings</span>
-          </Button>
-          <Button variant="ghost" className="w-full justify-start p-2 md:p-3">
-            <History className="h-5 w-5 md:mr-2" />
-            <span className="hidden md:inline">Transactions</span>
-          </Button>
-          <Button variant="ghost" className="w-full justify-start p-2 md:p-3">
-            <Database className="h-5 w-5 md:mr-2" />
-            <span className="hidden md:inline">Staking</span>
-          </Button>
-          <Button variant="ghost" className="w-full justify-start p-2 md:p-3">
-            <Settings className="h-5 w-5 md:mr-2" />
-            <span className="hidden md:inline">APIs</span>
-          </Button>
-          <Button variant="ghost" className="w-full justify-start p-2 md:p-3">
-            <File className="h-5 w-5 md:mr-2" />
-            <span className="hidden md:inline">Documentation</span>
-          </Button>
-          <Button variant="ghost" className="w-full justify-start p-2 md:p-3">
-            <User className="h-5 w-5 md:mr-2" />
-            <span className="hidden md:inline">Account</span>
-          </Button>
-        </div>
-        <div className="mt-auto px-2 md:px-4">
-          <Separator className="my-2" />
-          <Button variant="ghost" className="w-full justify-start p-2 md:p-3">
-            <LogOut className="h-5 w-5 md:mr-2" />
-            <span className="hidden md:inline">Logout</span>
-          </Button>
-        </div>
-      </div>
+    <DashboardLayout>
+      <div className="flex h-screen bg-black text-white">
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4 border-b border-gray-800">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="">Dashboard</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/liquidity">Liquidity Pools</BreadcrumbLink>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </header>
-        <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
-          <div className="max-w-full mx-auto px-4 md:px-6 lg:px-8">
-            <div className="flex flex-wrap gap-4 mb-6">
-            <Card className="bg-black mb-6 w-full md:w-1/3">
-              <CardHeader>
-                <CardTitle className='text-white'>{amountCurrency}/{amount2Currency}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-white">Pool Address</p>
-                    <p className="font-medium text-white break-words">{ammInfo.account}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-white">Total Value Locked</p>
-                    <p className="font-medium text-white">${latestMetrics?.totalValueLocked.toFixed(2) || '0.00'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-white">Trading fees</p>
-                    <p className="font-medium text-white">{(ammInfo.trading_fee / 1000).toFixed(2)}%</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-white">24h Trading Volume</p>
-                    <p className="font-medium text-white"> {latestMetrics?.totalPoolVolume.toFixed(2) || '0.00'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-white">APR</p>
-                    <p className="font-medium text-white">{latestMetrics?.relativeAPR.toFixed(2) || '0.00'}%</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-white">Pool Balance ({amountCurrency})</p>
-                    <p className="font-medium text-white">{poolBalance1.toFixed(6)}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-white">Pool Balance ({amount2Currency})</p>
-                    <p className="font-medium text-white">{poolBalance2.toFixed(6)}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-400">Your LP Tokens</p>
-                    <p className="font-medium">{currentTokenAmount}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-black mb-6 w-full md:w-1/3">
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <header className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4 border-b border-gray-800">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="">Dashboard</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/liquidity">Liquidity Pools</BreadcrumbLink>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </header>
+          <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
+            <div className="max-w-full mx-auto px-4 md:px-6 lg:px-8">
+              <div className="flex flex-wrap gap-4 mb-6">
+              <Card className="bg-black mb-6 w-full md:w-1/3">
                 <CardHeader>
-                  <CardTitle>AMM Actions</CardTitle>
+                  <CardTitle className='text-white'>{amountCurrency}/{amount2Currency}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex flex-col space-y-4">
-                    <div className="flex space-x-4">
-                      <Button onClick={() => handleModeChange('addLiquidity')} variant={mode === 'addLiquidity' ? 'default' : 'outline'}>
-                        Add Liquidity
-                      </Button>
-                      <Button onClick={() => handleModeChange('withdrawLiquidity')} variant={mode === 'withdrawLiquidity' ? 'default' : 'outline'}>
-                        Withdraw Liquidity
-                      </Button>
-                      <Button onClick={() => handleModeChange('vote')} variant={mode === 'vote' ? 'default' : 'outline'}>
-                        Vote
-                      </Button>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-white">Pool Address</p>
+                      <p className="font-medium text-white break-words">{ammInfo.account}</p>
                     </div>
-                    {mode === 'addLiquidity' && (
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="amount1">{amountCurrency} Amount</Label>
-                          <Input
-                            id="amount1"
-                            type="text"
-                            value={currencyAmount1}
-                            onChange={(e) => setCurrencyAmount1(e.target.value)}
-                            placeholder={`Enter ${amountCurrency} Amount`}
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="amount2">{amount2Currency} Amount</Label>
-                          <Input
-                            id="amount2"
-                            type="text"
-                            value={currencyAmount2}
-                            onChange={(e) => setCurrencyAmount2(e.target.value)}
-                            placeholder={`Enter ${amount2Currency} Amount`}
-                          />
-                        </div>
-                        <Button onClick={handleAddLiquidity} className="w-full">
+                    <div>
+                      <p className="text-sm text-white">Total Value Locked</p>
+                      <p className="font-medium text-white">${latestMetrics?.totalValueLocked.toFixed(2) || '0.00'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-white">Trading fees</p>
+                      <p className="font-medium text-white">{(ammInfo.trading_fee / 1000).toFixed(2)}%</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-white">24h Trading Volume</p>
+                      <p className="font-medium text-white"> {latestMetrics?.totalPoolVolume.toFixed(2) || '0.00'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-white">APR</p>
+                      <p className="font-medium text-white">{latestMetrics?.relativeAPR.toFixed(2) || '0.00'}%</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-white">Pool Balance ({amountCurrency})</p>
+                      <p className="font-medium text-white">{poolBalance1.toFixed(6)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-white">Pool Balance ({amount2Currency})</p>
+                      <p className="font-medium text-white">{poolBalance2.toFixed(6)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-400">Your LP Tokens</p>
+                      <p className="font-medium">{currentTokenAmount}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-black mb-6 w-full md:w-1/3">
+                  <CardHeader>
+                    <CardTitle>AMM Actions</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-col space-y-4">
+                      <div className="flex space-x-4">
+                        <Button onClick={() => handleModeChange('addLiquidity')} variant={mode === 'addLiquidity' ? 'default' : 'outline'}>
                           Add Liquidity
                         </Button>
-                      </div>
-                    )}
-                    {mode === 'withdrawLiquidity' && (
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="withdrawAmount1">{amountCurrency} Amount to Withdraw</Label>
-                          <Input
-                            id="withdrawAmount1"
-                            type="text"
-                            value={currencyAmount1}
-                            onChange={(e) => setCurrencyAmount1(e.target.value)}
-                            placeholder={`Enter ${amountCurrency} Amount to Withdraw`}
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="withdrawAmount2">{amount2Currency} Amount to Withdraw</Label>
-                          <Input
-                            id="withdrawAmount2"
-                            type="text"
-                            value={currencyAmount2}
-                            onChange={(e) => setCurrencyAmount2(e.target.value)}
-                            placeholder={`Enter ${amount2Currency} Amount to Withdraw`}
-                          />
-                        </div>
-                        <Button onClick={handleWithdraw} className="w-full">
+                        <Button onClick={() => handleModeChange('withdrawLiquidity')} variant={mode === 'withdrawLiquidity' ? 'default' : 'outline'}>
                           Withdraw Liquidity
                         </Button>
-                      </div>
-                    )}
-                    {mode === 'vote' && (
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="tradingFeeVote">Trading Fee Vote</Label>
-                          <Input
-                            id="tradingFeeVote"
-                            type="text"
-                            value={tradingFeeVote}
-                            onChange={(e) => setTradingFeeVote(e.target.value)}
-                            placeholder="Enter Your Vote for Trading Fee"
-                          />
-                        </div>
-                        <Button onClick={handleVote} className="w-full">
+                        <Button onClick={() => handleModeChange('vote')} variant={mode === 'vote' ? 'default' : 'outline'}>
                           Vote
                         </Button>
                       </div>
-                    )}
-                    {transactionStatus && (
-                      <p className="text-sm text-yellow-500">{transactionStatus}</p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+                      {mode === 'addLiquidity' && (
+                        <div className="space-y-4">
+                          <div>
+                            <Label htmlFor="amount1">{amountCurrency} Amount</Label>
+                            <Input
+                              id="amount1"
+                              type="text"
+                              value={currencyAmount1}
+                              onChange={(e) => setCurrencyAmount1(e.target.value)}
+                              placeholder={`Enter ${amountCurrency} Amount`}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="amount2">{amount2Currency} Amount</Label>
+                            <Input
+                              id="amount2"
+                              type="text"
+                              value={currencyAmount2}
+                              onChange={(e) => setCurrencyAmount2(e.target.value)}
+                              placeholder={`Enter ${amount2Currency} Amount`}
+                            />
+                          </div>
+                          <Button onClick={handleAddLiquidity} className="w-full">
+                            Add Liquidity
+                          </Button>
+                        </div>
+                      )}
+                      {mode === 'withdrawLiquidity' && (
+                        <div className="space-y-4">
+                          <div>
+                            <Label htmlFor="withdrawAmount1">{amountCurrency} Amount to Withdraw</Label>
+                            <Input
+                              id="withdrawAmount1"
+                              type="text"
+                              value={currencyAmount1}
+                              onChange={(e) => setCurrencyAmount1(e.target.value)}
+                              placeholder={`Enter ${amountCurrency} Amount to Withdraw`}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="withdrawAmount2">{amount2Currency} Amount to Withdraw</Label>
+                            <Input
+                              id="withdrawAmount2"
+                              type="text"
+                              value={currencyAmount2}
+                              onChange={(e) => setCurrencyAmount2(e.target.value)}
+                              placeholder={`Enter ${amount2Currency} Amount to Withdraw`}
+                            />
+                          </div>
+                          <Button onClick={handleWithdraw} className="w-full">
+                            Withdraw Liquidity
+                          </Button>
+                        </div>
+                      )}
+                      {mode === 'vote' && (
+                        <div className="space-y-4">
+                          <div>
+                            <Label htmlFor="tradingFeeVote">Trading Fee Vote</Label>
+                            <Input
+                              id="tradingFeeVote"
+                              type="text"
+                              value={tradingFeeVote}
+                              onChange={(e) => setTradingFeeVote(e.target.value)}
+                              placeholder="Enter Your Vote for Trading Fee"
+                            />
+                          </div>
+                          <Button onClick={handleVote} className="w-full">
+                            Vote
+                          </Button>
+                        </div>
+                      )}
+                      {transactionStatus && (
+                        <p className="text-sm text-yellow-500">{transactionStatus}</p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
 
-              <Card className="bg-black mb-6 w-full md:w-1/4">
-                <CardHeader>
-                  <CardTitle>Your Holdings</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <WalletPoolHoldingTable holdings={holdings} />
-                </CardContent>
-              </Card>
-              
-              <div className="bg-black mb-6 w-full md:w-1/3">
-                <VoteSlotsGauge voteSlotsData={ammInfo.pool.voteSlots} />
+                <Card className="bg-black mb-6 w-full md:w-1/4">
+                  <CardHeader>
+                    <CardTitle>Your Holdings</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <WalletPoolHoldingTable holdings={holdings} />
+                  </CardContent>
+                </Card>
+                
+                <div className="bg-black mb-6 w-full md:w-1/3">
+                  <VoteSlotsGauge voteSlotsData={ammInfo.pool.voteSlots} />
+                </div>
+                
+                <div className="bg-black mb-6 w-full md:w-1/3">
+                  <p>Vote Slots Table</p>
+                      <AmmInfoTable 
+                        headers={[
+                          { key: 'account', label: 'Account' },
+                          { key: 'trading_fee', label: 'Trading Fee' },
+                          { key: 'vote_weight', label: 'Vote Weight' },
+                        ]} 
+                        data={ammInfo.pool.voteSlots.map((vote: any) => ({
+                          account: vote.account,
+                          trading_fee: `${vote.tradingFee / 1000}%`,
+                          vote_weight: vote.voteWeight,
+                        }))}
+                      />
+                </div >
+
+                <Card className="bg-black mb-6 w-full md:w-1/4">
+                  <CardHeader>
+                    <CardTitle>Recent Transactions</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <TransactionTable transactions={transactions} />
+                  </CardContent>
+                </Card>
               </div>
-               
-              <div className="bg-black mb-6 w-full md:w-1/3">
-                <p>Vote Slots Table</p>
-                    <AmmInfoTable 
-                      headers={[
-                        { key: 'account', label: 'Account' },
-                        { key: 'trading_fee', label: 'Trading Fee' },
-                        { key: 'vote_weight', label: 'Vote Weight' },
-                      ]} 
-                      data={ammInfo.pool.voteSlots.map((vote: any) => ({
-                        account: vote.account,
-                        trading_fee: `${vote.tradingFee / 1000}%`,
-                        vote_weight: vote.voteWeight,
-                      }))}
-                    />
-              </div >
 
-              <Card className="bg-black mb-6 w-full md:w-1/4">
-                <CardHeader>
-                  <CardTitle>Recent Transactions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <TransactionTable transactions={transactions} />
-                </CardContent>
-              </Card>
+              <div className="mt-6 mb-4">
+                <Label htmlFor="timeRange" className="mr-2">
+                  Select Time Range:
+                </Label>
+                <select
+                  id="timeRange"
+                  value={timeRange}
+                  onChange={(e) => setTimeRange(e.target.value)}
+                  className="bg-gray-800 text-white p-2 rounded"
+                >
+                  {timeRanges.map((range) => (
+                    <option key={range.value} value={range.value}>
+                      {range.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <GlobalPoolMetricsTable metrics={filteredMetrics} timeRange={timeRange} />
+              <GlobalPoolMetricsChart metrics={filteredMetrics} />
             </div>
-
-            <div className="mt-6 mb-4">
-              <Label htmlFor="timeRange" className="mr-2">
-                Select Time Range:
-              </Label>
-              <select
-                id="timeRange"
-                value={timeRange}
-                onChange={(e) => setTimeRange(e.target.value)}
-                className="bg-gray-800 text-white p-2 rounded"
-              >
-                {timeRanges.map((range) => (
-                  <option key={range.value} value={range.value}>
-                    {range.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <GlobalPoolMetricsTable metrics={filteredMetrics} timeRange={timeRange} />
-            <GlobalPoolMetricsChart metrics={filteredMetrics} />
-          </div>
-        </main>
+          </main>
+        </div>
       </div>
-    </div>
+    </DashboardLayout>
   )
 }

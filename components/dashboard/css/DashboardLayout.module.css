@@ -1,0 +1,14 @@
+/* components/dashboard/DashboardLayout.module.css */
+.dashboardContainer {
+    display: flex;
+    height: 100vh; /* Full height */
+    position: relative;
+}
+
+.mainContent {
+    flex: 1; /* Ensure it takes up the remaining space */
+    padding: 0px; /* Adjust padding if needed */
+    overflow-y: auto; /* Allow scrolling */
+    transition: margin-left 0.3s ease-in-out; /* Smooth transition */
+    margin-left: 250px; /* This is the default width of the sidebar */
+}
