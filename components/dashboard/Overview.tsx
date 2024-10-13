@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState, useRef } from 'react';
+import { useWallet } from '@/providers/Wallet'; // Adjust path based on your project structure
 import PoolsTable from '@/components/PoolsTable';
 import Pagination from '@/components/Pagination';
 import SearchBar from '@/components/SearchBar';
@@ -55,6 +56,14 @@ const Dashboard: React.FC = () => {
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
 
   const hasFetchedData = useRef<boolean>(false);
+
+  const { account, handleLogin, handleLogout } = useWallet() || {}; // Getting account status and login handler from Wallet provider
+  // const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Dropdown state
+
+  const truncateAddress = (address) => {
+        return `${address.slice(0, 3)}...${address.slice(-6)}`;
+      };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -144,6 +153,14 @@ const Dashboard: React.FC = () => {
           <div className="hidden md:block mb-4">
             <SearchBar handleSearch={handleSearch} />
           </div>
+        {/* Connect Wallet or Display Account */}
+          {account ? (
+          <Button onClick={handleLogout} variant="ghost" className="w-full justify-start p-2 md:p-3">
+            <span className="wallet-address">Wallet : {truncateAddress(account)}</span>
+          </Button>
+            ) : (
+          <Button className="primary" onClick={handleLogin}>Connect Wallet</Button>
+          )}
           <Button variant="ghost" className="w-full justify-start p-2 md:p-3">
             <LayoutDashboard className="h-5 w-5 md:mr-2" />
             <span className="hidden md:inline">Overview</span>
