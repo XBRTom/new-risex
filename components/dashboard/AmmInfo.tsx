@@ -6,11 +6,11 @@ import AMMActions from './AmmInfo/AMMActions'
 import GlobalPoolMetricsTable from './AmmInfo/GlobalPoolMetricsTable'
 import GlobalPoolMetricsChart from './pool-details/GlobalPoolMetricsChart'
 import apiClient from '@/libs/api'
-import { Button } from "@/components/ui/button"
+// import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useWallet } from '@/providers/Wallet'
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+// import { Input } from "@/components/ui/input"
+// import { Label } from "@/components/ui/label"
 import VoteSlotsGauge from './pool-details/VoteSlotsGauge'
 import AmmInfoTable from './pool-details/AmmInfoTable'
 import WalletPoolHoldingTable from './pool-details/WalletPoolHoldingTable'

@@ -1,4 +1,3 @@
-import AmmDashboard from '@/components/dashboard/AmmDashboard';
 import AmmInfo from '@/components/dashboard/AmmInfo';
 import { fetchAmmInfo } from '@/libs/db';
 

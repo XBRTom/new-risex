@@ -4,14 +4,14 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useWallet } from '@/providers/Wallet'; // Adjust path based on your project structure
 import PoolsTable from '@/components/PoolsTable';
 import Pagination from '@/components/Pagination';
-import SearchBar from '@/components/SearchBar';
+// import SearchBar from '@/components/SearchBar';
 import apiClient from '@/libs/api';
 import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+// import { Button } from "@/components/ui/button";
+// import { Separator } from "@/components/ui/separator";
 // import { Bar, BarChart } from "recharts";
 // import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
-import { Package2, LayoutDashboard, Wallet, History, LogOut, Settings, File, Database, User, Sidebar } from "lucide-react";
+// import { Package2, LayoutDashboard, Wallet, History, LogOut, Settings, File, Database, User, Sidebar } from "lucide-react";
 
 import {
   Breadcrumb,
