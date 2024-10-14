@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import PoolInfoCard from './AmmInfo/PoolInfoCard'
 import AMMActions from './AmmInfo/AMMActions'
 import GlobalPoolMetricsTable from './AmmInfo/GlobalPoolMetricsTable'
+import PoolVolumeMetrics from './AmmInfo/PoolVolumeMetrics'
 import GlobalPoolMetricsChart from './pool-details/GlobalPoolMetricsChart'
 import apiClient from '@/libs/api'
 // import { Button } from "@/components/ui/button"
@@ -14,7 +15,7 @@ import { useWallet } from '@/providers/Wallet'
 import VoteSlotsGauge from './pool-details/VoteSlotsGauge'
 import AmmInfoTable from './pool-details/AmmInfoTable'
 import WalletPoolHoldingTable from './pool-details/WalletPoolHoldingTable'
-import TransactionTable from './pool-details/TransactionTable'
+// import TransactionTable from './pool-details/TransactionTable'
 import DashboardLayout from './Layout/DashboardLayout'
 
 import {
@@ -25,12 +26,12 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 
-const timeRanges = [
-  { value: '15days', label: 'Last 15 Days' },
-  { value: 'month', label: 'Current Month' },
-  { value: '3months', label: 'Last 3 Months' },
-  { value: 'alltime', label: 'All Time' },
-]
+// const timeRanges = [
+//   { value: '15days', label: 'Last 15 Days' },
+//   { value: 'month', label: 'Current Month' },
+//   { value: '3months', label: 'Last 3 Months' },
+//   { value: 'alltime', label: 'All Time' },
+// ]
 
 interface LatestMetrics {
   totalValueLocked: number
@@ -43,13 +44,12 @@ interface ExchangeRatesResponse {
   exchangeRates: any; // Replace `any` with the actual type if available
 }
 
-
 export default function Component({ account, ammInfo }: { account: string, ammInfo: any }) {
   const [loading, setLoading] = useState(true)
   const [latestMetrics, setLatestMetrics] = useState<LatestMetrics | null>(null)
   const [historicalMetrics, setHistoricalMetrics] = useState<any[]>([])
   const [filteredMetrics, setFilteredMetrics] = useState<any[]>([])
-  const [timeRange, setTimeRange] = useState('15days')
+  const [timeRange, setTimeRange] = useState('alltime')
   const [error, setError] = useState<string | null>(null)
   const [mode, setMode] = useState('addLiquidity')
   const [currencyAmount1, setCurrencyAmount1] = useState('')
@@ -66,12 +66,8 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
   useEffect(() => {
     const fetchAmmInfo = async () => {
       try {
-        console.log(`Fetching latest metrics for poolId: ${ammInfo.poolId}`)
         const metricsResponse: any = await apiClient.get(`/latest-metrics?poolId=${ammInfo.poolId}`)
-        console.log('Fetched Latest Metrics:', metricsResponse)
-
         const currentPoolMetrics = metricsResponse.find((metric: any) => metric.poolId === ammInfo.poolId)
-
         if (currentPoolMetrics) {
           setLatestMetrics({
             totalValueLocked: parseFloat(currentPoolMetrics.totalValueLocked) || 0,
@@ -84,9 +80,8 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
           setLatestMetrics(null)
         }
 
-        console.log(`Fetching historical metrics for poolId: ${ammInfo.poolId}`)
         const historicalResponse: any = await apiClient.get(`/historical-metrics?poolId=${ammInfo.poolId}`)
-        console.log('Fetched Historical Metrics:', historicalResponse)
+        console.log('Historical Metrics:', historicalResponse) // Log the historical metrics response
         setHistoricalMetrics(historicalResponse)
 
         setLoading(false)
@@ -104,140 +99,142 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
 
   useEffect(() => {
     if (historicalMetrics.length > 0) {
-      const now = new Date()
-      let filteredData: any[] = []
-
-      switch (timeRange) {
-        case '15days':
-          filteredData = historicalMetrics.filter((metric) => {
-            const metricDate = new Date(metric.date)
-            const daysDifference = Math.floor((now.getTime() - metricDate.getTime()) / (1000 * 60 * 60 * 24))
-            return daysDifference <= 15
-          })
-          break
-        case 'month':
-          filteredData = historicalMetrics.filter((metric) => {
-            const metricDate = new Date(metric.date)
-            return metricDate.getMonth() === now.getMonth() && metricDate.getFullYear() === now.getFullYear()
-          })
-          break
-        case '3months':
-        case 'alltime':
-          const metricsByMonth: { [key: string]: any } = {}
-
-          historicalMetrics.forEach((metric) => {
-            const metricDate = new Date(metric.date)
-            const yearMonth = `${metricDate.getFullYear()}-${metricDate.getMonth() + 1}`
-
-            if (!metricsByMonth[yearMonth]) {
-              metricsByMonth[yearMonth] = {
-                totalValueLocked: 0,
-                totalPoolVolume: 0,
-                poolYield: 0,
-                relativeAPR: 0,
-                feesGenerated: 0,
-                count: 0,
-              }
-            }
-
-            metricsByMonth[yearMonth].totalValueLocked += parseFloat(metric.totalValueLocked)
-            metricsByMonth[yearMonth].totalPoolVolume += parseFloat(metric.totalPoolVolume)
-            metricsByMonth[yearMonth].poolYield += parseFloat(metric.poolYield)
-            metricsByMonth[yearMonth].relativeAPR += parseFloat(metric.relativeAPR)
-            metricsByMonth[yearMonth].feesGenerated += parseFloat(metric.feesGenerated)
-            metricsByMonth[yearMonth].count += 1
-          })
-
-          for (let [key, value] of Object.entries(metricsByMonth)) {
-            const avgTotalValueLocked = value.totalValueLocked / value.count
-            const avgTotalPoolVolume = value.totalPoolVolume / value.count
-            const avgPoolYield = value.poolYield / value.count
-            const avgRelativeAPR = value.relativeAPR / value.count
-            const totalFeesGenerated = value.feesGenerated
-
-            filteredData.push({
-              date: `${key}-01`,
-              totalValueLocked: avgTotalValueLocked,
-              totalPoolVolume: avgTotalPoolVolume,
-              poolYield: avgPoolYield,
-              relativeAPR: avgRelativeAPR,
-              feesGenerated: totalFeesGenerated,
-            })
-          }
-
-          filteredData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-          if (timeRange === '3months') {
-            filteredData = filteredData.slice(-3)
-          }
-          break
-        default:
-          break
-      }
-
-      setFilteredMetrics(filteredData)
+      setFilteredMetrics(filterMetricsByTimeRange(historicalMetrics, timeRange))
     }
   }, [timeRange, historicalMetrics])
-
-  // useEffect(() => {
-  //   const updateCurrentTokenAmount = () => {
-  //     let poolDetails
-  //     if (lpTokenDetails) {
-  //       poolDetails = lpTokenDetails.find(detail => detail.poolAddress === ammInfo.poolId)
-  //     }
-  //     if (poolDetails) {
-  //       setCurrentTokenAmount(poolDetails.current)
-  //     } else {
-  //       setCurrentTokenAmount('-')
-  //     }
-  //   }
-
-  //   updateCurrentTokenAmount()
-  // }, [ammInfo.poolId, lpTokenDetails])
 
   useEffect(() => {
     const fetchExchangeRates = async () => {
       try {
-        const response = await apiClient.get(`/fetch-exchange-rates-from-db`);
-  
-        // Log the response to check its structure
-        console.log('API Response:', response);
-  
+        const response = await apiClient.get(`/fetch-exchange-rates-from-db`)
         if (response && response.data) {
-          const { exchangeRates } = response.data;
-          console.log('exchangeRates:', exchangeRates);
-  
-          const base = ammInfo.amount_currency || 'XRP';
-          const counter = ammInfo.amount2_currency || 'XRP';
-  
-          const baseCurrency = base === 'XRP' ? 'XRP' : (base.includes('_') ? base.split('_')[1] : base);
-          const baseIssuer = base === 'XRP' ? null : (base.includes('_') ? base.split('_')[0] : null);
-  
-          const counterCurrency = counter === 'XRP' ? 'XRP' : (counter.includes('_') ? counter.split('_')[1] : counter);
-          const counterIssuer = counter === 'XRP' ? null : (counter.includes('_') ? counter.split('_')[0] : null);
-  
+          const { exchangeRates } = response.data
+          const base = ammInfo.amount_currency || 'XRP'
+          const counter = ammInfo.amount2_currency || 'XRP'
+
+          const baseCurrency = base === 'XRP' ? 'XRP' : (base.includes('_') ? base.split('_')[1] : base)
+          const baseIssuer = base === 'XRP' ? null : (base.includes('_') ? base.split('_')[0] : null)
+
+          const counterCurrency = counter === 'XRP' ? 'XRP' : (counter.includes('_') ? counter.split('_')[1] : counter)
+          const counterIssuer = counter === 'XRP' ? null : (counter.includes('_') ? counter.split('_')[0] : null)
+
           const baseRate = baseIssuer && exchangeRates && exchangeRates[baseIssuer]
             ? exchangeRates[baseIssuer][baseCurrency]
-            : (baseCurrency === 'XRP' ? 1 : null);
-  
+            : (baseCurrency === 'XRP' ? 1 : null)
+
           const counterRate = counterIssuer && exchangeRates && exchangeRates[counterIssuer]
             ? exchangeRates[counterIssuer][counterCurrency]
-            : (counterCurrency === 'XRP' ? 1 : null);
-  
-          setBaseExchangeRate(baseRate || null);
-          setCounterExchangeRate(counterRate || null);
-          setBaseCurrency(baseCurrency);
-          setCounterCurrency(counterCurrency);
+            : (counterCurrency === 'XRP' ? 1 : null)
+
+          setBaseExchangeRate(baseRate || null)
+          setCounterExchangeRate(counterRate || null)
+          setBaseCurrency(baseCurrency)
+          setCounterCurrency(counterCurrency)
         } else {
-          console.error('Error: Response data is undefined or invalid.');
+          console.error('Error: Response data is undefined or invalid.')
         }
       } catch (error) {
-        console.error('Error fetching exchange rates:', error);
+        console.error('Error fetching exchange rates:', error)
       }
-    };
-  
-    fetchExchangeRates();
-  }, [ammInfo.amount_currency, ammInfo.amount2_currency]);
-  
+    }
+
+    fetchExchangeRates()
+  }, [ammInfo.amount_currency, ammInfo.amount2_currency])
+
+  const filterMetricsByTimeRange = (metrics: any[], range: string) => {
+    const now = new Date()
+    let filteredData: any[] = []
+
+    switch (range) {
+      case '7days':
+        filteredData = metrics.filter((metric) => {
+          const metricDate = new Date(metric.date)
+          const daysDifference = Math.floor((now.getTime() - metricDate.getTime()) / (1000 * 60 * 60 * 24))
+          return daysDifference <= 7
+        })
+        break
+      case '15days':
+        filteredData = metrics.filter((metric) => {
+          const metricDate = new Date(metric.date)
+          const daysDifference = Math.floor((now.getTime() - metricDate.getTime()) / (1000 * 60 * 60 * 24))
+          return daysDifference <= 15
+        })
+        break
+      case 'month':
+        filteredData = metrics.filter((metric) => {
+          const metricDate = new Date(metric.date)
+          return metricDate.getMonth() === now.getMonth() && metricDate.getFullYear() === now.getFullYear()
+        })
+        break
+      case '3months':
+        filteredData = metrics.filter((metric) => {
+          const metricDate = new Date(metric.date)
+          const threeMonthsAgo = new Date()
+          threeMonthsAgo.setMonth(now.getMonth() - 3)
+          return metricDate >= threeMonthsAgo && metricDate <= now
+        })
+        break
+      case '6months':
+        filteredData = metrics.filter((metric) => {
+          const metricDate = new Date(metric.date)
+          const sixMonthsAgo = new Date()
+          sixMonthsAgo.setMonth(now.getMonth() - 6)
+          return metricDate >= sixMonthsAgo && metricDate <= now
+        })
+        break
+      case 'year':
+        filteredData = metrics.filter((metric) => {
+          const metricDate = new Date(metric.date)
+          const oneYearAgo = new Date()
+          oneYearAgo.setFullYear(now.getFullYear() - 1)
+          return metricDate >= oneYearAgo && metricDate <= now
+        })
+        break
+      case 'alltime':
+        filteredData = metrics
+        break
+      default:
+        break
+    }
+
+    return filteredData
+}
+
+  // const aggregateMetricsByMonth = (metrics: any[]) => {
+  //   const metricsByMonth: { [key: string]: any } = {}
+
+  //   metrics.forEach((metric) => {
+  //     const metricDate = new Date(metric.date)
+  //     const yearMonth = `${metricDate.getFullYear()}-${metricDate.getMonth() + 1}`
+
+  //     if (!metricsByMonth[yearMonth]) {
+  //       metricsByMonth[yearMonth] = {
+  //         totalValueLocked: 0,
+  //         totalPoolVolume: 0,
+  //         poolYield: 0,
+  //         relativeAPR: 0,
+  //         feesGenerated: 0,
+  //         count: 0,
+  //       }
+  //     }
+
+  //     metricsByMonth[yearMonth].totalValueLocked += parseFloat(metric.totalValueLocked)
+  //     metricsByMonth[yearMonth].totalPoolVolume += parseFloat(metric.totalPoolVolume)
+  //     metricsByMonth[yearMonth].poolYield += parseFloat(metric.poolYield)
+  //     metricsByMonth[yearMonth].relativeAPR += parseFloat(metric.relativeAPR)
+  //     metricsByMonth[yearMonth].feesGenerated += parseFloat(metric.feesGenerated)
+  //     metricsByMonth[yearMonth].count += 1
+  //   })
+
+  //   return Object.entries(metricsByMonth).map(([key, value]) => ({
+  //     date: `${key}-01`,
+  //     totalValueLocked: value.totalValueLocked / value.count,
+  //     totalPoolVolume: value.totalPoolVolume / value.count,
+  //     poolYield: value.poolYield / value.count,
+  //     relativeAPR: value.relativeAPR / value.count,
+  //     feesGenerated: value.feesGenerated,
+  //   })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+  // }
 
   const handleModeChange = (newMode: string) => {
     setMode(newMode)
@@ -255,77 +252,7 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
   }
 
   // const handleAddLiquidity = async () => {
-  //   if (!account) {
-  //     setTransactionStatus('Account information not available')
-  //     return
-  //   }
-
-  //   try {
-  //     setTransactionStatus('Creating add liquidity transaction...')
-  //     const formattedAmount1 = convertToProperFormat(currencyAmount1, ammInfo.amount_currency)
-  //     const formattedAmount2 = convertToProperFormat(currencyAmount2, ammInfo.amount2_currency)
-
-  //     const payload = {
-  //       TransactionType: 'AMMDeposit',
-  //       Account: account,
-  //       Amount: formattedAmount1,
-  //       Amount2: {
-  //         currency: ammInfo.amount2_currency,
-  //         value: formattedAmount2,
-  //         issuer: ammInfo.amount2_issuer,
-  //       },
-  //       Asset: {
-  //         currency: ammInfo.amount_currency,
-  //         issuer: ammInfo.amount_currency === 'XRP' ? undefined : ammInfo.amount_issuer,
-  //       },
-  //       Asset2: {
-  //         currency: ammInfo.amount2_currency,
-  //         issuer: ammInfo.amount2_issuer,
-  //       },
-  //       Flags: 1048576,
-  //     }
-
-  //     const createdPayload = await xumm.payload.createAndSubscribe(payload, event => {
-  //       if (event.data.signed) {
-  //         setTransactionStatus('Liquidity added successfully!')
-  //         setCurrencyAmount1('')
-  //         setCurrencyAmount2('')
-  //         fetchLpTokenDetails()
-  //         return true
-  //       }
-  //       return false
-  //     })
-
-  //     const payloadUUID = createdPayload?.created?.uuid
-
-  //     if (!payloadUUID) {
-  //       throw new Error('Failed to create payload')
-  //     }
-
-  //     const payloadURL = `https://xumm.app/sign/${payloadUUID}`
-  //     const newPopup = window.open(payloadURL, 'XummSign', 'width=500,height=600')
-
-  //     if (!newPopup) {
-  //       throw new Error('Failed to open popup window')
-  //     }
-
-  //     const interval = setInterval(async () => {
-  //       if (newPopup && newPopup.closed) {
-  //         clearInterval(interval)
-  //         const resolvedPayload = await createdPayload.resolved
-  //         if (resolvedPayload.signed) {
-  //           setTransactionStatus('Liquidity added successfully!')
-  //           setCurrencyAmount1('')
-  //           setCurrencyAmount2('')
-  //           fetchLpTokenDetails()
-  //         } else if (transactionStatus !== 'Liquidity added successfully!') {
-  //           setTransactionStatus('Transaction was not signed.')
-  //         }
-  //       }
-  //     }, 1000)
-  //   } catch (error) {
-  //     setTransactionStatus(`Failed to add liquidity: ${error.message}`)
-  //   }
+  //   // Implementation commented out
   // }
 
   const handleWithdraw = async () => {
@@ -366,7 +293,7 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
   const calculateYourAssets = () => {
     const lpTokenValue = ammInfo.lpToken?.length > 0 ? ammInfo.lpToken[0].value : 0
 
-    if (currentTokenAmount ===   '-' || lpTokenValue === 0) {
+    if (currentTokenAmount === '-' || lpTokenValue === 0) {
       return { asset1: '-', asset2: '-' }
     }
 
@@ -387,8 +314,6 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
   return (
     <DashboardLayout>
       <div className="flex h-screen bg-black text-white">
-
-        {/* Main Content */}
         <div className="flex-1 flex flex-col overflow-hidden">
           <header className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4 border-b border-gray-800">
             <Breadcrumb>
@@ -406,13 +331,16 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
           <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
             <div className="max-w-full mx-auto px-4 md:px-6 lg:px-8">
               <div className="flex flex-wrap gap-4 mb-6">
-              <PoolInfoCard
+                <PoolInfoCard
                   amountCurrency={amountCurrency}
                   amount2Currency={amount2Currency}
                   ammInfo={ammInfo}
-                  latestMetrics= {{totalValueLocked: 0,
+                  latestMetrics={latestMetrics || {
+                    totalValueLocked: 0,
                     totalPoolVolume: 0,
-                    relativeAPR: 0}} 
+                    relativeAPR: 0,
+                    feesGenerated: 0,
+                  }}
                   poolBalance1={poolBalance1}
                   poolBalance2={poolBalance2}
                   currentTokenAmount={0}
@@ -421,7 +349,7 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
                   baseExchangeRate={baseExchangeRate}
                   counterExchangeRate={counterExchangeRate}
                 />
-              <AMMActions
+                <AMMActions
                   amountCurrency={amountCurrency}
                   amount2Currency={amount2Currency}
                   handleAddLiquidity={() => {}}
@@ -429,13 +357,13 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
                   handleVote={handleVote}
                   currencyAmount1={currencyAmount1}
                   currencyAmount2={currencyAmount2}
+                  
                   tradingFeeVote={tradingFeeVote}
                   setCurrencyAmount1={setCurrencyAmount1}
                   setCurrencyAmount2={setCurrencyAmount2}
                   setTradingFeeVote={setTradingFeeVote}
                   transactionStatus={transactionStatus}
                 />
-
                 <Card className="bg-black mb-6 w-full md:w-1/4">
                   <CardHeader>
                     <CardTitle>Your Holdings</CardTitle>
@@ -444,27 +372,24 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
                     <WalletPoolHoldingTable holdings={holdings} />
                   </CardContent>
                 </Card>
-                
                 <div className="bg-black mb-6 w-full md:w-1/3">
                   <VoteSlotsGauge voteSlotsData={ammInfo.pool.voteSlots} />
                 </div>
-                
                 <div className="bg-black mb-6 w-full md:w-1/3">
                   <p>Vote Slots Table</p>
-                      <AmmInfoTable 
-                        headers={[
-                          { key: 'account', label: 'Account' },
-                          { key: 'trading_fee', label: 'Trading Fee' },
-                          { key: 'vote_weight', label: 'Vote Weight' },
-                        ]} 
-                        data={ammInfo.pool.voteSlots.map((vote: any) => ({
-                          account: vote.account,
-                          trading_fee: `${vote.tradingFee / 1000}%`,
-                          vote_weight: vote.voteWeight,
-                        }))}
-                      />
-                </div >
-
+                  <AmmInfoTable 
+                    headers={[
+                      { key: 'account', label: 'Account' },
+                      { key: 'trading_fee', label: 'Trading Fee' },
+                      { key: 'vote_weight', label: 'Vote Weight' },
+                    ]} 
+                    data={ammInfo.pool.voteSlots.map((vote: any) => ({
+                      account: vote.account,
+                      trading_fee: `${vote.tradingFee / 1000}%`,
+                      vote_weight: vote.voteWeight,
+                    }))}
+                  />
+                </div>
                 <Card className="bg-black mb-6 w-full md:w-1/4">
                   <CardHeader>
                     <CardTitle>Recent Transactions</CardTitle>
@@ -474,7 +399,6 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
                   </CardContent>
                 </Card>
               </div>
-
               {/* <div className="mt-6 mb-4">
                 <Label htmlFor="timeRange" className="mr-2">
                   Select Time Range:
@@ -492,6 +416,9 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
                   ))}
                 </select>
               </div> */}
+              <div className="mt-6 mb-4">
+                <PoolVolumeMetrics metrics={historicalMetrics} />
+              </div>
               <GlobalPoolMetricsTable metrics={filteredMetrics} initialTimeRange={timeRange} />
               <GlobalPoolMetricsChart metrics={filteredMetrics} />
             </div>

@@ -3,7 +3,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
 import { ArrowUpDown, ArrowUp, ArrowDown, HelpCircle } from "lucide-react"
 import {
   Tooltip,
@@ -46,7 +45,6 @@ const timeRanges = [
 export default function GlobalPoolMetricsTable({ metrics, initialTimeRange }: GlobalPoolMetricsTableProps) {
   const [timeRange, setTimeRange] = useState(initialTimeRange)
   const [sortConfig, setSortConfig] = useState<{ key: keyof ProcessedMetric; direction: 'asc' | 'desc' } | null>(null)
-  const [isMonthlyView, setIsMonthlyView] = useState(false)
 
   const safeToFixed = (value: number | string, digits = 2) => {
     const numberValue = typeof value === 'string' ? parseFloat(value) : value
@@ -84,35 +82,10 @@ export default function GlobalPoolMetricsTable({ metrics, initialTimeRange }: Gl
     }
   }
 
-  const aggregateMonthlyMetrics = (metrics: RawMetric[]): RawMetric[] => {
-    const monthlyMetrics: { [key: string]: RawMetric } = {}
-
-    metrics.forEach(metric => {
-      const date = new Date(metric.date)
-      const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`
-
-      if (!monthlyMetrics[monthKey]) {
-        monthlyMetrics[monthKey] = { ...metric, date: `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-01` }
-      } else {
-        monthlyMetrics[monthKey].totalValueLocked = Math.max(monthlyMetrics[monthKey].totalValueLocked, metric.totalValueLocked)
-        monthlyMetrics[monthKey].totalPoolVolume += metric.totalPoolVolume
-        monthlyMetrics[monthKey].poolYield = (monthlyMetrics[monthKey].poolYield + metric.poolYield) / 2
-        monthlyMetrics[monthKey].relativeAPR = (monthlyMetrics[monthKey].relativeAPR + metric.relativeAPR) / 2
-        monthlyMetrics[monthKey].feesGenerated += metric.feesGenerated
-      }
-    })
-
-    return Object.values(monthlyMetrics).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-  }
-
   const processedMetrics = useMemo<ProcessedMetric[]>(() => {
-    let filteredMetrics = filterMetricsByTimeRange(metrics, timeRange)
-    if (isMonthlyView && timeRange !== '7days' && timeRange !== '15days') {
-      filteredMetrics = aggregateMonthlyMetrics(filteredMetrics)
-    }
-
     let cumulativeFees = 0
-    return filteredMetrics
+    return filterMetricsByTimeRange(metrics, timeRange)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .map((metric, index, array) => {
         const feesGenerated = Number(metric.feesGenerated) || 0
         cumulativeFees += feesGenerated
@@ -135,7 +108,7 @@ export default function GlobalPoolMetricsTable({ metrics, initialTimeRange }: Gl
           volumeGrowth
         }
       })
-  }, [metrics, timeRange, isMonthlyView])
+  }, [metrics, timeRange])
 
   const sortedMetrics = useMemo(() => {
     if (sortConfig !== null) {
@@ -183,31 +156,18 @@ export default function GlobalPoolMetricsTable({ metrics, initialTimeRange }: Gl
     <Card className="w-full bg-gradient-to-br from-gray-900 to-black border-gray-800 shadow-lg rounded-xl overflow-hidden">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-xl font-bold text-white">Historical Pool Metrics</CardTitle>
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="monthly-view"
-              checked={isMonthlyView}
-              onCheckedChange={(checked) => setIsMonthlyView(checked as boolean)}
-              disabled={timeRange === '7days' || timeRange === '15days'}
-            />
-            <label htmlFor="monthly-view" className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-white ${(timeRange === '7days' || timeRange === '15days') ? 'opacity-50' : ''}`}>
-              Monthly View
-            </label>
-          </div>
-          <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-[180px] bg-gray-800 text-white border-gray-700 hover:bg-gray-700">
-              <SelectValue placeholder="Select time range" />
-            </SelectTrigger>
-            <SelectContent className="bg-gray-900 text-white border-gray-700">
-              {timeRanges.map((range) => (
-                <SelectItem key={range.value} value={range.value} className="hover:bg-gray-800">
-                  {range.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <Select value={timeRange} onValueChange={setTimeRange}>
+          <SelectTrigger className="w-[180px] bg-gray-800 text-white border-gray-700 hover:bg-gray-700">
+            <SelectValue placeholder="Select time range" />
+          </SelectTrigger>
+          <SelectContent className="bg-gray-900 text-white border-gray-700">
+            {timeRanges.map((range) => (
+              <SelectItem key={range.value} value={range.value} className="hover:bg-gray-800">
+                {range.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
@@ -223,8 +183,8 @@ export default function GlobalPoolMetricsTable({ metrics, initialTimeRange }: Gl
                   { key: 'poolYield', label: 'Yield' },
                   { key: 'relativeAPR', label: 'APR' },
                   { key: 'feesGenerated', label: 'Fees' },
-                  { key: 'cumulativeFees', label: 'Cum. Fees' },
-                  { key: 'growth', label: 'Fees Growth' }
+                  { key: 'growth', label: 'Fees Growth' },
+                  { key: 'cumulativeFees', label: 'Cum. Fees' }
                 ].map((column) => (
                   <TableHead key={column.key} className="text-gray-400">
                     <Button
@@ -279,7 +239,7 @@ export default function GlobalPoolMetricsTable({ metrics, initialTimeRange }: Gl
                               metric.relativeAPR < 0 ? <ArrowDown className="h-4 w-4 text-red-500" /> : null
                             ) : (
                               metric.relativeAPR > sortedMetrics[index - 1].relativeAPR ? <ArrowUp className="h-4 w-4 text-green-500" /> :
-                              metric.relativeAPR < sortedMetrics[index -   1].relativeAPR ? <ArrowDown className="h-4 w-4 text-red-500" /> : null
+                              metric.relativeAPR < sortedMetrics[index - 1].relativeAPR ? <ArrowDown className="h-4 w-4 text-red-500" /> : null
                             )}
                           </span>
                         </TooltipTrigger>
@@ -290,8 +250,8 @@ export default function GlobalPoolMetricsTable({ metrics, initialTimeRange }: Gl
                     </TooltipProvider>
                   </TableCell>
                   <TableCell className="text-white">{formatCurrency(metric.feesGenerated)}</TableCell>
-                  <TableCell className="text-white">{formatCurrency(metric.cumulativeFees)}</TableCell>
                   <TableCell className="text-white">{renderGrowthCell(metric.growth)}</TableCell>
+                  <TableCell className="text-white">{formatCurrency(metric.cumulativeFees)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
