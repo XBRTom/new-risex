@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/breadcrumb";
 
 import DashboardLayout from './Layout/DashboardLayout';
+import { AnyNaptrRecord } from 'dns';
 
 
 interface Pool {
@@ -59,11 +60,11 @@ const Dashboard: React.FC = () => {
 
   const hasFetchedData = useRef<boolean>(false);
 
-  const { account, handleLogin, handleLogout } = useWallet() || {}; // Getting account status and login handler from Wallet provider
+  const { account, handleLogin, handleLogout }:any = useWallet() || {}; // Getting account status and login handler from Wallet provider
   // const [isModalOpen, setIsModalOpen] = useState(false);
   // const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Dropdown state
 
-  const truncateAddress = (address) => {
+  const truncateAddress = (address: string) => {
         return `${address.slice(0, 3)}...${address.slice(-6)}`;
       };
 

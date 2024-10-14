@@ -55,7 +55,7 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
   const [currencyAmount1, setCurrencyAmount1] = useState('')
   const [currencyAmount2, setCurrencyAmount2] = useState('')
   const [tradingFeeVote, setTradingFeeVote] = useState('')
-  const { lpTokenDetails, xumm, fetchLpTokenDetails, transactions } = useWallet()
+  // const { lpTokenDetails, xumm, fetchLpTokenDetails, transactions } = useWallet()
   const [currentTokenAmount, setCurrentTokenAmount] = useState('-')
   const [transactionStatus, setTransactionStatus] = useState('')
   const [baseExchangeRate, setBaseExchangeRate] = useState<number | null>(null)
@@ -178,21 +178,21 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
     }
   }, [timeRange, historicalMetrics])
 
-  useEffect(() => {
-    const updateCurrentTokenAmount = () => {
-      let poolDetails
-      if (lpTokenDetails) {
-        poolDetails = lpTokenDetails.find(detail => detail.poolAddress === ammInfo.poolId)
-      }
-      if (poolDetails) {
-        setCurrentTokenAmount(poolDetails.current)
-      } else {
-        setCurrentTokenAmount('-')
-      }
-    }
+  // useEffect(() => {
+  //   const updateCurrentTokenAmount = () => {
+  //     let poolDetails
+  //     if (lpTokenDetails) {
+  //       poolDetails = lpTokenDetails.find(detail => detail.poolAddress === ammInfo.poolId)
+  //     }
+  //     if (poolDetails) {
+  //       setCurrentTokenAmount(poolDetails.current)
+  //     } else {
+  //       setCurrentTokenAmount('-')
+  //     }
+  //   }
 
-    updateCurrentTokenAmount()
-  }, [ammInfo.poolId, lpTokenDetails])
+  //   updateCurrentTokenAmount()
+  // }, [ammInfo.poolId, lpTokenDetails])
 
   useEffect(() => {
     const fetchExchangeRates = async () => {
@@ -254,79 +254,79 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
     return amount
   }
 
-  const handleAddLiquidity = async () => {
-    if (!account) {
-      setTransactionStatus('Account information not available')
-      return
-    }
+  // const handleAddLiquidity = async () => {
+  //   if (!account) {
+  //     setTransactionStatus('Account information not available')
+  //     return
+  //   }
 
-    try {
-      setTransactionStatus('Creating add liquidity transaction...')
-      const formattedAmount1 = convertToProperFormat(currencyAmount1, ammInfo.amount_currency)
-      const formattedAmount2 = convertToProperFormat(currencyAmount2, ammInfo.amount2_currency)
+  //   try {
+  //     setTransactionStatus('Creating add liquidity transaction...')
+  //     const formattedAmount1 = convertToProperFormat(currencyAmount1, ammInfo.amount_currency)
+  //     const formattedAmount2 = convertToProperFormat(currencyAmount2, ammInfo.amount2_currency)
 
-      const payload = {
-        TransactionType: 'AMMDeposit',
-        Account: account,
-        Amount: formattedAmount1,
-        Amount2: {
-          currency: ammInfo.amount2_currency,
-          value: formattedAmount2,
-          issuer: ammInfo.amount2_issuer,
-        },
-        Asset: {
-          currency: ammInfo.amount_currency,
-          issuer: ammInfo.amount_currency === 'XRP' ? undefined : ammInfo.amount_issuer,
-        },
-        Asset2: {
-          currency: ammInfo.amount2_currency,
-          issuer: ammInfo.amount2_issuer,
-        },
-        Flags: 1048576,
-      }
+  //     const payload = {
+  //       TransactionType: 'AMMDeposit',
+  //       Account: account,
+  //       Amount: formattedAmount1,
+  //       Amount2: {
+  //         currency: ammInfo.amount2_currency,
+  //         value: formattedAmount2,
+  //         issuer: ammInfo.amount2_issuer,
+  //       },
+  //       Asset: {
+  //         currency: ammInfo.amount_currency,
+  //         issuer: ammInfo.amount_currency === 'XRP' ? undefined : ammInfo.amount_issuer,
+  //       },
+  //       Asset2: {
+  //         currency: ammInfo.amount2_currency,
+  //         issuer: ammInfo.amount2_issuer,
+  //       },
+  //       Flags: 1048576,
+  //     }
 
-      const createdPayload = await xumm.payload.createAndSubscribe(payload, event => {
-        if (event.data.signed) {
-          setTransactionStatus('Liquidity added successfully!')
-          setCurrencyAmount1('')
-          setCurrencyAmount2('')
-          fetchLpTokenDetails()
-          return true
-        }
-        return false
-      })
+  //     const createdPayload = await xumm.payload.createAndSubscribe(payload, event => {
+  //       if (event.data.signed) {
+  //         setTransactionStatus('Liquidity added successfully!')
+  //         setCurrencyAmount1('')
+  //         setCurrencyAmount2('')
+  //         fetchLpTokenDetails()
+  //         return true
+  //       }
+  //       return false
+  //     })
 
-      const payloadUUID = createdPayload?.created?.uuid
+  //     const payloadUUID = createdPayload?.created?.uuid
 
-      if (!payloadUUID) {
-        throw new Error('Failed to create payload')
-      }
+  //     if (!payloadUUID) {
+  //       throw new Error('Failed to create payload')
+  //     }
 
-      const payloadURL = `https://xumm.app/sign/${payloadUUID}`
-      const newPopup = window.open(payloadURL, 'XummSign', 'width=500,height=600')
+  //     const payloadURL = `https://xumm.app/sign/${payloadUUID}`
+  //     const newPopup = window.open(payloadURL, 'XummSign', 'width=500,height=600')
 
-      if (!newPopup) {
-        throw new Error('Failed to open popup window')
-      }
+  //     if (!newPopup) {
+  //       throw new Error('Failed to open popup window')
+  //     }
 
-      const interval = setInterval(async () => {
-        if (newPopup && newPopup.closed) {
-          clearInterval(interval)
-          const resolvedPayload = await createdPayload.resolved
-          if (resolvedPayload.signed) {
-            setTransactionStatus('Liquidity added successfully!')
-            setCurrencyAmount1('')
-            setCurrencyAmount2('')
-            fetchLpTokenDetails()
-          } else if (transactionStatus !== 'Liquidity added successfully!') {
-            setTransactionStatus('Transaction was not signed.')
-          }
-        }
-      }, 1000)
-    } catch (error) {
-      setTransactionStatus(`Failed to add liquidity: ${error.message}`)
-    }
-  }
+  //     const interval = setInterval(async () => {
+  //       if (newPopup && newPopup.closed) {
+  //         clearInterval(interval)
+  //         const resolvedPayload = await createdPayload.resolved
+  //         if (resolvedPayload.signed) {
+  //           setTransactionStatus('Liquidity added successfully!')
+  //           setCurrencyAmount1('')
+  //           setCurrencyAmount2('')
+  //           fetchLpTokenDetails()
+  //         } else if (transactionStatus !== 'Liquidity added successfully!') {
+  //           setTransactionStatus('Transaction was not signed.')
+  //         }
+  //       }
+  //     }, 1000)
+  //   } catch (error) {
+  //     setTransactionStatus(`Failed to add liquidity: ${error.message}`)
+  //   }
+  // }
 
   const handleWithdraw = async () => {
     // Implement withdraw logic similar to handleAddLiquidity
@@ -410,10 +410,12 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
                   amountCurrency={amountCurrency}
                   amount2Currency={amount2Currency}
                   ammInfo={ammInfo}
-                  latestMetrics={latestMetrics}
+                  latestMetrics= {{totalValueLocked: 0,
+                    totalPoolVolume: 0,
+                    relativeAPR: 0}} 
                   poolBalance1={poolBalance1}
                   poolBalance2={poolBalance2}
-                  currentTokenAmount={currentTokenAmount}
+                  currentTokenAmount={0}
                   baseCurrency={baseCurrency}
                   counterCurrency={counterCurrency}
                   baseExchangeRate={baseExchangeRate}
@@ -422,7 +424,7 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
               <AMMActions
                   amountCurrency={amountCurrency}
                   amount2Currency={amount2Currency}
-                  handleAddLiquidity={handleAddLiquidity}
+                  handleAddLiquidity={() => {}}
                   handleWithdraw={handleWithdraw}
                   handleVote={handleVote}
                   currencyAmount1={currencyAmount1}
@@ -468,7 +470,7 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
                     <CardTitle>Recent Transactions</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <TransactionTable transactions={transactions} />
+                    {/* <TransactionTable transactions={transactions} /> */}
                   </CardContent>
                 </Card>
               </div>

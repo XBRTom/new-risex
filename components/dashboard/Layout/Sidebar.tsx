@@ -21,7 +21,7 @@ interface NavItem {
 
 export default function Sidebar({ onCollapse }: SidebarProps) {
     const [collapsed, setCollapsed] = useState(false);
-    const { account, handleLogin, handleLogout } = useWallet() || {};
+    const { account, handleLogin, handleLogout }:any = useWallet() || {};
     const router = useRouter();
     const pathname = usePathname();
 

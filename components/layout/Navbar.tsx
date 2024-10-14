@@ -96,17 +96,17 @@ const ListItem = React.forwardRef<
 ListItem.displayName = "ListItem"
 
 const Navbar = () => {
-    const { account, handleLogin, handleLogout } = useWallet() || {}; // Getting account status and login handler from Wallet provider
+    const { account, handleLogin, handleLogout }:any = useWallet() || {}; // Getting account status and login handler from Wallet provider
     // const [isModalOpen, setIsModalOpen] = useState(false);
     // const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Dropdown state
 
-    const truncateAddress = (address) => {
+    const truncateAddress = (address: string) => {
         return `${address.slice(0, 3)}...${address.slice(-6)}`;
       };
 
-    const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
-    const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
+    // const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
+    // const openModal = () => setIsModalOpen(true);
+    // const closeModal = () => setIsModalOpen(false);
 
     return (
         <div className="sticky top-0 z-50 bg-white shadow-md no-scrollbar flex items-center h-10 px-4 sm:px-6 lg:px-16">

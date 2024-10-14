@@ -115,7 +115,7 @@ export default function AMMActions({
   );
 }
 
-function ActionButton({ mode, currentMode, onClick, icon, children }) {
+function ActionButton({ mode, currentMode, onClick, icon, children }:any) {
   return (
     <Button
       onClick={onClick}
@@ -139,7 +139,7 @@ function LiquidityForm({
   setCurrencyAmount1,
   setCurrencyAmount2,
   handleAction
-}) {
+}:any) {
   return (
     <div className="space-y-2">
       <div>
@@ -169,7 +169,7 @@ function LiquidityForm({
   );
 }
 
-function VoteForm({ tradingFeeVote, setTradingFeeVote, handleVote }) {
+function VoteForm({ tradingFeeVote, setTradingFeeVote, handleVote }:any) {
   return (
     <div className="space-y-2">
       <div>
