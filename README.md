@@ -22,4 +22,4 @@ This repo contains a git submodule
 ## Deployment
 
 ### Vercel
-Vercel doesn't support private git submodules, we use this workaround : https://github.com/vercel-contrib/vercel-workaround
+Vercel doesn't support private git submodules, we use this workaround : https://github.com/vercel-contrib/vercel-workaround 
