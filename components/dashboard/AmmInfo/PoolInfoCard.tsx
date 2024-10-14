@@ -19,6 +19,10 @@ interface PoolInfoCardProps {
   poolBalance1: number;
   poolBalance2: number;
   currentTokenAmount: number;
+  baseCurrency: string | null;
+  counterCurrency: string | null;
+  baseExchangeRate: number | null;
+  counterExchangeRate: number | null;
 }
 
 export default function PoolInfoCard({
@@ -28,7 +32,12 @@ export default function PoolInfoCard({
   latestMetrics,
   poolBalance1,
   poolBalance2,
-  currentTokenAmount
+  currentTokenAmount,
+  baseCurrency,
+  counterCurrency,
+  baseExchangeRate,
+  counterExchangeRate
+
 }: PoolInfoCardProps) {
   const isPositiveAPR = latestMetrics.relativeAPR >= 0;
 
@@ -63,6 +72,15 @@ export default function PoolInfoCard({
               <p className="text-sm text-gray-400 mb-1">24h Trading Volume</p>
               <p className="text-xl font-bold text-white">${latestMetrics?.totalPoolVolume.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
             </div>
+            <p>Base Currency: {baseCurrency ?? 'N/A'}</p>
+      <p>Counter Currency: {counterCurrency ?? 'N/A'}</p>
+      {baseExchangeRate !== null && (
+        <p>Base Currency Exchange Rate: {baseExchangeRate}</p>
+      )}
+      {counterExchangeRate !== null && (
+        <p>Counter Currency Exchange Rate: {counterExchangeRate}</p>
+      )}
+
           </div>
           <Separator className="bg-gray-800" />
           <div className="flex justify-between items-center">

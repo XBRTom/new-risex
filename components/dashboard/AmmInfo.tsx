@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react'
 import PoolInfoCard from './AmmInfo/PoolInfoCard'
-import GlobalPoolMetricsTable from './pool-details/GlobalPoolMetricsTable'
+import AMMActions from './AmmInfo/AMMActions'
+import GlobalPoolMetricsTable from './AmmInfo/GlobalPoolMetricsTable'
 import GlobalPoolMetricsChart from './pool-details/GlobalPoolMetricsChart'
 import apiClient from '@/libs/api'
 import { Button } from "@/components/ui/button"
@@ -37,6 +38,11 @@ interface LatestMetrics {
   relativeAPR: number
   feesGenerated: number
 }
+
+interface ExchangeRatesResponse {
+  exchangeRates: any; // Replace `any` with the actual type if available
+}
+
 
 export default function Component({ account, ammInfo }: { account: string, ammInfo: any }) {
   const [loading, setLoading] = useState(true)
@@ -191,37 +197,47 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
   useEffect(() => {
     const fetchExchangeRates = async () => {
       try {
-        const { exchangeRates } = await apiClient.get('/fetch-exchange-rates-from-db')
-        console.log('exchangeRates:', exchangeRates)
-
-        const base = ammInfo.amount_currency || 'XRP'
-        const counter = ammInfo.amount2_currency || 'XRP'
-
-        const baseCurrency = base === 'XRP' ? 'XRP' : (base.includes('_') ? base.split('_')[1] : base)
-        const baseIssuer = base === 'XRP' ? null : (base.includes('_') ? base.split('_')[0] : null)
-
-        const counterCurrency = counter === 'XRP' ? 'XRP' : (counter.includes('_') ? counter.split('_')[1] : counter)
-        const counterIssuer = counter === 'XRP' ? null : (counter.includes('_') ? counter.split('_')[0] : null)
-
-        const baseRate = baseIssuer && exchangeRates[baseIssuer]
-          ? exchangeRates[baseIssuer][baseCurrency]
-          : (baseCurrency === 'XRP' ? 1 : null)
-        
-        const counterRate = counterIssuer && exchangeRates[counterIssuer]
-          ? exchangeRates[counterIssuer][counterCurrency]
-          : (counterCurrency === 'XRP' ? 1 : null)
-
-        setBaseExchangeRate(baseRate || null)
-        setCounterExchangeRate(counterRate || null)
-        setBaseCurrency(baseCurrency)
-        setCounterCurrency(counterCurrency)
+        const response = await apiClient.get(`/fetch-exchange-rates-from-db`);
+  
+        // Log the response to check its structure
+        console.log('API Response:', response);
+  
+        if (response && response.data) {
+          const { exchangeRates } = response.data;
+          console.log('exchangeRates:', exchangeRates);
+  
+          const base = ammInfo.amount_currency || 'XRP';
+          const counter = ammInfo.amount2_currency || 'XRP';
+  
+          const baseCurrency = base === 'XRP' ? 'XRP' : (base.includes('_') ? base.split('_')[1] : base);
+          const baseIssuer = base === 'XRP' ? null : (base.includes('_') ? base.split('_')[0] : null);
+  
+          const counterCurrency = counter === 'XRP' ? 'XRP' : (counter.includes('_') ? counter.split('_')[1] : counter);
+          const counterIssuer = counter === 'XRP' ? null : (counter.includes('_') ? counter.split('_')[0] : null);
+  
+          const baseRate = baseIssuer && exchangeRates && exchangeRates[baseIssuer]
+            ? exchangeRates[baseIssuer][baseCurrency]
+            : (baseCurrency === 'XRP' ? 1 : null);
+  
+          const counterRate = counterIssuer && exchangeRates && exchangeRates[counterIssuer]
+            ? exchangeRates[counterIssuer][counterCurrency]
+            : (counterCurrency === 'XRP' ? 1 : null);
+  
+          setBaseExchangeRate(baseRate || null);
+          setCounterExchangeRate(counterRate || null);
+          setBaseCurrency(baseCurrency);
+          setCounterCurrency(counterCurrency);
+        } else {
+          console.error('Error: Response data is undefined or invalid.');
+        }
       } catch (error) {
-        console.error('Error fetching exchange rates:', error)
+        console.error('Error fetching exchange rates:', error);
       }
-    }
-
-    fetchExchangeRates()
-  }, [ammInfo.amount_currency, ammInfo.amount2_currency])
+    };
+  
+    fetchExchangeRates();
+  }, [ammInfo.amount_currency, ammInfo.amount2_currency]);
+  
 
   const handleModeChange = (newMode: string) => {
     setMode(newMode)
@@ -398,101 +414,25 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
                   poolBalance1={poolBalance1}
                   poolBalance2={poolBalance2}
                   currentTokenAmount={currentTokenAmount}
+                  baseCurrency={baseCurrency}
+                  counterCurrency={counterCurrency}
+                  baseExchangeRate={baseExchangeRate}
+                  counterExchangeRate={counterExchangeRate}
                 />
-              <Card className="bg-black mb-6 w-full md:w-1/3">
-                  <CardHeader>
-                    <CardTitle>AMM Actions</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-col space-y-4">
-                      <div className="flex space-x-4">
-                        <Button onClick={() => handleModeChange('addLiquidity')} variant={mode === 'addLiquidity' ? 'default' : 'outline'}>
-                          Add Liquidity
-                        </Button>
-                        <Button onClick={() => handleModeChange('withdrawLiquidity')} variant={mode === 'withdrawLiquidity' ? 'default' : 'outline'}>
-                          Withdraw Liquidity
-                        </Button>
-                        <Button onClick={() => handleModeChange('vote')} variant={mode === 'vote' ? 'default' : 'outline'}>
-                          Vote
-                        </Button>
-                      </div>
-                      {mode === 'addLiquidity' && (
-                        <div className="space-y-4">
-                          <div>
-                            <Label htmlFor="amount1">{amountCurrency} Amount</Label>
-                            <Input
-                              id="amount1"
-                              type="text"
-                              value={currencyAmount1}
-                              onChange={(e) => setCurrencyAmount1(e.target.value)}
-                              placeholder={`Enter ${amountCurrency} Amount`}
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="amount2">{amount2Currency} Amount</Label>
-                            <Input
-                              id="amount2"
-                              type="text"
-                              value={currencyAmount2}
-                              onChange={(e) => setCurrencyAmount2(e.target.value)}
-                              placeholder={`Enter ${amount2Currency} Amount`}
-                            />
-                          </div>
-                          <Button onClick={handleAddLiquidity} className="w-full">
-                            Add Liquidity
-                          </Button>
-                        </div>
-                      )}
-                      {mode === 'withdrawLiquidity' && (
-                        <div className="space-y-4">
-                          <div>
-                            <Label htmlFor="withdrawAmount1">{amountCurrency} Amount to Withdraw</Label>
-                            <Input
-                              id="withdrawAmount1"
-                              type="text"
-                              value={currencyAmount1}
-                              onChange={(e) => setCurrencyAmount1(e.target.value)}
-                              placeholder={`Enter ${amountCurrency} Amount to Withdraw`}
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="withdrawAmount2">{amount2Currency} Amount to Withdraw</Label>
-                            <Input
-                              id="withdrawAmount2"
-                              type="text"
-                              value={currencyAmount2}
-                              onChange={(e) => setCurrencyAmount2(e.target.value)}
-                              placeholder={`Enter ${amount2Currency} Amount to Withdraw`}
-                            />
-                          </div>
-                          <Button onClick={handleWithdraw} className="w-full">
-                            Withdraw Liquidity
-                          </Button>
-                        </div>
-                      )}
-                      {mode === 'vote' && (
-                        <div className="space-y-4">
-                          <div>
-                            <Label htmlFor="tradingFeeVote">Trading Fee Vote</Label>
-                            <Input
-                              id="tradingFeeVote"
-                              type="text"
-                              value={tradingFeeVote}
-                              onChange={(e) => setTradingFeeVote(e.target.value)}
-                              placeholder="Enter Your Vote for Trading Fee"
-                            />
-                          </div>
-                          <Button onClick={handleVote} className="w-full">
-                            Vote
-                          </Button>
-                        </div>
-                      )}
-                      {transactionStatus && (
-                        <p className="text-sm text-yellow-500">{transactionStatus}</p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+              <AMMActions
+                  amountCurrency={amountCurrency}
+                  amount2Currency={amount2Currency}
+                  handleAddLiquidity={handleAddLiquidity}
+                  handleWithdraw={handleWithdraw}
+                  handleVote={handleVote}
+                  currencyAmount1={currencyAmount1}
+                  currencyAmount2={currencyAmount2}
+                  tradingFeeVote={tradingFeeVote}
+                  setCurrencyAmount1={setCurrencyAmount1}
+                  setCurrencyAmount2={setCurrencyAmount2}
+                  setTradingFeeVote={setTradingFeeVote}
+                  transactionStatus={transactionStatus}
+                />
 
                 <Card className="bg-black mb-6 w-full md:w-1/4">
                   <CardHeader>
@@ -533,7 +473,7 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
                 </Card>
               </div>
 
-              <div className="mt-6 mb-4">
+              {/* <div className="mt-6 mb-4">
                 <Label htmlFor="timeRange" className="mr-2">
                   Select Time Range:
                 </Label>
@@ -549,8 +489,8 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
                     </option>
                   ))}
                 </select>
-              </div>
-              <GlobalPoolMetricsTable metrics={filteredMetrics} timeRange={timeRange} />
+              </div> */}
+              <GlobalPoolMetricsTable metrics={filteredMetrics} initialTimeRange={timeRange} />
               <GlobalPoolMetricsChart metrics={filteredMetrics} />
             </div>
           </main>
