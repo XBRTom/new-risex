@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import PoolInfoCard from './AmmInfo/PoolInfoCard'
 import AMMActions from './AmmInfo/AMMActions'
 import GlobalPoolMetricsTable from './AmmInfo/GlobalPoolMetricsTable'
-import PoolVolumeMetrics from './AmmInfo/PoolVolumeMetrics'
+import PoolMetricsChart from './AmmInfo/PoolMetricsChart'
 import GlobalPoolMetricsChart from './pool-details/GlobalPoolMetricsChart'
 import apiClient from '@/libs/api'
 // import { Button } from "@/components/ui/button"
@@ -417,7 +417,7 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
                 </select>
               </div> */}
               <div className="mt-6 mb-4">
-                <PoolVolumeMetrics metrics={historicalMetrics} />
+                <PoolMetricsChart metrics={historicalMetrics} />
               </div>
               <GlobalPoolMetricsTable metrics={filteredMetrics} initialTimeRange={timeRange} />
               <GlobalPoolMetricsChart metrics={filteredMetrics} />
