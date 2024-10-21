@@ -80,8 +80,15 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
           setLatestMetrics(null)
         }
 
-        const historicalResponse: any = await apiClient.get(`/historical-metrics?poolId=${ammInfo.poolId}`)
+        let historicalResponse: any = await apiClient.get(`/historical-metrics?poolId=${ammInfo.poolId}`)
         console.log('Historical Metrics:', historicalResponse) // Log the historical metrics response
+        historicalResponse = historicalResponse.map((histo: any) => ({
+          ...histo,
+          totalValueLocked: parseFloat(histo.totalValueLocked), 
+          totalPoolVolume: parseFloat(histo.totalPoolVolume), 
+          relativeAPR: parseFloat(histo.relativeAPR),
+          feesGenerated: parseFloat(histo.feesGenerated),
+        }));
         setHistoricalMetrics(historicalResponse)
 
         setLoading(false)

@@ -1,59 +1,111 @@
-'use client'
-
-import React, { useMemo, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Line, Bar, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer, ComposedChart, Tooltip } from 'recharts'
-import { ChartContainer } from "@/components/ui/chart"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
-import { PlusCircle, XCircle } from 'lucide-react'
-
-interface Metric {
-  date: string
-  totalPoolVolume: string
-  feesGenerated: string
-  relativeAPR: string
-  totalValueLocked: string
-  yield: string
-}
-
 interface PoolMetricsChartProps {
   metrics: Metric[]
 }
 
-interface ChartType {
-  label: string
-  color: string
-  type: 'line' | 'bar'
+'use client'
+
+import React, { useMemo, useState, useCallback } from 'react'
+import { Card, CardContent } from "@/components/ui/card"
+import { LineChart, Line, BarChart, Bar, ComposedChart, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
+import { motion, AnimatePresence } from "framer-motion"
+import { ChevronDown, LineChart as LineChartIcon, BarChart as BarChartIcon, LayoutGrid, Rows } from 'lucide-react'
+import { startOfWeek, startOfMonth, startOfQuarter, endOfWeek, endOfMonth, endOfQuarter, format, parseISO, isWithinInterval, subDays, subMonths, subYears } from 'date-fns'
+
+interface Metric {
+  date: string;
+  totalValueLocked: number;
+  totalPoolVolume: number;
 }
 
-type ChartTypes = {
-  [key: string]: ChartType
-}
+type ProcessedMetric = {
+  date: string;
+  totalValueLocked: number;
+  tvlPercentageChange: number;
+  totalPoolVolume: number;
+  totalPoolVolumePercentageChange: number;
+  [key: string]: number | string;
+};
 
-const chartTypes: ChartTypes = {
-  totalPoolVolume: { label: "Total Pool Volume", color: "#3b82f6", type: "bar" },
-  feesGenerated: { label: "Fees Generated", color: "#10b981", type: "line" },
-  relativeAPR: { label: "Relative APR", color: "#f59e0b", type: "line" },
-  averageVolume: { label: "Average Volume", color: "#6366f1", type: "line" },
-  volumeGrowth: { label: "Volume Growth (%)", color: "#ef4444", type: "bar" },
-  totalValueLocked: { label: "Total Value Locked", color: "#8b5cf6", type: "line" },
-  yield: { label: "Pool Yield", color: "#ec4899", type: "line" }
-}
+const formatNumber = (value: number) => {
+  const absValue = Math.abs(value);
+  if (absValue >= 1e9) return `${(value / 1e9).toFixed(2)}B`;
+  if (absValue >= 1e6) return `${(value / 1e6).toFixed(2)}M`;
+  if (absValue >= 1e3) return `${(value / 1e3).toFixed(2)}K`;
+  return value.toFixed(2);
+};
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const formatDate = (dateString: string, aggregation: string) => {
+  const date = parseISO(dateString);
+  switch (aggregation) {
+    case 'daily':
+      return format(date, 'MMM d');
+    case 'weekly':
+      return `Week of ${format(date, 'MMM d')}`;
+    case 'monthly':
+      return format(date, 'MMMM yyyy');
+    case 'quarterly':
+      return `Q${Math.floor(date.getMonth() / 3) + 1} ${date.getFullYear()}`;
+    default:
+      return format(date, 'MMM d');
+  }
+};
+
+const CustomTooltip = ({ active, payload, label, aggregation }: any) => {
   if (active && payload && payload.length) {
+    const tvlValue = payload.find((p: any) => p.dataKey === 'totalValueLocked')?.value;
+    const tvlPercentageChange = payload.find((p: any) => p.dataKey === 'tvlPercentageChange')?.value;
+    const totalPoolVolumeValue = payload.find((p: any) => p.dataKey === 'totalPoolVolume')?.value;
+    const totalPoolVolumePercentageChange = payload.find((p: any) => p.dataKey === 'totalPoolVolumePercentageChange')?.value;
+
+    console.log('Tooltip Data:', { label, tvlValue, tvlPercentageChange, totalPoolVolumeValue, totalPoolVolumePercentageChange });
+
     return (
-      <div className="bg-gray-800 p-4 rounded shadow-lg border border-gray-700">
-        <p className="text-white font-bold mb-2">{label}</p>
-        {payload.map((entry: any, index: number) => (
-          <p key={`item-${index}`} style={{ color: entry.color }}>
-            {entry.name}: {entry.name === "Pool Yield" 
-              ? `${entry.value?.toFixed(2) ?? 'N/A'}%` 
-              : entry.value?.toLocaleString(undefined, { maximumFractionDigits: 2 }) ?? 'N/A'
-            }
-          </p>
-        ))}
+      <div className="bg-gray-800/90 p-4 rounded-lg shadow-lg border border-gray-700 backdrop-blur-sm">
+        <p className="text-white text-sm font-medium mb-2">{formatDate(label, aggregation)}</p>
+        {tvlValue !== undefined && (
+          <div className="mb-2">
+            <p className="text-white text-sm font-medium flex items-center">
+              <span className="w-3 h-3 inline-block mr-2 bg-[#FF9500]"></span>
+              TVL: {formatNumber(tvlValue)}
+            </p>
+            {tvlPercentageChange !== undefined && (
+              <p className={`text-sm font-medium flex items-center ${
+                tvlPercentageChange > 0
+                  ? 'text-green-400'
+                  : tvlPercentageChange < 0
+                    ? 'text-red-400'
+                    : 'text-gray-400'
+              }`}>
+                <span className="w-3 h-3 inline-block mr-2 bg-[#007AFF]"></span>
+                <span className="text-white">Change:</span> {tvlPercentageChange.toFixed(2)}%
+              </p>
+            )}
+          </div>
+        )}
+        {totalPoolVolumeValue !== undefined && (
+          <div>
+            <p className="text-white text-sm font-medium flex items-center">
+              <span className="w-3 h-3 inline-block mr-2 bg-[#34C759]"></span>
+              Total Pool Volume: {formatNumber(totalPoolVolumeValue)}
+            </p>
+            {totalPoolVolumePercentageChange !== undefined && (
+              <p className={`text-sm font-medium flex items-center ${
+                totalPoolVolumePercentageChange > 0
+                  ? 'text-green-400'
+                  : totalPoolVolumePercentageChange < 0
+                    ? 'text-red-400'
+                    : 'text-gray-400'
+              }`}>
+                <span className="w-3 h-3 inline-block mr-2 bg-[#5856D6]"></span>
+                <span className="text-white">Change:</span> {totalPoolVolumePercentageChange.toFixed(2)}%
+              </p>
+            )}
+          </div>
+        )}
       </div>
     )
   }
@@ -61,138 +113,418 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 }
 
 export default function PoolMetricsChart({ metrics }: PoolMetricsChartProps) {
-  const [selectedCharts, setSelectedCharts] = useState<string[]>(["yield", "totalValueLocked"])
-  const [chartToAdd, setChartToAdd] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [timeRange, setTimeRange] = useState<string>('all')
+  const [aggregation, setAggregation] = useState<string>('daily')
+  const [tvlChartType, setTvlChartType] = useState<string>('line')
+  const [totalPoolVolumeChartType, setVolumeChartType] = useState<string>('bar')
+  const [percentageChartType, setPercentageChartType] = useState<string>('line')
+  const [showTVL, setShowTVL] = useState<boolean>(true)
+  const [showTotalPoolVolume, setShowVolume] = useState<boolean>(true)
+  const [showPercentageChange, setShowPercentageChange] = useState<boolean>(true)
+  const [chartLayout, setChartLayout] = useState<'stacked' | 'sideBySide'>('stacked')
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false)
 
-  const processedMetrics = useMemo(() => {
-    try {
-      return metrics.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-        .map((metric) => {
-          const yieldValue = metric.yield ? parseFloat(metric.yield) : null
-          if (yieldValue === null) {
-            console.warn(`Missing yield value for date ${metric.date}`)
-          } else if (isNaN(yieldValue)) {
-            console.error(`Invalid yield value for date ${metric.date}: ${metric.yield}`)
-          }
-          return {
-            date: new Date(metric.date).toLocaleDateString(),
-            poolyield: parseFloat(metric.yield),
-            totalPoolVolume: parseFloat(metric.totalPoolVolume),
-            feesGenerated: parseFloat(metric.feesGenerated),
-            relativeAPR: parseFloat(metric.relativeAPR),
-            totalValueLocked: parseFloat(metric.totalValueLocked),
-            averageVolume: parseFloat(metric.totalPoolVolume) / (new Date(metric.date).getDate()),
-            volumeGrowth: 0 // This would need to be calculated if required
-          }
-        });
-    } catch (err) {
-      setError(`Error processing metrics: ${err instanceof Error ? err.message : String(err)}`)
-      return []
+  const processedMetrics = useMemo<ProcessedMetric[]>(() => {
+    console.log('Processing metrics:', { timeRange, aggregation, metricsCount: metrics.length });
+
+    let filteredMetrics = metrics.sort((a: Metric, b: Metric) => parseISO(a.date).getTime() - parseISO(b.date).getTime())
+
+    if (timeRange !== 'all') {
+      const now = new Date()
+      let pastDate: Date
+      switch (timeRange) {
+        case '7d':
+          pastDate = subDays(now, 7)
+          break
+        case '30d':
+          pastDate = subDays(now, 30)
+          break
+        case '90d':
+          pastDate = subDays(now, 90)
+          break
+        case '180d':
+          pastDate = subDays(now, 180)
+          break
+        case '1y':
+          pastDate = subYears(now, 1)
+          break
+        case '5y':
+          pastDate = subYears(now, 5)
+          break
+        default:
+          pastDate = subDays(now, 30)
+      }
+      filteredMetrics = filteredMetrics.filter(metric => 
+        isWithinInterval(parseISO(metric.date), { start: pastDate, end: now })
+      )
     }
-  }, [metrics]);
 
-  const handleAddChart = () => {
-    if (chartToAdd && !selectedCharts.includes(chartToAdd)) {
-      setSelectedCharts([...selectedCharts, chartToAdd])
-      setChartToAdd(null)
+    console.log('Filtered metrics:', filteredMetrics.length);
+
+    const aggregatedMetrics = filteredMetrics.reduce((acc: any[], metric: Metric) => {
+      const date = parseISO(metric.date)
+      let key: string
+      let periodStart: Date
+
+      switch (aggregation) {
+        case 'weekly':
+          periodStart = startOfWeek(date)
+          key = format(periodStart, 'yyyy-MM-dd')
+          break
+        case 'monthly':
+          periodStart = startOfMonth(date)
+          key = format(periodStart, 'yyyy-MM')
+          break
+        case 'quarterly':
+          periodStart = startOfQuarter(date)
+          key = `${date.getFullYear()}-Q${Math.floor(date.getMonth() / 3) + 1}`
+          break
+        default:
+          key = metric.date
+          periodStart = date
+      }
+
+      const existingEntry = acc.find(m => m.key === key)
+      if (existingEntry) {
+        existingEntry.totalValueLocked += metric.totalValueLocked
+        existingEntry.totalPoolVolume += metric.totalPoolVolume
+        existingEntry.count += 1
+      } else {
+        acc.push({ 
+          key, 
+          date: format(periodStart, 'yyyy-MM-dd'),
+          totalValueLocked: metric.totalValueLocked, 
+          totalPoolVolume: metric.totalPoolVolume,
+          count: 1
+        })
+      }
+      return acc
+    }, [])
+
+    console.log('Aggregated metrics:', aggregatedMetrics);
+
+    const result = aggregatedMetrics.map((m: any, index: number, array: any[]) => {
+      const tvl = m.totalValueLocked / m.count
+      const prevTVL = index > 0 ? array[index - 1].totalValueLocked / array[index - 1].count : tvl
+      const tvlPercentageChange = ((tvl - prevTVL) / prevTVL) * 100
+
+      const totalPoolVolume = m.totalPoolVolume / m.count
+      const prevTotalPoolVolume = index > 0 ? array[index - 1].totalPoolVolume / array[index - 1].count : totalPoolVolume
+      const totalPoolVolumePercentageChange = ((totalPoolVolume - prevTotalPoolVolume) / prevTotalPoolVolume) * 100
+
+      console.log('Processed metric:', { 
+        date: m.date, 
+        tvl, 
+        tvlPercentageChange, 
+        totalPoolVolume, 
+        totalPoolVolumePercentageChange 
+      });
+
+      return {
+        date: m.date,
+        totalValueLocked: tvl,
+        tvlPercentageChange: index === 0 ? 0 : tvlPercentageChange,
+        totalPoolVolume: totalPoolVolume,
+        totalPoolVolumePercentageChange: index === 0 ? 0 : totalPoolVolumePercentageChange
+      }
+    })
+
+    console.log('Final processed metrics:', result);
+
+    return result
+  }, [metrics, timeRange, aggregation])
+
+  const tvlDomain = useMemo(() => {
+    const values = processedMetrics.map(metric => metric.totalValueLocked)
+    const minValue = Math.min(...values)
+    const maxValue = Math.max(...values)
+    const range = maxValue - minValue
+    return [Math.max(0, minValue - range * 0.1), maxValue + range * 0.1]
+  }, [processedMetrics])
+
+  const totalPoolVolumeDomain = useMemo(() => {
+    const values = processedMetrics.map(metric => metric.totalPoolVolume)
+    const minValue = Math.min(...values)
+    const maxValue = Math.max(...values)
+    const range = maxValue - minValue
+    return [Math.max(0, minValue - range * 0.1), maxValue + range * 0.1]
+  }, [processedMetrics])
+
+  const renderChart = useCallback((chartType: string, dataKey: string, percentageDataKey: string, color: string, percentageColor: string, domain: number[]) => {
+    const calculatePercentageChangeDomain = (dataKey: string) => {
+      const values = processedMetrics.map(metric => metric[dataKey] as number)
+      const minValue = Math.min(...values)
+      const maxValue = Math.max(...values)
+      const padding = Math.max(Math.abs(minValue), Math.abs(maxValue)) * 0.1
+      return [-Math.max(Math.abs(minValue), Math.abs(maxValue)) - padding, Math.max(Math.abs(minValue), Math.abs(maxValue)) + padding]
     }
-  }
 
-  const handleRemoveChart = (chart: string) => {
-    setSelectedCharts(selectedCharts.filter(c => c !== chart))
-  }
+    const percentageChangeDomain = calculatePercentageChangeDomain(percentageDataKey)
 
-  const chartConfig = useMemo(() => {
-    return Object.fromEntries(
-      selectedCharts.map(chart => [chart, chartTypes[chart]])
-    )
-  }, [selectedCharts])
+    return (
+      <ResponsiveContainer width="100%" height={300}>
+        <ComposedChart data={processedMetrics} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.5} />
+          <XAxis 
+            dataKey="date" 
+            stroke="#ffffff"
+            tick={{ fill: '#ffffff', fontSize: 12 }}
+            tickLine={{ stroke: '#ffffff' }}
+            tickFormatter={(value) => formatDate(value, aggregation)}
+            interval={'preserveStartEnd'}
+          />
+          <YAxis 
+            yAxisId="left"
+            stroke="#ffffff"
+            tickFormatter={formatNumber}
+            domain={domain}
+            tick={{ fill: '#ffffff', fontSize: 12 }}
+            tickLine={{ stroke: '#ffffff' }}
+            width={80}
+          />
+          {showPercentageChange && (
+            <YAxis
+              yAxisId="right"
+              orientation="right"
+              stroke="#ffffff"
+              tickFormatter={(value) => `${value.toFixed(2)}%`}
+              domain={percentageChangeDomain}
+              tick={{ fill: '#ffffff', fontSize: 12 }}
+              tickLine={{ stroke: '#ffffff' }}
+              width={80}
+            />
+          )}
+          <Tooltip 
+            content={<CustomTooltip aggregation={aggregation} />}
+            cursor={{ stroke: '#4B5563', strokeWidth: 1 }}
+          />
+          {showPercentageChange && <ReferenceLine y={0} yAxisId="right" stroke="#666" />}
+          {chartType === 'line' ? (
+            <Line
+              yAxisId="left"
+              type="monotone"
+              dataKey={dataKey}
+              stroke={color}
+              strokeWidth={2}
+              dot={false}
+              activeDot={{ r: 8, fill: color, stroke: '#ffffff', strokeWidth: 2 }}
+            />
+          ) : (
+            <Bar
+              yAxisId="left"
+              dataKey={dataKey}
+              fill={color}
+              radius={[4, 4, 0, 0]}
+            />
+          )}
+          {showPercentageChange && (
+            percentageChartType === 'line' ? (
+              <Line
+                yAxisId="right"
+                type="monotone"
+                dataKey={percentageDataKey}
+                stroke={percentageColor}
+                strokeWidth={2}
+                dot={false}
+                activeDot={{ r: 8, fill: percentageColor, stroke:  '#ffffff', strokeWidth: 2 }}
+              />
+            ) : (
+              <Bar
+                yAxisId="right"
+                dataKey={percentageDataKey}
+                fill={percentageColor}
+                radius={[4, 4, 0, 0]}
+              />
+            )
+          )}
+        </ComposedChart>
+      </ResponsiveContainer>
+    );
+  }, [processedMetrics, aggregation, showPercentageChange, percentageChartType]);
 
-  if (error) {
-    return <div className="text-red-500">{error}</div>
-  }
+  const renderSummaryStats = useCallback(() => {
+    const totalPoolVolume = processedMetrics.reduce((sum, metric) => sum + metric.totalPoolVolume, 0);
+    const averageDailyTotalPoolVolume = totalPoolVolume / processedMetrics.length;
+    const lastTVL = processedMetrics[processedMetrics.length - 1]?.totalValueLocked || 0;
+
+    return (
+      <div className="mt-4">
+        <h3 className="text-white font-semibold mb-2">Summary Statistics</h3>
+        <p className="text-sm text-gray-300">Total Pool Volume: {formatNumber(totalPoolVolume)}</p>
+        <p className="text-sm text-gray-300">Average Daily Total Pool Volume: {formatNumber(averageDailyTotalPoolVolume)}</p>
+        <p className="text-sm text-gray-300">Current TVL: {formatNumber(lastTVL)}</p>
+      </div>
+    );
+  }, [processedMetrics]);
 
   return (
-    <Card className="w-full bg-gradient-to-br from-gray-900 to-black border-gray-800 shadow-lg rounded-xl overflow-hidden">
-      <CardHeader>
-        <CardTitle className="text-xl font-bold text-white">Pool Yield Analysis</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-col md:flex-row">
-          <div className="w-full md:w-3/4 mt-4 md:mt-0">
-            <ChartContainer config={chartConfig} className="h-[400px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={processedMetrics}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis dataKey="date" stroke="#ffffff" />
-                  <YAxis yAxisId="left" orientation="left" stroke="#ffffff" />
-                  <YAxis yAxisId="right" orientation="right" stroke="#ffffff" />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend />
-                  {selectedCharts.map(chart => {
-                    const chartConfig = chartTypes[chart]
-                    if (chartConfig.type === 'line') {
-                      return (
-                        <Line
-                          key={chart}
-                          yAxisId={chart === "yield" ? "right" : "left"}
-                          type="monotone"
-                          dataKey={chart}
-                          stroke={chartConfig.color}
-                          strokeWidth={2}
-                          dot={false}
-                          name={chartConfig.label}
-                          connectNulls={true}
-                        />
-                      )
-                    } else if (chartConfig.type === 'bar') {
-                      return (
-                        <Bar
-                          key={chart}
-                          yAxisId="left"
-                          dataKey={chart}
-                          fill={chartConfig.color}
-                          name={chartConfig.label}
-                        />
-                      )
-                    }
-                    return null
-                  })}
-                </ComposedChart>
-              </ResponsiveContainer>
-            </ChartContainer>
+    <Card className="w-full bg-gradient-to-br from-gray-900 to-black border-gray-800 shadow-lg rounded-2xl overflow-hidden">
+      <CardContent className="p-6">
+        <div className="flex flex-col space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-semibold text-white">Pool Metrics</h2>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+              className={`text-white hover:text-gray-200 bg-gray-800/50 hover:bg-gray-700/60 border-gray-600 hover:border-gray-500 transition-all duration-200 backdrop-blur-sm ${
+                isSettingsOpen ? 'bg-white/10 text-white' : ''
+              }`}
+            >
+              Settings
+              <ChevronDown className={`ml-2 h-4 w-4 transition-transform duration-200 ${isSettingsOpen ? 'rotate-180' : ''}`} />
+            </Button>
           </div>
-          <div className="w-full md:w-1/4 pr-4">
-            <div className="flex items-center space-x-2 mb-4">
-              <Select value={chartToAdd || ''} onValueChange={setChartToAdd}>
-                <SelectTrigger className="w-[180px] bg-gray-800 text-white border-gray-700">
-                  <SelectValue placeholder="Add chart" />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-800 text-white border-gray-700">
-                  {Object.entries(chartTypes).map(([key, { label }]) => (
-                    <SelectItem key={key} value={key} className="hover:bg-gray-700">
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button onClick={handleAddChart} className="bg-blue-500 hover:bg-blue-600 text-white">
-                <PlusCircle className="w-4 h-4 mr-2" />
-                Add
-              </Button>
-            </div>
-            <div className="space-y-2">
-              {selectedCharts.map(chart => (
-                <div key={chart} className="flex items-center justify-between bg-gray-800 p-2 rounded">
-                  <span className="text-white">{chartTypes[chart].label}</span>
-                  <Button onClick={() => handleRemoveChart(chart)} variant="ghost" className="text-gray-400 hover:text-white">
-                    <XCircle className="w-4 h-4" />
-                  </Button>
+
+          <AnimatePresence>
+            {isSettingsOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="overflow-hidden"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <Select value={timeRange} onValueChange={setTimeRange}>
+                    <SelectTrigger className="w-full bg-gray-800/50 text-white border-gray-600 hover:border-gray-500 focus:ring-2 focus:ring-blue-500 transition-all duration-200 backdrop-blur-sm">
+                      <SelectValue placeholder="Select time range" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-800/90 text-white border-gray-600 backdrop-blur-sm">
+                      <SelectItem value="all" className="hover:bg-gray-700">All Time</SelectItem>
+                      <SelectItem value="7d" className="hover:bg-gray-700">Last 7 Days</SelectItem>
+                      <SelectItem value="30d" className="hover:bg-gray-700">Last 30 Days</SelectItem>
+                      <SelectItem value="90d" className="hover:bg-gray-700">Last 90 Days</SelectItem>
+                      <SelectItem value="180d" className="hover:bg-gray-700">Last 180 Days</SelectItem>
+                      <SelectItem value="1y" className="hover:bg-gray-700">Last Year</SelectItem>
+                      <SelectItem value="5y" className="hover:bg-gray-700">Last 5 Years</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={aggregation} onValueChange={setAggregation}>
+                    <SelectTrigger className="w-full bg-gray-800/50 text-white border-gray-600 hover:border-gray-500 focus:ring-2 focus:ring-blue-500 transition-all duration-200 backdrop-blur-sm">
+                      <SelectValue placeholder="Select view" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-800/90 text-white border-gray-600 backdrop-blur-sm">
+                      <SelectItem value="daily" className="hover:bg-gray-700">Daily</SelectItem>
+                      <SelectItem value="weekly" className="hover:bg-gray-700">Weekly</SelectItem>
+                      <SelectItem value="monthly" className="hover:bg-gray-700">Monthly</SelectItem>
+                      <SelectItem value="quarterly" className="hover:bg-gray-700">Quarterly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="show-tvl"
+                        checked={showTVL}
+                        onCheckedChange={setShowTVL}
+                        className="data-[state=checked]:bg-blue-500"
+                      />
+                      <Label htmlFor="show-tvl" className="text-sm text-gray-300">TVL</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="show-volume"
+                        checked={showTotalPoolVolume}
+                        onCheckedChange={setShowVolume}
+                        className="data-[state=checked]:bg-blue-500"
+                      />
+                      <Label htmlFor="show-volume" className="text-sm text-gray-300">Total Pool Volume</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="show-percentage"
+                        checked={showPercentageChange}
+                        onCheckedChange={setShowPercentageChange}
+                        className="data-[state=checked]:bg-blue-500"
+                      />
+                      <Label htmlFor="show-percentage" className="text-sm text-gray-300">% Change</Label>
+                    </div>
+                  </div>
                 </div>
-              ))}
-            </div>
+                <div className="mt-4 flex justify-between items-center">
+                  <div className="flex space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setChartLayout(chartLayout === 'stacked' ? 'sideBySide' : 'stacked')}
+                      className={`text-white hover:text-gray-200 bg-gray-800/50 hover:bg-gray-700/60 border-gray-600 hover:border-gray-500 transition-all duration-200 backdrop-blur-sm ${
+                        chartLayout === 'stacked' ? 'bg-white/10' : ''
+                      }`}
+                    >
+                      {chartLayout === 'stacked' ? <Rows className="h-4 w-4" /> : <LayoutGrid className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setTvlChartType('line');
+                        setVolumeChartType('line');
+                      }}
+                      className={`text-white hover:text-gray-200 bg-gray-800/50 hover:bg-gray-700/60 border-gray-600 hover:border-gray-500 transition-all duration-200 backdrop-blur-sm ${
+                        tvlChartType === 'line' && totalPoolVolumeChartType === 'line' ? 'bg-white/10' : ''
+                      }`}
+                    >
+                      <LineChartIcon className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setTvlChartType('bar');
+                        setVolumeChartType('bar');
+                      }}
+                      className={`text-white hover:text-gray-200 bg-gray-800/50 hover:bg-gray-700/60 border-gray-600 hover:border-gray-500 transition-all duration-200 backdrop-blur-sm ${
+                        tvlChartType === 'bar' && totalPoolVolumeChartType === 'bar' ? 'bg-white/10' : ''
+                      }`}
+                    >
+                      <BarChartIcon className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPercentageChartType('line')}
+                      className={`text-white hover:text-gray-200 bg-gray-800/50 hover:bg-gray-700/60 border-gray-600 hover:border-gray-500 transition-all duration-200 backdrop-blur-sm ${
+                        percentageChartType === 'line' ? 'bg-white/10' : ''
+                      }`}
+                    >
+                      % Line
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPercentageChartType('bar')}
+                      className={`text-white hover:text-gray-200 bg-gray-800/50 hover:bg-gray-700/60 border-gray-600 hover:border-gray-500 transition-all duration-200 backdrop-blur-sm ${
+                        percentageChartType === 'bar' ? 'bg-white/10' : ''
+                      }`}
+                    >
+                      % Bar
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className={`grid ${chartLayout === 'stacked' ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'} gap-6`}>
+            {showTVL && (
+              <div className="border border-gray-700 rounded-lg p-4">
+                <h3 className="text-lg font-semibold text-white mb-4">Total Value Locked (TVL)</h3>
+                {renderChart(tvlChartType, 'totalValueLocked', 'tvlPercentageChange', '#FF9500', '#007AFF', tvlDomain)}
+              </div>
+            )}
+            {showTotalPoolVolume && (
+              <div className="border border-gray-700 rounded-lg p-4">
+                <h3 className="text-lg font-semibold text-white mb-4">Total Pool Volume</h3>
+                {renderChart(totalPoolVolumeChartType, 'totalPoolVolume', 'totalPoolVolumePercentageChange', '#34C759', '#5856D6', totalPoolVolumeDomain)}
+              </div>
+            )}
           </div>
+
+          {renderSummaryStats()}
         </div>
       </CardContent>
     </Card>
