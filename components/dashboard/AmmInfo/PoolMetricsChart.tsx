@@ -478,6 +478,7 @@ export default function PoolMetricsChart({ metrics }: PoolMetricsChartProps) {
   const renderSummaryStats = useCallback(() => {
     const lastMetric = filteredMetrics[filteredMetrics.length - 1];
     const prevMetric = filteredMetrics[filteredMetrics.length - 2];
+    const initialMetric = filteredMetrics[0];
 
     const calculateChange = (current: number, previous: number) => {
       const change = ((current - previous) / previous) * 100;
@@ -489,6 +490,7 @@ export default function PoolMetricsChart({ metrics }: PoolMetricsChartProps) {
       fees: filteredMetrics.reduce((sum, metric) => sum + metric.feesGenerated, 0) / filteredMetrics.length,
       apr: filteredMetrics.reduce((sum, metric) => sum + metric.relativeAPR, 0) / filteredMetrics.length,
       utilizationRate: filteredMetrics.reduce((sum, metric) => sum + (metric.totalPoolVolume / metric.totalValueLocked) * 100, 0) / filteredMetrics.length,
+      liquidity: filteredMetrics.reduce((sum, metric) => sum + metric.totalValueLocked, 0) / filteredMetrics.length,
     };
 
     const totals = {
@@ -503,6 +505,9 @@ export default function PoolMetricsChart({ metrics }: PoolMetricsChartProps) {
       apr: lastMetric.relativeAPR,
       utilizationRate: (lastMetric.totalPoolVolume / lastMetric.totalValueLocked) * 100,
     };
+
+    const liquidityGrowth = current.tvl - initialMetric.totalValueLocked;
+    const liquidityGrowthPercentage = ((liquidityGrowth / initialMetric.totalValueLocked) * 100).toFixed(2);
 
     const renderMetric = (label: string, value: number, change?: number) => (
       <div className="flex justify-between items-center py-1">
@@ -521,13 +526,15 @@ export default function PoolMetricsChart({ metrics }: PoolMetricsChartProps) {
 
     return (
       <Card className="bg-transparent border-none">
-        {/* <CardHeader className="pb-2">
-          <CardTitle className="text-lg font-semibold text-white">Summary Statistics</CardTitle>
-        </CardHeader> */}
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="space-y-1">
-              <h4 className="text-sm font-medium text-white mb-1">Today</h4>
+              <h4 className="text-sm font-medium text-white mb-1">Since Inception</h4>
+              {renderMetric("Liquidity Growth", liquidityGrowth, parseFloat(liquidityGrowthPercentage))}
+              
+            </div>
+            <div className="space-y-1">
+              <h4 className="text-sm font-medium text-white mb-1">Today Performance</h4>
               {renderMetric("Value Locked", current.tvl, parseFloat(calculateChange(current.tvl, prevMetric.totalValueLocked)))}
               {renderMetric("Trading Volume", current.volume, parseFloat(calculateChange(current.volume, prevMetric.totalPoolVolume)))}
               {renderMetric("Daily Fees", current.fees, parseFloat(calculateChange(current.fees, prevMetric.feesGenerated)))}
@@ -535,23 +542,20 @@ export default function PoolMetricsChart({ metrics }: PoolMetricsChartProps) {
               {renderMetric("Utilization Rate", current.utilizationRate, parseFloat(calculateChange(current.utilizationRate, (prevMetric.totalPoolVolume / prevMetric.totalValueLocked) * 100)))}
             </div>
             <div className="space-y-1">
-              <h4 className="text-sm font-medium text-white mb-1">{timeRangeDisplayText[timeRange]}</h4>
-              {renderMetric("Pool Volume", totals.volume)}
-              {renderMetric("Cumulated Fees", totals.fees)}
-            </div>
-            <div className="space-y-1">
-              <h4 className="text-sm font-medium text-white mb-1"> </h4>
+              <h4 className="text-sm font-medium text-white mb-1">Daily Averages</h4>
               {renderMetric("Avg. Daily Volume", averages.volume)}
               {renderMetric("Avg. Daily Fees", averages.fees)}
+              {renderMetric("Avg. Daily Liquidity", averages.liquidity)}
               {renderMetric("Avg. Relative APR", averages.apr)}
               {renderMetric("Avg. Utilization Rate", averages.utilizationRate)}
             </div>
             <div className="space-y-1">
-              <h4 className="text-sm font-medium text-white mb-1"> </h4>
-              {renderMetric("Avg. Daily Volume", averages.volume)}
-              {renderMetric("Avg. Daily Fees", averages.fees)}
-              {renderMetric("Avg. Relative APR", averages.apr)}
-              {renderMetric("Avg. Utilization Rate", averages.utilizationRate)}
+            <h4 className="text-sm font-medium text-white mb-1">Pool Performance</h4>
+              {renderMetric("Total Volume", totals.volume)}
+              {renderMetric("Total Fees", totals.fees)}
+              {renderMetric("Impermant Loss", averages.volume)}
+              {renderMetric("Variance", averages.fees)}
+              {renderMetric("Liquid Sentiment", averages.fees)}
             </div>
           </div>
         </CardContent>
