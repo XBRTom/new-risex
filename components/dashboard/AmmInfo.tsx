@@ -5,15 +5,9 @@ import PoolInfoCard from './AmmInfo/PoolInfoCard'
 import AMMActions from './AmmInfo/AMMActions'
 import GlobalPoolMetricsTable from './AmmInfo/GlobalPoolMetricsTable'
 import PoolMetricsChart from './AmmInfo/PoolMetricsChart'
-import GlobalPoolMetricsChart from './pool-details/GlobalPoolMetricsChart'
 import apiClient from '@/libs/api'
-// import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useWallet } from '@/providers/Wallet'
-// import { Input } from "@/components/ui/input"
-// import { Label } from "@/components/ui/label"
-import VoteSlotsGauge from './pool-details/VoteSlotsGauge'
-import AmmInfoTable from './pool-details/AmmInfoTable'
+// import { useWallet } from '@/providers/Wallet'
 import WalletPoolHoldingTable from './pool-details/WalletPoolHoldingTable'
 // import TransactionTable from './pool-details/TransactionTable'
 import DashboardLayout from './Layout/DashboardLayout'
@@ -25,13 +19,6 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-
-// const timeRanges = [
-//   { value: '15days', label: 'Last 15 Days' },
-//   { value: 'month', label: 'Current Month' },
-//   { value: '3months', label: 'Last 3 Months' },
-//   { value: 'alltime', label: 'All Time' },
-// ]
 
 interface LatestMetrics {
   totalValueLocked: number
@@ -379,10 +366,10 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
                     <WalletPoolHoldingTable holdings={holdings} />
                   </CardContent>
                 </Card>
-                <div className="bg-black mb-6 w-full md:w-1/3">
+                {/* <div className="bg-black mb-6 w-full md:w-1/3">
                   <VoteSlotsGauge voteSlotsData={ammInfo.pool.voteSlots} />
-                </div>
-                <div className="bg-black mb-6 w-full md:w-1/3">
+                </div> */}
+                {/* <div className="bg-black mb-6 w-full md:w-1/3">
                   <p>Vote Slots Table</p>
                   <AmmInfoTable 
                     headers={[
@@ -396,15 +383,15 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
                       vote_weight: vote.voteWeight,
                     }))}
                   />
-                </div>
-                <Card className="bg-black mb-6 w-full md:w-1/4">
+                </div> */}
+                {/* <Card className="bg-black mb-6 w-full md:w-1/4">
                   <CardHeader>
                     <CardTitle>Recent Transactions</CardTitle>
                   </CardHeader>
                   <CardContent>
                     {/* <TransactionTable transactions={transactions} /> */}
-                  </CardContent>
-                </Card>
+                  {/* </CardContent>
+                </Card> */}
               </div>
               {/* <div className="mt-6 mb-4">
                 <Label htmlFor="timeRange" className="mr-2">
@@ -427,7 +414,7 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
                 <PoolMetricsChart metrics={historicalMetrics} />
               </div>
               <GlobalPoolMetricsTable metrics={filteredMetrics} initialTimeRange={timeRange} />
-              <GlobalPoolMetricsChart metrics={filteredMetrics} />
+              {/* <GlobalPoolMetricsChart metrics={filteredMetrics} /> */}
             </div>
           </main>
         </div>
