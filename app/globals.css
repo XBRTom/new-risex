@@ -190,7 +190,7 @@ section p {
   font-size: 1.25rem;
 }
 
-table {
+/* table {
   width: 100%;
   margin-top: 1rem;
   border-collapse: collapse;
@@ -215,7 +215,7 @@ tfoot {
 
 tfoot td {
   font-weight: bold;
-}
+} */
 
 .flex {
   display: flex;

@@ -63,7 +63,7 @@ const PoolsTable: React.FC<PoolsTableProps> = ({
     { label: '24h Base Volume', key: 'baseVolume', sortable: true },
     { label: '24h Counter Volume', key: 'counterVolume', sortable: true },
     { label: 'Instant APR', key: 'InstantAPR', sortable: true },
-    { label: 'Actions', key: 'Actions', sortable: false },
+    { label: 'Add / Withdraw', key: 'Actions', sortable: false },
   ];
 
   const sortedPools = useMemo(() => {
@@ -208,23 +208,24 @@ const PoolsTable: React.FC<PoolsTableProps> = ({
                     <Button
                       variant="outline"
                       size="sm"
-                      className="mr-2"
+                      className="mr-2 bg-transparent hover:bg-gray-700/50 text-green-400 border border-green-400 hover:border-green-300"
                       onClick={(e) => {
                         e.stopPropagation();
                         openAddLiquidityModal(pool);
                       }}
                     >
-                      <Plus className="h-4 w-4 mr-1" /> Add
+                      <Plus className="h-4 w-4 mr-1" />
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
+                      className="bg-transparent hover:bg-gray-700/50 text-red-400 border border-red-400 hover:border-red-300"
                       onClick={(e) => {
                         e.stopPropagation();
                         openWithdrawLiquidityModal(pool);
                       }}
                     >
-                      <Minus className="h-4 w-4 mr-1" /> Withdraw
+                      <Minus className="h-4 w-4 mr-1" />
                     </Button>
                   </TableCell>
                 </TableRow>

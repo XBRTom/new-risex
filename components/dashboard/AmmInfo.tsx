@@ -1,10 +1,10 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import PoolInfoCard from './ammInfo/PoolInfoCard'
-import AMMActions from './ammInfo/AMMActions'
-import GlobalPoolMetricsTable from './ammInfo/GlobalPoolMetricsTable'
-import PoolMetricsChart from './ammInfo/PoolMetricsChart'
+import PoolInfoCard from './amminfo/PoolInfoCard'
+import AMMActions from './amminfo/AMMActions'
+import GlobalPoolMetricsTable from './amminfo/GlobalPoolMetricsTable'
+import PoolMetricsChart from './amminfo/PoolMetricsChart'
 import apiClient from '@/libs/api'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 // import { useWallet } from '@/providers/Wallet'

@@ -82,23 +82,43 @@ const Dashboard: React.FC = () => {
     const fetchAllPoolsData = async () => {
       if (hasFetchedData.current) return;
       hasFetchedData.current = true;
+  
       try {
         setLoading(true);
         const currentDate = new Date().toISOString().split('T')[0];
-        const cachedPools = localStorage.getItem(`poolsData_${currentDate}`);
-        if (!cachedPools) {
+        const cacheKey = `poolsData_${currentDate}`;
+        const cachedPoolsData = localStorage.getItem(cacheKey);
+        const cachedTimestamp = localStorage.getItem(`${cacheKey}_timestamp`);
+  
+        // Define a threshold (e.g., 24 hours) for when the data is considered outdated
+        const cacheExpirationTime = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+  
+        const isCacheValid = cachedTimestamp && (new Date().getTime() - new Date(cachedTimestamp).getTime()) < cacheExpirationTime;
+  
+        // console.log('Cached pools data:', cachedPoolsData);
+        // console.log('Cached timestamp:', cachedTimestamp);
+        // console.log('Is cache valid?:', isCacheValid);
+  
+        if (!cachedPoolsData || !isCacheValid) {
           const data: any = await apiClient.get(`/fetch-pools/${1100}`);
+          console.log('Fetched data from API:', data);
+  
           const { pools, totalPools } = data;
           setPools(pools);
           setFilteredPools(pools);
           setTotalItems(totalPools);
-          localStorage.setItem(`poolsData_${currentDate}`, JSON.stringify(pools));
-          return;
+  
+          // Store the fetched data and timestamp in localStorage
+          localStorage.setItem(cacheKey, JSON.stringify(pools));
+          localStorage.setItem(`${cacheKey}_timestamp`, new Date().toISOString());
+        } else {
+          const parsedPools = JSON.parse(cachedPoolsData);
+          console.log('Parsed pools from cache:', parsedPools);
+  
+          setPools(parsedPools);
+          setFilteredPools(parsedPools);
+          setTotalItems(parsedPools.length);
         }
-        const parsedPools = JSON.parse(cachedPools);
-        setPools(parsedPools);
-        setFilteredPools(parsedPools);
-        setTotalItems(parsedPools.length);
       } catch (err) {
         console.error('Failed to fetch initial data:', err);
         setError('Failed to fetch data');
@@ -106,9 +126,11 @@ const Dashboard: React.FC = () => {
         setLoading(false);
       }
     };
-    
+  
     fetchAllPoolsData();
   }, []);
+  
+  
 
   useEffect(() => {
     if (!isInitializing && typeof window !== 'undefined') {
