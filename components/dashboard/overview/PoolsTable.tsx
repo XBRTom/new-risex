@@ -1,22 +1,59 @@
 import React, { useState, useMemo } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArrowUpDown, ArrowUp, ArrowDown, Plus, Minus } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ArrowUpDown, ArrowUp, ArrowDown, Plus, Minus } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import AddLiquidityModal from '@/components/AddLiquidityModal';
-import WithdrawLiquidityModal from '@/components/WithdrawLiquidityModal';
+} from '@/components/ui/tooltip';
+import AddLiquidityModal from '@/components/dashboard/global/AddLiquidityModal';
+import WithdrawLiquidityModal from '@/components/dashboard/global/WithdrawLiquidityModal';
 
-const PoolsTable = ({ pools = [], itemsPerPage, totalItems, currentPage, onPageChange }) => {
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+// Define the shape of a pool object
+interface Pool {
+  account: string;
+  asset_currency: string;
+  asset2_currency: string;
+  tradingFee: number;
+  totalValueLocked: string | number;
+  totalPoolVolume: string | number;
+  baseVolume?: number;
+  counterVolume?: number;
+  relativeAPR?: string | number;
+}
+
+interface PoolsTableProps {
+  pools: Pool[];
+  itemsPerPage: number;
+  totalItems: number;
+  currentPage: number;
+  onPageChange: (page: number) => void;
+}
+
+const PoolsTable: React.FC<PoolsTableProps> = ({
+  pools = [],
+  itemsPerPage,
+  totalItems,
+  currentPage,
+  onPageChange,
+}) => {
+  const [sortConfig, setSortConfig] = useState<{ key: string | null; direction: string | null }>({
+    key: null,
+    direction: null,
+  });
   const [isAddLiquidityModalOpen, setIsAddLiquidityModalOpen] = useState(false);
   const [isWithdrawLiquidityModalOpen, setIsWithdrawLiquidityModalOpen] = useState(false);
-  const [selectedPool, setSelectedPool] = useState(null);
+  const [selectedPool, setSelectedPool] = useState<Pool | null>(null);
 
   const headers = [
     { label: 'Pools', key: 'Pair', sortable: true },
@@ -26,32 +63,36 @@ const PoolsTable = ({ pools = [], itemsPerPage, totalItems, currentPage, onPageC
     { label: '24h Base Volume', key: 'baseVolume', sortable: true },
     { label: '24h Counter Volume', key: 'counterVolume', sortable: true },
     { label: 'Instant APR', key: 'InstantAPR', sortable: true },
-    { label: 'Actions', key: 'Actions', sortable: false }
+    { label: 'Actions', key: 'Actions', sortable: false },
   ];
 
   const sortedPools = useMemo(() => {
     let sortablePools = [...pools];
     if (sortConfig.key) {
       sortablePools.sort((a, b) => {
-        let aValue = a[sortConfig.key];
-        let bValue = b[sortConfig.key];
-        
+        let aValue: any = a[sortConfig.key as keyof Pool];
+        let bValue: any = b[sortConfig.key as keyof Pool];
+
         if (sortConfig.key === 'LiquidityXRP') {
-          aValue = parseFloat(a.totalValueLocked || 0);
-          bValue = parseFloat(b.totalValueLocked || 0);
+          aValue = parseFloat(a.totalValueLocked?.toString() || '0');
+          bValue = parseFloat(b.totalValueLocked?.toString() || '0');
         } else if (sortConfig.key === 'TotalVolume') {
-          aValue = parseFloat(a.totalPoolVolume || 0);
-          bValue = parseFloat(b.totalPoolVolume || 0);
+          aValue = parseFloat(a.totalPoolVolume?.toString() || '0');
+          bValue = parseFloat(b.totalPoolVolume?.toString() || '0');
         } else if (sortConfig.key === 'Pair') {
           aValue = `${a.asset_currency} / ${a.asset2_currency}`;
           bValue = `${b.asset_currency} / ${b.asset2_currency}`;
         } else if (sortConfig.key === 'baseVolume' || sortConfig.key === 'counterVolume') {
-          aValue = parseFloat(a[sortConfig.key]);
-          bValue = parseFloat(b[sortConfig.key]);
+          aValue = parseFloat(a[sortConfig.key as keyof Pool]?.toString() || '0');
+          bValue = parseFloat(b[sortConfig.key as keyof Pool]?.toString() || '0');
         } else if (sortConfig.key === 'InstantAPR') {
-          aValue = parseFloat(a.relativeAPR || 0);
-          bValue = parseFloat(b.relativeAPR || 0);
+          aValue = parseFloat(a.relativeAPR?.toString() || '0');
+          bValue = parseFloat(b.relativeAPR?.toString() || '0');
         }
+
+        if (aValue == null && bValue == null) return 0;
+        if (aValue == null) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (bValue == null) return sortConfig.direction === 'asc' ? 1 : -1;
 
         if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
         if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
@@ -61,7 +102,7 @@ const PoolsTable = ({ pools = [], itemsPerPage, totalItems, currentPage, onPageC
     return sortablePools;
   }, [pools, sortConfig]);
 
-  const requestSort = (key) => {
+  const requestSort = (key: string) => {
     let direction = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc';
@@ -69,11 +110,11 @@ const PoolsTable = ({ pools = [], itemsPerPage, totalItems, currentPage, onPageC
     setSortConfig({ key, direction });
   };
 
-  const formatCurrency = (value) => {
+  const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
   };
 
-  const openAddLiquidityModal = (pool) => {
+  const openAddLiquidityModal = (pool: Pool) => {
     setSelectedPool(pool);
     setIsAddLiquidityModalOpen(true);
   };
@@ -83,7 +124,7 @@ const PoolsTable = ({ pools = [], itemsPerPage, totalItems, currentPage, onPageC
     setSelectedPool(null);
   };
 
-  const openWithdrawLiquidityModal = (pool) => {
+  const openWithdrawLiquidityModal = (pool: Pool) => {
     setSelectedPool(pool);
     setIsWithdrawLiquidityModalOpen(true);
   };
@@ -124,22 +165,37 @@ const PoolsTable = ({ pools = [], itemsPerPage, totalItems, currentPage, onPageC
                 <TableRow
                   key={index}
                   className="border-b border-gray-800 hover:bg-gray-800/50"
-                  onClick={() => window.location.href = `/dashboard/pool/${pool.account}`}
+                  onClick={() => (window.location.href = `/dashboard/pool/${pool.account}`)}
                 >
-                  <TableCell className="font-medium text-white">{pool.asset_currency} / {pool.asset2_currency}</TableCell>
-                  <TableCell className="text-white">{(pool.tradingFee / 1000).toFixed(2)}%</TableCell>
-                  <TableCell className="text-white">{formatCurrency(parseFloat(pool.totalValueLocked || 0))}</TableCell>
-                  <TableCell className="text-white">{formatCurrency(parseFloat(pool.totalPoolVolume || 0))}</TableCell>
-                  <TableCell className="text-white">{(pool.baseVolume ?? 0).toFixed(2)} {pool.asset_currency}</TableCell>
-                  <TableCell className="text-white">{(pool.counterVolume ?? 0).toFixed(2)} {pool.asset2_currency}</TableCell>
+                  <TableCell className="font-medium text-white">
+                    {pool.asset_currency} / {pool.asset2_currency}
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {(pool.tradingFee / 1000).toFixed(2)}%
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {formatCurrency(parseFloat(pool.totalValueLocked?.toString() || '0'))}
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {formatCurrency(parseFloat(pool.totalPoolVolume?.toString() || '0'))}
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {(pool.baseVolume ?? 0).toFixed(2)} {pool.asset_currency}
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {(pool.counterVolume ?? 0).toFixed(2)} {pool.asset2_currency}
+                  </TableCell>
                   <TableCell className="text-white">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <span className="flex items-center space-x-1">
-                            {parseFloat(pool.relativeAPR || 0).toFixed(2)}%
-                            {parseFloat(pool.relativeAPR || 0) > 0 ? <ArrowUp className="h-4 w-4 text-green-500" /> : 
-                             parseFloat(pool.relativeAPR || 0) < 0 ? <ArrowDown className="h-4 w-4 text-red-500" /> : null}
+                            {parseFloat(pool.relativeAPR?.toString() || '0').toFixed(2)}%
+                            {parseFloat(pool.relativeAPR?.toString() || '0') > 0 ? (
+                              <ArrowUp className="h-4 w-4 text-green-500" />
+                            ) : parseFloat(pool.relativeAPR?.toString() || '0') < 0 ? (
+                              <ArrowDown className="h-4 w-4 text-red-500" />
+                            ) : null}
                           </span>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -178,7 +234,8 @@ const PoolsTable = ({ pools = [], itemsPerPage, totalItems, currentPage, onPageC
         </div>
         <div className="flex justify-between items-center mt-4">
           <div className="text-sm text-gray-400">
-            Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
+            Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
+            {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
           </div>
           <div className="flex space-x-2">
             <Button
@@ -201,16 +258,10 @@ const PoolsTable = ({ pools = [], itemsPerPage, totalItems, currentPage, onPageC
         </div>
       </CardContent>
       {isAddLiquidityModalOpen && selectedPool && (
-        <AddLiquidityModal
-          pool={selectedPool}
-          closeModal={closeAddLiquidityModal}
-        />
+        <AddLiquidityModal pool={selectedPool} closeModal={closeAddLiquidityModal} />
       )}
       {isWithdrawLiquidityModalOpen && selectedPool && (
-        <WithdrawLiquidityModal
-          pool={selectedPool}
-          closeModal={closeWithdrawLiquidityModal}
-        />
+        <WithdrawLiquidityModal pool={selectedPool} closeModal={closeWithdrawLiquidityModal} />
       )}
     </Card>
   );

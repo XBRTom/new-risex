@@ -1,10 +1,11 @@
 import { Client, dropsToXrp, xrpToDrops } from 'xrpl';
+import { AMM } from 'xrpl/dist/npm/models/ledger';
 
 const client = new Client('wss://s1.ripple.com', {
   connectionTimeout: 10000, // Increase connection timeout to 10 seconds
 });
 
-const connectClient = async () => {
+const connectClient = async (): Promise<void> => {
   if (!client.isConnected()) {
     console.log('Connecting to XRPL Ledger...');
     await client.connect();
@@ -12,7 +13,12 @@ const connectClient = async () => {
   }
 };
 
-const fetchAmmDetails = async (ammAccount) => {
+interface AmmDetails {
+  accountData: any;
+  ammData: any;
+}
+
+const fetchAmmDetails = async (ammAccount: string): Promise<AmmDetails> => {
   try {
     await connectClient();
     const accountInfoResponse = await client.request({
@@ -28,31 +34,47 @@ const fetchAmmDetails = async (ammAccount) => {
       accountData: accountInfoResponse.result.account_data,
       ammData: ammInfoResponse.result.amm,
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error(`Error fetching AMM details for account ${ammAccount}: ${error.message}`);
     throw error;
   }
 };
 
-const fetchAllAmms = async () => {
+const fetchAllAmms = async (): Promise<string[]> => {
   await connectClient();
   const response = await client.request({
-    command: 'amm_list', // Hypothetical endpoint
+    command: 'ledger_entry',
+    type: 'amm',
   });
-  return response.result.amms.map(amm => amm.account);
+  return response.result.node
+    ? (Array.isArray(response.result.node)
+      ? response.result.node.filter((amm): amm is AMM => amm.LedgerEntryType === 'AMM').map(amm => amm.Account)
+      : response.result.node.LedgerEntryType === 'AMM' ? [response.result.node.Account] : [])
+    : [];
 };
 
-const fetchTransactions = async (address) => {
-  let transactions = [];
-  let marker = null;
+interface Transaction {
+  id: string;
+  date: string;
+  sender: string;
+  recipient: string;
+  amount: string;
+  type: string;
+  lpTokens: string;
+  ammOwnership: string;
+  issuer1: string;
+  issuer2: string;
+}
+
+const fetchTransactions = async (address: string): Promise<Transaction[]> => {
+  let transactions: any[] = [];
+  let marker: string | null = null;
 
   try {
     await connectClient();
-    let response;
+    let response: any;
 
     do {
-      // console.log(`Fetching transactions for ${address} with marker:`, marker);
-
       response = await client.request({
         command: 'account_tx',
         account: address,
@@ -64,8 +86,6 @@ const fetchTransactions = async (address) => {
         marker: marker || undefined, // Pass marker only if defined
       });
 
-      console.log('Response:', response);
-
       if (response.result.transactions) {
         transactions = transactions.concat(response.result.transactions);
       } else {
@@ -74,13 +94,11 @@ const fetchTransactions = async (address) => {
       }
 
       marker = response.result.marker || null;
-      console.log('Next marker:', marker);
 
     } while (marker);
 
-    return transactions.map(tx => {
-    // console.log('TX MAP:', tx);
-        const txData = tx.tx || tx.tx_json;
+    return transactions.map((tx) => {
+      const txData = tx.tx || tx.tx_json;
       let type = 'Unknown';
       let amount = '0';
       let sender = txData.Account;
@@ -101,7 +119,7 @@ const fetchTransactions = async (address) => {
         issuer1 = txData.Amount.issuer || 'N/A';
         issuer2 = txData.Amount2.issuer || 'N/A';
 
-        tx.meta.AffectedNodes.forEach(node => {
+        tx.meta.AffectedNodes.forEach((node: any) => {
           if (node.ModifiedNode && node.ModifiedNode.LedgerEntryType === 'AMM') {
             const finalLpBalance = parseFloat(node.ModifiedNode.FinalFields.LPTokenBalance.value);
             const previousLpBalance = parseFloat(node.ModifiedNode.PreviousFields.LPTokenBalance.value);
@@ -133,36 +151,34 @@ const fetchTransactions = async (address) => {
         issuer2: issuer2,
       };
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching transactions:', error.message);
     throw error;
   }
 };
 
-
-
-
-const fetchAmmTransactionsWithRetries = async (ammAccount, retries = 5, delay = 2000) => {
+const fetchAmmTransactionsWithRetries = async (ammAccount: string, retries = 5, delay = 2000): Promise<Transaction[]> => {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       return await fetchTransactions(ammAccount);
-    } catch (error) {
+    } catch (error: any) {
       if (attempt < retries) {
         console.warn(`Retry ${attempt} failed. Retrying in ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
       } else {
         throw error;
       }
     }
   }
+  throw new Error('All retries failed'); // Add this line
 };
 
-module.exports = {
+export {
   client,
   connectClient,
   fetchAmmDetails,
   fetchAllAmms,
   fetchTransactions,
   fetchAmmTransactionsWithRetries,
-  xrpToDrops
+  xrpToDrops,
 };

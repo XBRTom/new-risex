@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useWallet } from '@/providers/Wallet'; // Adjust path based on your project structure
-import PoolsTable from '@/components/PoolsTable';
-import Pagination from '@/components/Pagination';
+import PoolsTable from '@/components/dashboard/overview/PoolsTable';
+import Pagination from '@/components/dashboard/global/Pagination';
 // import SearchBar from '@/components/SearchBar';
 import apiClient from '@/libs/api';
 import { Progress } from "@/components/ui/progress";
@@ -21,7 +21,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-import DashboardLayout from './Layout/DashboardLayout';
+import DashboardLayout from './layout/DashboardLayout';
 import { AnyNaptrRecord } from 'dns';
 
 
