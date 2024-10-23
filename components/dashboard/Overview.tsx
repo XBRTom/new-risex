@@ -178,6 +178,10 @@ const Dashboard: React.FC = () => {
           </ChartContainer> */}
           <PoolsTable 
             pools={filteredPools.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)}
+            itemsPerPage={itemsPerPage}
+            totalItems={totalItems}
+            currentPage={currentPage}
+            onPageChange={paginate}
           />
           <Pagination
             currentPage={currentPage}
