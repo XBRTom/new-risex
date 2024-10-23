@@ -531,6 +531,8 @@ export default function PoolMetricsChart({ metrics }: PoolMetricsChartProps) {
             <div className="space-y-1">
               <h4 className="text-sm font-medium text-white mb-1">Since Inception</h4>
               {renderMetric("Liquidity Growth", liquidityGrowth, parseFloat(liquidityGrowthPercentage))}
+              {renderMetric("Asset A Growth", liquidityGrowth, parseFloat(liquidityGrowthPercentage))}
+              {renderMetric("Asset B Growth", liquidityGrowth, parseFloat(liquidityGrowthPercentage))}
               
             </div>
             <div className="space-y-1">
@@ -561,7 +563,7 @@ export default function PoolMetricsChart({ metrics }: PoolMetricsChartProps) {
         </CardContent>
       </Card>
     );
-  }, [filteredMetrics, timeRange, timeRangeDisplayText]);
+  }, [filteredMetrics]);
 
 
   const renderSwitches = () => (

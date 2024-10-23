@@ -72,25 +72,32 @@ export default function PoolInfoCard({
               <p className="text-sm text-gray-400 mb-1">24h Trading Volume</p>
               <p className="text-xl font-bold text-white">${latestMetrics?.totalPoolVolume.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
             </div>
-            <p>Base Currency: {baseCurrency ?? 'N/A'}</p>
-      <p>Counter Currency: {counterCurrency ?? 'N/A'}</p>
-      {baseExchangeRate !== null && (
-        <p>Base Currency Exchange Rate: {baseExchangeRate}</p>
-      )}
-      {counterExchangeRate !== null && (
-        <p>Counter Currency Exchange Rate: {counterExchangeRate}</p>
-      )}
-
+            <div>
+              <p className="text-sm text-gray-400 mb-1">Trading Fees</p>
+              <p className={`${isPositiveAPR ? 'text-green-400' : 'text-red-400'}`}>{isPositiveAPR ? <ArrowUpRight className="h-4 w-4 mr-1" /> : <ArrowDownRight className="h-4 w-4 mr-1" />}
+              <span className="text-lg font-bold">{latestMetrics?.relativeAPR.toFixed(2)}%</span></p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-400 mb-1">APR</p>
+              <p className={`${isPositiveAPR ? 'text-green-400' : 'text-red-400'}`}>{isPositiveAPR ? <ArrowUpRight className="h-4 w-4 mr-1" /> : <ArrowDownRight className="h-4 w-4 mr-1" />}
+              <span className="text-lg font-bold">{latestMetrics?.relativeAPR.toFixed(2)}%</span></p>
+            </div>
           </div>
           <Separator className="bg-gray-800" />
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
-              <Percent className="h-5 w-5 text-gray-400" />
-              <span className="text-sm text-gray-400">APR</span>
+              <span className="text-sm text-gray-400">Base Currency</span>
             </div>
-            <div className={`flex items-center ${isPositiveAPR ? 'text-green-400' : 'text-red-400'}`}>
-              {isPositiveAPR ? <ArrowUpRight className="h-4 w-4 mr-1" /> : <ArrowDownRight className="h-4 w-4 mr-1" />}
-              <span className="text-lg font-bold">{latestMetrics?.relativeAPR.toFixed(2)}%</span>
+            <div>
+              <span className="text-lg font-bold">{counterCurrency ?? 'N/A'}</span>
+            </div>
+          </div>
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-400">Base Currency</span>
+            </div>
+            <div>
+              <span className="text-lg font-bold">{counterCurrency ?? 'N/A'}</span>
             </div>
           </div>
           <Separator className="bg-gray-800" />
