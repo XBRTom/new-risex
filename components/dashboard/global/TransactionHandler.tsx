@@ -42,18 +42,26 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
         return;
       }
     }
-
+  
+    // Log the account and issuer values before constructing the payload
+    console.log('Account:', account);  // Log the account to check if it's valid
+    console.log('Issuer (Asset2):', pool.asset2_issuer);  // Log the issuer to check if it's valid
+  
     try {
       setStatus('Creating transaction payload...');
 
       const payload = {
         TransactionType: transactionType,
         Account: account,
-        Amount: pool.asset_currency === 'XRP' ? xrpToDrops(amount1) : amount1,
+        Amount: pool.asset_currency === 'XRP' ? xrpToDrops(amount1) : {
+          currency: pool.asset_currency,
+          value: String(amount1),
+          issuer: pool.asset_currency === 'XRP' ? undefined : pool.asset_issuer,
+        },
         Amount2: {
           currency: pool.asset2_currency,
-          value: amount2,
-          issuer: pool.asset2_issuer,
+          value: String(amount2),
+          issuer: pool.asset2_issuer || 'rExampleIssuerAddress',
         },
         Asset: {
           currency: pool.asset_currency,
