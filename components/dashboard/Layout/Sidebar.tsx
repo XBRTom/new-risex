@@ -29,7 +29,7 @@ export default function Sidebar({ onCollapse }: SidebarProps) {
         { name: 'Overview', href: '/dashboard/overview', icon: <LayoutDashboard className="h-5 w-5" /> },
         { name: 'Pools', href: '/dashboard/pool', icon: <Package2 className="h-5 w-5" /> },
         { name: 'Holdings', href: '/holdings', icon: <Wallet className="h-5 w-5" /> },
-        { name: 'Transactions', href: '/transactions', icon: <History className="h-5 w-5" /> },
+        { name: 'Transactions', href: '/dashboard/transactions', icon: <History className="h-5 w-5" /> },
         { name: 'Staking', href: '/staking', icon: <Database className="h-5 w-5" /> },
         { name: 'APIs', href: '/apis', icon: <Settings className="h-5 w-5" /> },
         { name: 'Documentation', href: '/docs', icon: <File className="h-5 w-5" /> },
