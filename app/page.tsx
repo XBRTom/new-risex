@@ -1,5 +1,3 @@
-'use client';
-
 import Login from "@/components/homepage/login";
 import Sections from "@/components/homepage/sections";
 

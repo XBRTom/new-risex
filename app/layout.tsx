@@ -3,7 +3,7 @@ import Script from "next/script";
 import { WalletProvider } from "@/providers/Wallet";
 import Navbar from "@/components/layout/Navbar";
 import "./globals.css";
-
+import { SessionProvider } from "next-auth/react"
 
 export default function RootLayout(
   {children,}: Readonly<{

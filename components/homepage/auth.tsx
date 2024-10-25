@@ -1,0 +1,77 @@
+"use client"
+
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { handleSignIn, handleSignOut } from "@/authServerActions"
+export function SignInGoogle({
+  provider,
+  ...props
+}: { provider?: string } & React.ComponentPropsWithRef<typeof Button>) {
+
+  const handleSignInSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    await handleSignIn(provider);
+  };
+
+  return (
+    <>
+        <form onSubmit={handleSignInSubmit}>
+          <Button {...props}>Sign In with Google</Button>
+        </form>
+    </>
+  )
+}
+
+export function SignInMagicLink({
+  provider,
+  ...props
+}: { provider?: string } & React.ComponentPropsWithRef<typeof Button>) {
+
+  const handleSignInSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get('email');
+    await handleSignIn(provider, formData);
+  };
+
+  return (
+    <>
+        <form
+            onSubmit={handleSignInSubmit}
+            >
+              <div className="grid gap-2 text-white">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                      id="email"
+                      type="email"
+                      placeholder="m@example.com"
+                      required
+                  />
+              </div>
+              <Button {...props} className="w-full">
+                Sign In with E-mail
+              </Button>
+        </form>
+    </>
+  )
+}
+
+export function SignOut(props: React.ComponentPropsWithRef<typeof Button>) {
+
+  const handleSignOutSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    console.log('=====SIGN OUT ===== ')
+    const resp = await handleSignOut()
+    console.log('====END SIGN OUT====', resp)
+  };
+
+  return (
+    <form
+      onSubmit={handleSignOutSubmit}>
+      <Button {...props}>
+        Sign Out
+      </Button>
+    </form>
+  )
+}
