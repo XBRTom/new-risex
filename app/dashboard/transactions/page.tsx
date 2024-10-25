@@ -1,10 +1,10 @@
-// import Transactions from '@/components/Transactions';
+import Transactions from '@/components/dashboard/Transactions';
 
 const TransactionsPage = () => {
 
   return (
       <div>
-        {/* <Transactions /> */}
+        <Transactions />
       </div>
   );
 };
