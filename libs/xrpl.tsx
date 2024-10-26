@@ -53,7 +53,7 @@ const fetchAllAmms = async (): Promise<string[]> => {
     : [];
 };
 
-interface Transaction {
+export interface Transaction {
   id: string;
   date: string;
   sender: string;
@@ -64,6 +64,8 @@ interface Transaction {
   ammOwnership: string;
   issuer1: string;
   issuer2: string;
+  asset_currency?: string;
+  asset2_currency?: string;
 }
 
 const fetchTransactions = async (address: string): Promise<Transaction[]> => {

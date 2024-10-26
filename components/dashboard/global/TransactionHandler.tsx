@@ -28,16 +28,18 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
   onError,
   onCancel,
 }) => {
-  const { xumm, account, handleLogin, error: walletError } = useWallet();
+  const walletContext = useWallet();
+  const { xumm, account, handleLogin } = walletContext || {};
   const [status, setStatus] = useState<string>('');
 
   const handleTransaction = async () => {
     if (!account) {
       try {
-        await handleLogin();
+        if (handleLogin)
+          await handleLogin();
       } catch (error) {
         console.error(error);
-        setStatus(walletError || 'Sign in was canceled.');
+        // setStatus(walletError || 'Sign in was canceled.');
         if (onCancel) onCancel();
         return;
       }
@@ -76,7 +78,7 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
 
       console.log('Payload:', JSON.stringify(payload, null, 2)); // For debugging
 
-      const createdPayload = await xumm.payload.createAndSubscribe(payload, (event) => {
+      const createdPayload = await xumm.payload.createAndSubscribe(payload, (event: any) => {
         if (event.data.signed) {
           return true;
         }

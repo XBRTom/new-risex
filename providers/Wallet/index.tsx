@@ -28,9 +28,10 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   useEffect(() => {
     const initXumm = async () => {
       try {
-        if (window.xumm) {
-          setXumm(window.xumm);
-          console.log('Xumm SDK initialized:', window.xumm);
+        const xummInstance = (window as any).xumm;
+        if (xummInstance) {
+          setXumm(xummInstance);
+          console.log('Xumm SDK initialized:', xummInstance);
         } else {
           console.warn('Xumm SDK not found, using mock for testing');
           const mockXumm = {

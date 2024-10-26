@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useWallet } from '@/providers/Wallet';
 import TransactionsTable from './transactions/TransactionsTable';
-import DashboardLayout from './layout/DashboardLayout';
+import DashboardLayout from './Layout/DashboardLayout';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,12 +11,14 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { fetchTransactions } from '@/libs/xrpl';
+import { fetchTransactions, Transaction } from '@/libs/xrpl';
 import * as xrpl from 'xrpl';
+  // Start of Selection
 
 const Transactions: React.FC = () => {
-  const { account } = useWallet();
-  const [transactions, setTransactions] = useState([]);
+  const wallet = useWallet();
+  const account = wallet ? wallet.account : null;
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

@@ -21,7 +21,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-import DashboardLayout from './layout/DashboardLayout';
+import DashboardLayout from './Layout/DashboardLayout';
 import { AnyNaptrRecord } from 'dns';
 
 

@@ -13,19 +13,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import Link from 'next/link'
-
-type Transaction = {
-  id: string;
-  date: string;
-  type: string;
-  sender: string;
-  recipient?: string;
-  amount: string;
-  asset_currency: string;
-  asset2_currency: string;
-  lpTokens: string;
-  ammOwnership: string;
-};
+import { Transaction } from '@/libs/xrpl';
 
 interface TransactionsTableProps {
   transactions: Transaction[];
@@ -103,8 +91,8 @@ export default function TransactionsTable({ transactions, loading, error, isWall
             ? new Date(a.date).getTime() - new Date(b.date).getTime()
             : new Date(b.date).getTime() - new Date(a.date).getTime()
         }
-        const aValue = a[sortConfig.key];
-        const bValue = b[sortConfig.key];
+        const aValue = a[sortConfig.key] || 0;
+        const bValue = b[sortConfig.key] || 0;
         if (aValue < bValue) {
           return sortConfig.direction === 'asc' ? -1 : 1;
         }
