@@ -1,12 +1,21 @@
+'use client'
+
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import Transactions from '@/components/dashboard/Transactions';
 
-const TransactionsPage = () => {
+export default function TransactionsPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
 
-  return (
-      <div>
-        <Transactions />
-      </div>
-  );
-};
+  if (status === 'loading') {
+    return <p>Loading...</p>; // Optional: Replace with a loading spinner for better UX
+  }
 
-export default TransactionsPage;
+  if (!session && status === 'unauthenticated') {
+    router.push('/');
+    return null; // Avoid rendering anything until redirect completes
+  }
+
+  return <Transactions />;
+}
