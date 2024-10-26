@@ -1,4 +1,4 @@
-import NextAuth from "next-auth"
+import NextAuth, { type DefaultSession } from "next-auth"
 import "next-auth/jwt"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import GoogleProvider from "next-auth/providers/google"
@@ -27,7 +27,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         from: process.env.AUTH_RESEND_FROM,
     }),
   ],
-  session: { strategy: "jwt" },
+  session: { strategy: "database" },
   callbacks: {
     jwt({ token, trigger, session, account }) {
       if (trigger === "update") token.name = session.user.name
@@ -36,17 +36,32 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return token
     },
-    async session({ session, token }) {
-      if (token?.accessToken) session.accessToken = token.accessToken
-
-      return session
-    },
+    session({ session, token, user }) {
+      console.log('=====> SESSION')
+      console.log('User', user)
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: user.id,
+          phoneNumber: user.phoneNumber,
+        },
+      }
+    }
   },
 })
+
 
 declare module "next-auth" {
   interface Session {
     accessToken?: string
+    user: {
+      phoneNumber: string
+    } & DefaultSession["user"]
+  }
+
+  interface User {
+    phoneNumber?: string
   }
 }
 
