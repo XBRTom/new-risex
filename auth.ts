@@ -5,6 +5,7 @@ import GoogleProvider from "next-auth/providers/google"
 import Resend from "next-auth/providers/resend"
 import prisma from '@/libs/prisma';
 
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   debug: !!process.env.AUTH_DEBUG,
   theme: { logo: "https://authjs.dev/img/logo-sm.png" },
