@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useWallet } from '@/providers/Wallet'; // Adjust path based on your project structure
 import Modal from '@/components/Modal'; 
+import { useSession } from "next-auth/react"
 import {
     NavigationMenu,
     NavigationMenuContent,
@@ -73,6 +74,7 @@ const ListItem = React.forwardRef<
   React.ElementRef<"a">,
   React.ComponentPropsWithoutRef<"a">
 >(({ className, title, children, ...props }, ref) => {
+    
   return (
     <li>
       <NavigationMenuLink asChild>
@@ -96,6 +98,7 @@ const ListItem = React.forwardRef<
 ListItem.displayName = "ListItem"
 
 const Navbar = () => {
+    const { data: session, status } = useSession()
     const { account, handleLogin, handleLogout }:any = useWallet() || {}; // Getting account status and login handler from Wallet provider
     // const [isModalOpen, setIsModalOpen] = useState(false);
     // const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Dropdown state
@@ -107,7 +110,6 @@ const Navbar = () => {
     // const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
     // const openModal = () => setIsModalOpen(true);
     // const closeModal = () => setIsModalOpen(false);
-
     return (
         <div className="sticky top-0 z-50 bg-white shadow-md no-scrollbar flex items-center h-10 px-4 sm:px-6 lg:px-16">
             <div className="w-full flex justify-between items-center">
@@ -217,99 +219,101 @@ const Navbar = () => {
                             </NavigationMenuLink>
                         </NavigationMenuItem>
 
-                        <NavigationMenuItem className="hidden md:block">
+                        {/*<NavigationMenuItem className="hidden md:block">
                             <NavigationMenuLink asChild>
                                 <a className="flex items-center h-full px-4 text-sm font-medium text-gray-900 no-underline">not logged
-                                <span className="ml-2 h-2 w-2 rounded-full bg-red-600"></span> {/* Red patch */}
+                                <span className="ml-2 h-2 w-2 rounded-full bg-red-600"></span>
                                 </a>
                             </NavigationMenuLink>
-                        </NavigationMenuItem>
+                        </NavigationMenuItem>*/}
                     </NavigationMenuList>
                 </NavigationMenu>
 
-                <a className="flex items-center h-full px-4 text-sm font-medium text-gray-900 no-underline">
-                           <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="outline">Account</Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-56">
-                                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                                    <DropdownMenuGroup>
-                                        {/* Connect Wallet or Display Account */}
-                                        {account ? (
-                                        <DropdownMenuItem>
-                                            <span className="wallet-address">Wallet : {truncateAddress(account)}</span>
-                                            <DropdownMenuShortcut onClick={handleLogout}>Quit</DropdownMenuShortcut>
-                                        </DropdownMenuItem>
-                                        
-                                        ) : (
-                                        <DropdownMenuItem>
-                                            <Button onClick={handleLogin}>Connect Wallet</Button>
-                                            <DropdownMenuShortcut></DropdownMenuShortcut>
-                                        </DropdownMenuItem>
-                                        )}
-                                        
-                                        {/* Dashboard */}
-                                        <DropdownMenuItem>
-                                        <a href="/dashboard/overview">Dashboard</a>
-                                        <DropdownMenuShortcut></DropdownMenuShortcut>
-                                        </DropdownMenuItem>
-
-                                        {/* Billing */}
-                                        <DropdownMenuItem>
-                                        Billing
-                                        <DropdownMenuShortcut></DropdownMenuShortcut>
-                                        </DropdownMenuItem>
-
-                                        {/* Settings */}
-                                        <DropdownMenuItem>
-                                        Settings
-                                        <DropdownMenuShortcut></DropdownMenuShortcut>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuGroup>
-
-                                    <DropdownMenuSeparator />
-
-                                    <DropdownMenuGroup>
-                                        <DropdownMenuItem disabled>
-                                        Reward
-                                        <DropdownMenuShortcut>coming soon</DropdownMenuShortcut>
-                                        </DropdownMenuItem>
-
-                                        {/* Invite Users Submenu */}
-                                        <DropdownMenuSub>
-                                        <DropdownMenuSubTrigger>Invite users</DropdownMenuSubTrigger>
-                                        <DropdownMenuPortal>
-                                            <DropdownMenuSubContent>
-                                            <DropdownMenuItem>Email</DropdownMenuItem>
-                                            <DropdownMenuItem>Message</DropdownMenuItem>
-                                            <DropdownMenuSeparator />
-                                            <DropdownMenuItem>More...</DropdownMenuItem>
-                                            </DropdownMenuSubContent>
-                                        </DropdownMenuPortal>
-                                        </DropdownMenuSub>
-                                    </DropdownMenuGroup>
-
-                                    <DropdownMenuSeparator />
-
-                                    {/* Support and API */}
-                                    <DropdownMenuItem>Support</DropdownMenuItem>
-                                    <DropdownMenuItem disabled>API</DropdownMenuItem>
-
-                                    <DropdownMenuSeparator />
-
-                                    {/* Log Out */}
+                {session && (
+                    <a className="flex items-center h-full px-4 text-sm font-medium text-gray-900 no-underline">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline">Account</Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56">
+                                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                <DropdownMenuGroup>
+                                    {/* Connect Wallet or Display Account */}
+                                    {account ? (
                                     <DropdownMenuItem>
-                                        Log out
+                                        <span className="wallet-address">Wallet : {truncateAddress(account)}</span>
+                                        <DropdownMenuShortcut onClick={handleLogout}>Quit</DropdownMenuShortcut>
+                                    </DropdownMenuItem>
+                                    
+                                    ) : (
+                                    <DropdownMenuItem>
+                                        <Button onClick={handleLogin}>Connect Wallet</Button>
                                         <DropdownMenuShortcut></DropdownMenuShortcut>
                                     </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                            </DropdownMenu>
-                                
-                            {/* Blue patch */}
-                            <span className="ml-2 h-2 w-2 rounded-full bg-blue-600"></span>
-                            </a>
-                            </div>
+                                    )}
+                                    
+                                    {/* Dashboard */}
+                                    <DropdownMenuItem>
+                                    <a href="/dashboard/overview">Dashboard</a>
+                                    <DropdownMenuShortcut></DropdownMenuShortcut>
+                                    </DropdownMenuItem>
+
+                                    {/* Billing */}
+                                    <DropdownMenuItem>
+                                    Billing
+                                    <DropdownMenuShortcut></DropdownMenuShortcut>
+                                    </DropdownMenuItem>
+
+                                    {/* Settings */}
+                                    <DropdownMenuItem>
+                                    Settings
+                                    <DropdownMenuShortcut></DropdownMenuShortcut>
+                                    </DropdownMenuItem>
+                                </DropdownMenuGroup>
+
+                                <DropdownMenuSeparator />
+
+                                <DropdownMenuGroup>
+                                    <DropdownMenuItem disabled>
+                                    Reward
+                                    <DropdownMenuShortcut>coming soon</DropdownMenuShortcut>
+                                    </DropdownMenuItem>
+
+                                    {/* Invite Users Submenu */}
+                                    <DropdownMenuSub>
+                                    <DropdownMenuSubTrigger>Invite users</DropdownMenuSubTrigger>
+                                    <DropdownMenuPortal>
+                                        <DropdownMenuSubContent>
+                                        <DropdownMenuItem>Email</DropdownMenuItem>
+                                        <DropdownMenuItem>Message</DropdownMenuItem>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem>More...</DropdownMenuItem>
+                                        </DropdownMenuSubContent>
+                                    </DropdownMenuPortal>
+                                    </DropdownMenuSub>
+                                </DropdownMenuGroup>
+
+                                <DropdownMenuSeparator />
+
+                                {/* Support and API */}
+                                <DropdownMenuItem>Support</DropdownMenuItem>
+                                <DropdownMenuItem disabled>API</DropdownMenuItem>
+
+                                <DropdownMenuSeparator />
+
+                                {/* Log Out */}
+                                <DropdownMenuItem>
+                                    Log out
+                                    <DropdownMenuShortcut></DropdownMenuShortcut>
+                                </DropdownMenuItem>
+                                </DropdownMenuContent>
+                        </DropdownMenu>
+                            
+                        {/* Blue patch 
+                        <span className="ml-2 h-2 w-2 rounded-full bg-blue-600"></span>*/}
+                    </a>
+                )}
+            </div>
 
                         {/* Modal for connecting wallet
                             <Modal isOpen={isModalOpen} onClose={closeModal}>

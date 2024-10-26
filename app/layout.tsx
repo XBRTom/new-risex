@@ -4,14 +4,18 @@ import { WalletProvider } from "@/providers/Wallet";
 import Navbar from "@/components/layout/Navbar";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react"
+import { auth } from "@/auth"
 
-export default function RootLayout(
+export default async function RootLayout(
   {children,}: Readonly<{
   children: React.ReactNode;
   }>
 ) 
   
 {
+
+  const session = await auth()
+
   return (
     <html lang="en">
         <head>
@@ -41,10 +45,12 @@ export default function RootLayout(
             })
             `}
           </Script>
-          <WalletProvider>
-            <Navbar />
-           {children}
-          </WalletProvider>
+          <SessionProvider session={session}>
+            <WalletProvider>
+              <Navbar />
+              {children}
+            </WalletProvider>
+          </SessionProvider>
         </body>
     </html>
   );

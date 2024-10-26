@@ -43,7 +43,7 @@ export function SignInMagicLink({
         <form
             onSubmit={handleSignInSubmit}
             >
-              <div className="grid gap-2 text-white">
+              <div className="grid gap-2 text-white mb-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
                       id="email"
