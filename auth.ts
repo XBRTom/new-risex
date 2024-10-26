@@ -2,7 +2,7 @@ import NextAuth from "next-auth"
 import "next-auth/jwt"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import GoogleProvider from "next-auth/providers/google"
-import Mailgun from "next-auth/providers/mailgun"
+import Resend from "next-auth/providers/resend"
 import prisma from '@/libs/prisma';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -21,9 +21,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         } 
       }
     }),
-    Mailgun({
-        apiKey: process.env.AUTH_MAILGUN_KEY,
-        from: process.env.AUTH_MAILGUN_FROM,
+    Resend({
+        apiKey: process.env.AUTH_RESEND_KEY,
+        from: process.env.AUTH_RESEND_FROM,
     }),
   ],
   session: { strategy: "jwt" },

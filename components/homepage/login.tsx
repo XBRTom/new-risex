@@ -27,7 +27,7 @@ const Login = async () => {
                         <TabsContent value="Login" className="border-gray-400">
                             <Card className="bg-slate-800 bg-opacity-70 border-slate-900">
                                 <CardContent className="grid gap-4">
-                                    <SignInMagicLink provider="mailgun" />
+                                    <SignInMagicLink provider="resend" />
 
                                     <SignInGoogle 
                                         provider="google" 
