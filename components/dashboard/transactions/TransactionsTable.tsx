@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowUpDown, ArrowUp, ArrowDown, HelpCircle } from "lucide-react"
+import { ArrowUpDown, HelpCircle, AlertCircle, Loader2 } from "lucide-react"
 import {
   Tooltip,
   TooltipContent,
@@ -29,6 +29,9 @@ type Transaction = {
 
 interface TransactionsTableProps {
   transactions: Transaction[];
+  loading: boolean;
+  error: string | null;
+  isWalletConnected: boolean;
 }
 
 const timeRanges = [
@@ -41,60 +44,55 @@ const timeRanges = [
   { value: 'alltime', label: 'All Time' },
 ]
 
-export default function TransactionsTable({ transactions }: TransactionsTableProps) {
+export default function TransactionsTable({ transactions, loading, error, isWalletConnected }: TransactionsTableProps) {
   const [timeRange, setTimeRange] = useState('alltime')
   const [sortConfig, setSortConfig] = useState<{ key: keyof Transaction; direction: 'asc' | 'desc' } | null>(null)
 
-  const formatCurrency = (value: string) => {
-    const numberValue = parseFloat(value)
-    return isNaN(numberValue) ? value : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(numberValue)
-  }
-
-  const formatDate = (dateString: string) => {
-     // Splitting the date and time components
-     const [datePart, timePart] = dateString.split(', ');
-     const [day, month, year] = datePart.split('/');
-     const formattedDateString = `${year}-${month}-${day}T${timePart}`;
- 
-     // Parse the date string with the new format
-     const date = new Date(formattedDateString);
-     return isNaN(date.getTime()) 
-         ? 'Invalid Date' 
-         : date.toLocaleString('en-US', {
-             year: 'numeric',
-             month: 'short',
-             day: 'numeric',
-             hour: '2-digit',
-             minute: '2-digit',
-             second: '2-digit',
-             hour12: true
-         });
- };
+  const formatAmount = (amount: string) => {
+    return `${amount}`;
+  };
 
   const filterTransactionsByTimeRange = (transactions: Transaction[], range: string): Transaction[] => {
+    console.log('Filtering transactions for range:', range);
+    console.log('Total transactions before filtering:', transactions.length);
+    
     const now = new Date()
     const msPerDay = 24 * 60 * 60 * 1000
+    let filteredTransactions: Transaction[];
+    
     switch (range) {
       case '7days':
-        return transactions.filter(t => (now.getTime() - new Date(t.date).getTime()) <= 7 * msPerDay)
+        filteredTransactions = transactions.filter(t => (now.getTime() - new Date(t.date).getTime()) <= 7 * msPerDay)
+        break;
       case '15days':
-        return transactions.filter(t => (now.getTime() - new Date(t.date).getTime()) <= 15 * msPerDay)
+        filteredTransactions = transactions.filter(t => (now.getTime() - new Date(t.date).getTime()) <= 15 * msPerDay)
+        break;
       case 'month':
-        return transactions.filter(t => new Date(t.date).getMonth() === now.getMonth() && new Date(t.date).getFullYear() === now.getFullYear())
+        filteredTransactions = transactions.filter(t => {
+          const txDate = new Date(t.date);
+          return txDate.getMonth() === now.getMonth() && txDate.getFullYear() === now.getFullYear();
+        })
+        break;
       case '3months':
-        return transactions.filter(t => (now.getTime() - new Date(t.date).getTime()) <= 90 * msPerDay)
+        filteredTransactions = transactions.filter(t => (now.getTime() - new Date(t.date).getTime()) <= 90 * msPerDay)
+        break;
       case '6months':
-        return transactions.filter(t => (now.getTime() - new Date(t.date).getTime()) <= 180 * msPerDay)
+        filteredTransactions = transactions.filter(t => (now.getTime() - new Date(t.date).getTime()) <= 180 * msPerDay)
+        break;
       case 'year':
-        return transactions.filter(t => (now.getTime() - new Date(t.date).getTime()) <= 365 * msPerDay)
+        filteredTransactions = transactions.filter(t => (now.getTime() - new Date(t.date).getTime()) <= 365 * msPerDay)
+        break;
       case 'alltime':
       default:
-        return transactions
+        filteredTransactions = transactions
     }
+    
+    console.log('Filtered transactions:', filteredTransactions.length);
+    return filteredTransactions;
   }
 
   const filteredTransactions = useMemo(() => {
-    return filterTransactionsByTimeRange(transactions, timeRange)
+    return filterTransactionsByTimeRange(transactions, timeRange);
   }, [transactions, timeRange])
 
   const sortedTransactions = useMemo(() => {
@@ -105,8 +103,8 @@ export default function TransactionsTable({ transactions }: TransactionsTablePro
             ? new Date(a.date).getTime() - new Date(b.date).getTime()
             : new Date(b.date).getTime() - new Date(a.date).getTime()
         }
-        const aValue = a[sortConfig.key]!;
-        const bValue = b[sortConfig.key]!;
+        const aValue = a[sortConfig.key];
+        const bValue = b[sortConfig.key];
         if (aValue < bValue) {
           return sortConfig.direction === 'asc' ? -1 : 1;
         }
@@ -134,6 +132,109 @@ export default function TransactionsTable({ transactions }: TransactionsTablePro
     return sortConfig.key === name ? sortConfig.direction : undefined
   }
 
+  const renderTableContent = () => {
+    if (!isWalletConnected) {
+      return (
+        <TableRow>
+          <TableCell colSpan={7} className="h-24 text-center">
+            <AlertCircle className="mx-auto h-8 w-8 text-yellow-500 mb-2" />
+            <p className="text-lg font-semibold text-white">Wallet Not Connected</p>
+            <p className="text-sm text-white">Please connect your wallet to view your transactions.</p>
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    if (loading) {
+      return (
+        <TableRow>
+          <TableCell colSpan={7} className="h-24 text-center">
+            <Loader2 className="mx-auto h-8 w-8 animate-spin text-white" />
+            <p className="mt-2 text-lg font-semibold text-white">Loading Transactions...</p>
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    if (error) {
+      return (
+        <TableRow>
+          <TableCell colSpan={7} className="h-24 text-center">
+            <AlertCircle className="mx-auto h-8 w-8 text-red-500 mb-2" />
+            <p className="text-lg font-semibold text-white">Error Loading Transactions</p>
+            <p className="text-sm text-red-300">{error}</p>
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    if (sortedTransactions.length === 0) {
+      return (
+        <TableRow>
+          <TableCell colSpan={7} className="h-24 text-center">
+            <AlertCircle className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+            <p className="text-lg font-semibold text-white">No Transactions Found</p>
+            <p className="text-sm text-gray-400">There are no transactions to display for the selected time range.</p>
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    return sortedTransactions.map((tx) => (
+      <TableRow key={tx.id || tx.date} className="border-b border-gray-800 hover:bg-gray-800/50">
+        <TableCell className="font-medium text-white">{tx.date}</TableCell>
+        <TableCell className="text-white">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="flex items-center space-x-1">
+                  {tx.type}
+                  <HelpCircle className="h-4 w-4 ml-1" />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Transaction Type: {tx.type}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </TableCell>
+        <TableCell className="text-white">{tx.sender}</TableCell>
+        <TableCell className="text-white">
+          {(tx.type === 'AMMDeposit' || tx.type === 'AMMWithdraw') && tx.recipient ? (
+            <Link href={`/pool/${tx.recipient}`} className="text-blue-400 hover:underline">
+              {tx.recipient}
+            </Link>
+          ) : (
+            tx.recipient
+          )}
+        </TableCell>
+        <TableCell className="text-white">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="flex flex-col">
+                  <span>
+                    {formatAmount(tx.amount)}
+                  </span>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{tx.amount} {tx.asset_currency}</p>
+                {tx.asset2_currency && <p>{tx.amount} {tx.asset2_currency}</p>}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </TableCell>
+        <TableCell className="text-white">{tx.lpTokens}</TableCell>
+        <TableCell className="text-white">{tx.ammOwnership}%</TableCell>
+      </TableRow>
+    ));
+  };
+
+  useEffect(() => {
+    console.log('Time range changed to:', timeRange);
+  }, [timeRange]);
+
   return (
     <Card className="w-full bg-gradient-to-br from-gray-900 to-black border-gray-800 shadow-lg rounded-xl overflow-hidden">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -153,7 +254,7 @@ export default function TransactionsTable({ transactions }: TransactionsTablePro
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
-          <Table>
+          <Table aria-label="Transactions history">
             <TableHeader>
               <TableRow className="border-b border-gray-800">
                 {[
@@ -179,57 +280,7 @@ export default function TransactionsTable({ transactions }: TransactionsTablePro
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedTransactions.map((tx) => {
-                console.log('Transaction date:', tx.date);
-                return (
-                  <TableRow key={tx.id} className="border-b border-gray-800 hover:bg-gray-800/50">
-                    <TableCell className="font-medium text-white">{formatDate(tx.date)}</TableCell>
-                    <TableCell className="text-white">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span className="flex items-center space-x-1">
-                              {tx.type}
-                              <HelpCircle className="h-4 w-4 ml-1" />
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Transaction Type</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </TableCell>
-                    <TableCell className="text-white">{tx.sender}</TableCell>
-                    <TableCell className="text-white">
-                      {(tx.type === 'AMMDeposit' || tx.type === 'AMMWithdraw') && tx.recipient ? (
-                        <Link href={`/pool/${tx.recipient}`} className="text-blue-400 hover:underline">
-                          {tx.recipient}
-                        </Link>
-                      ) : (
-                        tx.recipient
-                      )}
-                    </TableCell>
-                    <TableCell className="text-white">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span className="flex flex-col">
-                              <span>{formatCurrency(tx.amount)} {tx.asset2_currency}</span>
-                              <span className="text-sm text-gray-400">{tx.asset_currency}</span>
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>{tx.amount} {tx.asset2_currency}</p>
-                            <p>{tx.asset_currency}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </TableCell>
-                    <TableCell className="text-white">{tx.lpTokens}</TableCell>
-                    <TableCell className="text-white">{tx.ammOwnership}%</TableCell>
-                  </TableRow>
-                );
-              })}
+              {renderTableContent()}
             </TableBody>
           </Table>
         </div>

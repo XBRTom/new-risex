@@ -1,10 +1,9 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useWallet } from '@/providers/Wallet';
 import TransactionsTable from './transactions/TransactionsTable';
 import DashboardLayout from './layout/DashboardLayout';
-import { Progress } from "@/components/ui/progress";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,6 +12,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { fetchTransactions } from '@/libs/xrpl';
+import * as xrpl from 'xrpl';
 
 const Transactions: React.FC = () => {
   const { account } = useWallet();
@@ -20,42 +20,53 @@ const Transactions: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const getTransactions = async () => {
-      if (account) {
-        try {
-          setLoading(true);
-          const txs = await fetchTransactions(account);
-          setTransactions(txs);
-        } catch (error: any) {
-          setError(error.message || 'Failed to fetch transactions');
-        } finally {
-          setLoading(false);
-        }
+  const loadTransactions = useCallback(async () => {
+    if (account) {
+      setLoading(true);
+      try {
+        const txs = await fetchTransactions(account);
+        console.log('Fetched transactions:', txs);
+        setTransactions(txs);
+        localStorage.setItem('cachedTransactions', JSON.stringify(txs));
+      } catch (error: any) {
+        console.error('Error fetching transactions:', error);
+        setError(error.message || 'Failed to fetch transactions');
+      } finally {
+        setLoading(false);
       }
-    };
-    getTransactions();
+    } else {
+      setTransactions([]);
+      setLoading(false);
+    }
   }, [account]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-black text-white">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold">Loading...</h1>
-          <br/>
-          <Progress value={50} />
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (account) {
+      loadTransactions();
 
-  if (error) {
-    return <div className="text-red-500 text-center">{error}</div>;
-  }
+      const client = new xrpl.Client('wss://s.altnet.rippletest.net:51233');
+      client.connect().then(() => {
+        client.request({
+          command: 'subscribe',
+          accounts: [account]
+        });
 
-  if (!account) {
-    return <p>Please connect your wallet to view transactions.</p>;
-  }
+        client.on('transaction', (tx) => {
+          if (tx.transaction.Account === account) {
+            loadTransactions();
+          }
+        });
+      });
+
+      return () => {
+        client.disconnect();
+      };
+    } else {
+      // Clear the cache when the wallet is disconnected
+      localStorage.removeItem('cachedTransactions');
+      setTransactions([]);
+    }
+  }, [account, loadTransactions]);
 
   return (
     <DashboardLayout>
@@ -76,7 +87,12 @@ const Transactions: React.FC = () => {
           </header>
           <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
             <h3 className="text-2xl font-bold mb-4">Transactions</h3>
-            <TransactionsTable transactions={transactions} />
+            <TransactionsTable 
+              transactions={transactions} 
+              loading={loading} 
+              error={error} 
+              isWalletConnected={!!account}
+            />
           </main>
         </div>
       </div>
