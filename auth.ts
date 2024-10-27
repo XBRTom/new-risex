@@ -37,8 +37,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return token
     },
     session({ session, token, user }) {
-      console.log('=====> SESSION')
-      console.log('User', user)
       return {
         ...session,
         user: {
