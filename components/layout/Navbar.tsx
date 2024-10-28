@@ -5,9 +5,8 @@ import { useSession, signOut } from "next-auth/react"
 import { useRouter } from 'next/navigation'
 import { useWallet } from '@/providers/Wallet'
 import Link from "next/link"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { ChevronDown, User, Settings, HelpCircle, LogOut, Wallet, CreditCard, Gift, X, Menu } from 'lucide-react'
-import { handleSignIn } from "@/authServerActions"
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -16,7 +15,6 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu"
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,7 +22,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -95,8 +92,8 @@ export default function Navbar() {
 
   const handleSignOutClick = async () => {
     try {
-      await signOut({ redirect: false }) // Use next-auth's signOut function
-      router.push('/') // Redirect to home page after sign out
+      await signOut({ redirect: false })
+      router.push('/')
     } catch (error) {
       console.error('Failed to sign out:', error)
     }
@@ -118,14 +115,15 @@ export default function Navbar() {
       className="sticky top-0 z-50 bg-gray-100 border-b border-gray-200"
     >
       <div className="max-w-full mx-auto px-2">
-        <div className="flex justify-between h-8">
-          <div className="flex items-center space-x-2">
+        <div className="flex justify-between items-center h-8">
+          <div className="flex items-center space-x-2 flex-1">
             <Link href="/" className="flex-shrink-0 flex items-center">
               <span className="text-sm font-semibold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                 LIQUID
               </span>
             </Link>
-            <NavigationMenu>
+            {/* Desktop menu */}
+            <NavigationMenu className="hidden md:flex">
               <NavigationMenuList>
                 <NavigationMenuItem>
                   <NavigationMenuTrigger className="h-8 px-2 text-xs">Getting started</NavigationMenuTrigger>
@@ -209,6 +207,7 @@ export default function Navbar() {
               </NavigationMenuList>
             </NavigationMenu>
           </div>
+          
           <div className="flex items-center space-x-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -220,12 +219,9 @@ export default function Navbar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 {!session ? (
-                  <>
-                    <DropdownMenuItem onSelect={handleSignInClick}>
-                      <span className="text-xs">Sign In</span>
-                    </DropdownMenuItem>
-              
-                  </>
+                  <DropdownMenuItem onSelect={handleSignInClick}>
+                    <span className="text-xs">Sign In</span>
+                  </DropdownMenuItem>
                 ) : (
                   <>
                     {account ? (
@@ -287,69 +283,53 @@ export default function Navbar() {
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
-
-          <div className="md:hidden">
-            <Button variant="ghost" size="sm" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-              <Menu className="h-6 w-6" />
-            </Button>
+            <div className="md:hidden absolute left-1/2 transform -translate-x-1/2">
+              <Button variant="ghost" size="sm" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                <Menu className="h-6 w-6" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Mobile menu */}
-      {isMobileMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
-          className="md:hidden"
-        >
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link href="/getting-started" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-              Getting started
-            </Link>
-            <Link href="/features" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-              Features
-            </Link>
-            <Link href="/partners" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-              Partners
-            </Link>
-            <Link href="/api-documentation" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-              API Documentation
-            </Link>
-          </div>
-          <div className="pt-4 pb-3 border-t border-gray-200">
-            <div className="flex items-center px-5">
-              <div className="flex-shrink-0">
-                <User className="h-10 w-10 rounded-full" />
-              </div>
-              <div className="ml-3">
-                <div className="text-base font-medium text-gray-800">{session ? 'Logged In' : 'Not Logged In'}</div>
-                <div className="text-sm font-medium text-gray-500">{account ? truncateAddress(account) : 'No Wallet Connected'}</div>
-              </div>
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="md:hidden bg-white absolute top-full left-0 right-0 z-50"
+          >
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              <Link href="/getting-started" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                Getting started
+              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                  Features
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-full">
+                  {components.map((component) => (
+                    <DropdownMenuItem key={component.title}>
+                      <Link href={component.href} className="w-full">
+                        {component.title}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Link href="/partners" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                Partners
+              </Link>
+              <Link href="/api-documentation" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                API Documentation
+              </Link>
             </div>
-            <div className="mt-3 px-2 space-y-1">
-              {!session ? (
-                <Button onClick={handleSignInClick} className="w-full justify-start">Sign In</Button>
-              ) : (
-                <>
-                  <Link href="/dashboard" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-                    Dashboard
-                  </Link>
-                  <Button onClick={handleSignOutClick} variant="ghost" className="w-full justify-start text-red-600">Log out</Button>
-                </>
-              )}
-              {account ? (
-                <Button onClick={handleLogout} variant="ghost" className="w-full justify-start text-red-600">Disconnect Wallet</Button>
-              ) : (
-                <Button onClick={handleLogin} variant="ghost" className="w-full justify-start">Connect Wallet</Button>
-              )}
-            </div>
-          </div>
-        </motion.div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.nav>
   )
-} 
+}
