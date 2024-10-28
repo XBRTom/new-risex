@@ -13,13 +13,13 @@ import { Progress } from "@/components/ui/progress";
 // import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 // import { Package2, LayoutDashboard, Wallet, History, LogOut, Settings, File, Database, User, Sidebar } from "lucide-react";
 
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+// import {
+//   Breadcrumb,
+//   BreadcrumbItem,
+//   BreadcrumbLink,
+//   BreadcrumbList,
+//   BreadcrumbSeparator,
+// } from "@/components/ui/breadcrumb";
 
 import DashboardLayout from './Layout/DashboardLayout';
 import { AnyNaptrRecord } from 'dns';
@@ -175,7 +175,7 @@ const Dashboard: React.FC = () => {
     <div className="flex h-screen bg-black text-white">
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4 border-b border-gray-800">
+        {/* <header className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4 border-b border-gray-800">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
@@ -190,7 +190,7 @@ const Dashboard: React.FC = () => {
           {/* <div className="md:hidden">
             <SearchBar handleSearch={handleSearch} />
           </div> */}
-        </header>
+        {/* </header> */}
         <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
           {/* <ChartContainer>
             <BarChart data={data}>

@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react"
 import { useWallet } from '@/providers/Wallet'
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { ChevronDown, User, Settings, HelpCircle, LogOut, Wallet, CreditCard, Gift } from 'lucide-react'
+import { ChevronDown, User, Settings, HelpCircle, LogOut, Wallet, CreditCard, Gift, X } from 'lucide-react'
 
 import {
   NavigationMenu,
@@ -86,7 +86,7 @@ const ListItem = React.forwardRef<
 })
 ListItem.displayName = "ListItem"
 
-export default function FinalOSStyleNavbar() {
+export default function NavbarWithWalletDisconnect() {
   const { data: session } = useSession()
   const { account, handleLogin, handleLogout } = useWallet() || {}
 
@@ -215,12 +215,20 @@ export default function FinalOSStyleNavbar() {
                 ) : (
                   <>
                     {account ? (
-                      <DropdownMenuItem>
-                        <span className="text-xs flex items-center">
-                          <Wallet className="mr-2 h-3 w-3" />
-                          Wallet: {truncateAddress(account)}
-                        </span>
-                      </DropdownMenuItem>
+                      <>
+                        <DropdownMenuItem>
+                          <span className="text-xs flex items-center">
+                            <Wallet className="mr-2 h-3 w-3" />
+                            Wallet: {truncateAddress(account)}
+                          </span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={handleLogout}>
+                          <span className="text-xs flex items-center text-red-600">
+                            <X className="mr-2 h-3 w-3" />
+                            Disconnect Wallet
+                          </span>
+                        </DropdownMenuItem>
+                      </>
                     ) : (
                       <DropdownMenuItem onSelect={handleLogin}>
                         <span className="text-xs flex items-center">
@@ -229,6 +237,7 @@ export default function FinalOSStyleNavbar() {
                         </span>
                       </DropdownMenuItem>
                     )}
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem>
                       <Link href="/dashboard" className="flex items-center text-xs">
                         <User className="mr-2 h-3 w-3" />

@@ -12,13 +12,13 @@ import WalletPoolHoldingTable from './pool-details/WalletPoolHoldingTable'
 // import TransactionTable from './pool-details/TransactionTable'
 import DashboardLayout from './Layout/DashboardLayout'
 
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
+// import {
+//   Breadcrumb,
+//   BreadcrumbItem,
+//   BreadcrumbLink,
+//   BreadcrumbList,
+//   BreadcrumbSeparator,
+// } from "@/components/ui/breadcrumb"
 
 interface LatestMetrics {
   totalValueLocked: number
@@ -309,7 +309,7 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
     <DashboardLayout>
       <div className="flex h-screen bg-black text-white">
         <div className="flex-1 flex flex-col overflow-hidden">
-          <header className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4 border-b border-gray-800">
+          {/* <header className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4 border-b border-gray-800">
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
@@ -321,7 +321,7 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
-          </header>
+          </header> */}
           <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
             <div className="max-w-full mx-auto px-4 md:px-6 lg:px-8">
               <div className="flex flex-wrap gap-4 mb-6">
