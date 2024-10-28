@@ -323,7 +323,7 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
             </Breadcrumb>
           </header> */}
           <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
-            <div className="max-w-full mx-auto px-4 md:px-6 lg:px-8">
+            <div className="max-w-full mx-auto">
               <div className="flex flex-wrap gap-4 mb-6">
                 <PoolInfoCard
                   amountCurrency={amountCurrency}

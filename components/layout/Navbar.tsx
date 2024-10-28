@@ -1,12 +1,13 @@
 'use client'
 
 import React from 'react'
-import { useSession } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
+import { useRouter } from 'next/navigation'
 import { useWallet } from '@/providers/Wallet'
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { ChevronDown, User, Settings, HelpCircle, LogOut, Wallet, CreditCard, Gift, X } from 'lucide-react'
-
+import { handleSignIn } from "@/authServerActions"
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -87,8 +88,18 @@ const ListItem = React.forwardRef<
 ListItem.displayName = "ListItem"
 
 export default function NavbarWithWalletDisconnect() {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const { account, handleLogin, handleLogout } = useWallet() || {}
+  const router = useRouter()
+
+  const handleSignOutClick = async () => {
+    try {
+      await signOut({ redirect: false }) // Use next-auth's signOut function
+      router.push('/') // Redirect to home page after sign out
+    } catch (error) {
+      console.error('Failed to sign out:', error)
+    }
+  }
 
   const truncateAddress = (address: string) => {
     return address ? `${address.slice(0, 3)}...${address.slice(-6)}` : ''
@@ -263,7 +274,7 @@ export default function NavbarWithWalletDisconnect() {
                       </span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onSelect={handleLogout}>
+                    <DropdownMenuItem onSelect={handleSignOutClick}>
                       <span className="flex items-center text-xs text-red-600">
                         <LogOut className="mr-2 h-3 w-3" />
                         <span>Log out</span>

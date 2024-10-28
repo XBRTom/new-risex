@@ -37,7 +37,7 @@ interface NavItem {
 }
 
 export default function DarkAppleStyleSidebar() {
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(true) // Changed to true for default collapsed state
   const router = useRouter()
   const pathname = usePathname()
 
@@ -62,7 +62,7 @@ export default function DarkAppleStyleSidebar() {
   return (
     <TooltipProvider>
       <motion.div
-        initial={false}
+        initial={{ width: 80 }} // Set initial width to collapsed state
         animate={{ width: collapsed ? 80 : 250 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         className="bg-gray-900 border-r border-gray-800 flex flex-col h-screen"
