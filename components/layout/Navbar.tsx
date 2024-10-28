@@ -1,12 +1,12 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from 'next/navigation'
 import { useWallet } from '@/providers/Wallet'
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { ChevronDown, User, Settings, HelpCircle, LogOut, Wallet, CreditCard, Gift, X } from 'lucide-react'
+import { ChevronDown, User, Settings, HelpCircle, LogOut, Wallet, CreditCard, Gift, X, Menu } from 'lucide-react'
 import { handleSignIn } from "@/authServerActions"
 import {
   NavigationMenu,
@@ -87,10 +87,11 @@ const ListItem = React.forwardRef<
 })
 ListItem.displayName = "ListItem"
 
-export default function NavbarWithWalletDisconnect() {
+export default function Navbar() {
   const { data: session, status } = useSession()
   const { account, handleLogin, handleLogout } = useWallet() || {}
   const router = useRouter()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const handleSignOutClick = async () => {
     try {
@@ -99,6 +100,10 @@ export default function NavbarWithWalletDisconnect() {
     } catch (error) {
       console.error('Failed to sign out:', error)
     }
+  }
+
+  const handleSignInClick = () => {
+    router.push('/')
   }
 
   const truncateAddress = (address: string) => {
@@ -216,12 +221,10 @@ export default function NavbarWithWalletDisconnect() {
               <DropdownMenuContent align="end" className="w-48">
                 {!session ? (
                   <>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onSelect={handleSignInClick}>
                       <span className="text-xs">Sign In</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <span className="text-xs">Sign Up</span>
-                    </DropdownMenuItem>
+              
                   </>
                 ) : (
                   <>
@@ -285,8 +288,68 @@ export default function NavbarWithWalletDisconnect() {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+
+          <div className="md:hidden">
+            <Button variant="ghost" size="sm" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+              <Menu className="h-6 w-6" />
+            </Button>
+          </div>
         </div>
       </div>
+
+      {/* Mobile menu */}
+      {isMobileMenuOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+          className="md:hidden"
+        >
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            <Link href="/getting-started" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+              Getting started
+            </Link>
+            <Link href="/features" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+              Features
+            </Link>
+            <Link href="/partners" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+              Partners
+            </Link>
+            <Link href="/api-documentation" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+              API Documentation
+            </Link>
+          </div>
+          <div className="pt-4 pb-3 border-t border-gray-200">
+            <div className="flex items-center px-5">
+              <div className="flex-shrink-0">
+                <User className="h-10 w-10 rounded-full" />
+              </div>
+              <div className="ml-3">
+                <div className="text-base font-medium text-gray-800">{session ? 'Logged In' : 'Not Logged In'}</div>
+                <div className="text-sm font-medium text-gray-500">{account ? truncateAddress(account) : 'No Wallet Connected'}</div>
+              </div>
+            </div>
+            <div className="mt-3 px-2 space-y-1">
+              {!session ? (
+                <Button onClick={handleSignInClick} className="w-full justify-start">Sign In</Button>
+              ) : (
+                <>
+                  <Link href="/dashboard" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                    Dashboard
+                  </Link>
+                  <Button onClick={handleSignOutClick} variant="ghost" className="w-full justify-start text-red-600">Log out</Button>
+                </>
+              )}
+              {account ? (
+                <Button onClick={handleLogout} variant="ghost" className="w-full justify-start text-red-600">Disconnect Wallet</Button>
+              ) : (
+                <Button onClick={handleLogin} variant="ghost" className="w-full justify-start">Connect Wallet</Button>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      )}
     </motion.nav>
   )
 }
