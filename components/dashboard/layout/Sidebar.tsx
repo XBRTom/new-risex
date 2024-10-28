@@ -48,6 +48,7 @@ interface NavItem {
 export default function ResponsiveSidebar() {
   const [collapsed, setCollapsed] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
+  const [isTablet, setIsTablet] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
 
@@ -64,12 +65,13 @@ export default function ResponsiveSidebar() {
   ]
 
   useEffect(() => {
-    const checkIsMobile = () => {
+    const checkScreenSize = () => {
       setIsMobile(window.innerWidth < 768)
+      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024)
     }
-    checkIsMobile()
-    window.addEventListener('resize', checkIsMobile)
-    return () => window.removeEventListener('resize', checkIsMobile)
+    checkScreenSize()
+    window.addEventListener('resize', checkScreenSize)
+    return () => window.removeEventListener('resize', checkScreenSize)
   }, [])
 
   const toggleCollapse = () => {
@@ -107,16 +109,14 @@ export default function ResponsiveSidebar() {
             </motion.span>
           )}
         </AnimatePresence>
-        {!isMobile && (
-          <Button
-            onClick={toggleCollapse}
-            variant="ghost"
-            size="icon"
-            className="text-gray-400 hover:text-gray-100"
-          >
-            {collapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
-          </Button>
-        )}
+        <Button
+          onClick={toggleCollapse}
+          variant="ghost"
+          size="icon"
+          className="text-gray-400 hover:text-gray-100"
+        >
+          {collapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+        </Button>
       </div>
       <div className="flex-grow overflow-y-auto">
         <div className="space-y-2 px-3">
@@ -173,34 +173,42 @@ export default function ResponsiveSidebar() {
     </>
   )
 
-  if (isMobile) {
+  const BottomNavItem = ({ item }: { item: NavItem }) => (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Link href={item.href} passHref>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "text-gray-300 hover:text-gray-400 active:text-gray-500",
+                isActive(item.href) && "text-blue-400 hover:text-blue-500 active:text-blue-600"
+              )}
+            >
+              {item.icon}
+            </Button>
+          </Link>
+        </TooltipTrigger>
+        <TooltipContent side="top">{item.name}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  )
+
+  if (isMobile || isTablet) {
     return (
       <div className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 shadow-lg z-50">
         <div className="flex justify-around items-center h-16">
-          {navItems.slice(0, 4).map((item) => (
-            <TooltipProvider key={item.name}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link href={item.href} passHref>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className={cn(
-                        "text-gray-300 hover:text-gray-100",
-                        isActive(item.href) && "text-blue-400"
-                      )}
-                    >
-                      {item.icon}
-                    </Button>
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent side="top">{item.name}</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+          {(isMobile ? navItems.slice(0, 4) : navItems).map((item) => (
+            <BottomNavItem key={item.name} item={item} />
           ))}
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-gray-300 hover:text-gray-100">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="text-gray-300 hover:text-gray-400 active:text-gray-500"
+              >
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
@@ -208,14 +216,14 @@ export default function ResponsiveSidebar() {
               <SheetHeader>
                 <SheetTitle className="text-gray-100">Menu</SheetTitle>
               </SheetHeader>
-              <div className="grid grid-cols-4 gap-4 mt-4">
-                {navItems.slice(4).map((item) => (
+              <div className="grid grid-cols-3 gap-4 mt-4">
+                {navItems.map((item) => (
                   <Link key={item.name} href={item.href} passHref>
                     <Button
                       variant="ghost"
                       className={cn(
-                        "w-full flex flex-col items-center justify-center py-2 px-3 text-gray-300 hover:bg-gray-800 hover:text-gray-100",
-                        isActive(item.href) && "bg-gray-800 text-blue-400"
+                        "w-full flex flex-col items-center justify-center py-2 px-3 text-gray-300 hover:text-gray-400 active:text-gray-500",
+                        isActive(item.href) && "bg-gray-800 text-blue-400 hover:text-blue-500 active:text-blue-600"
                       )}
                     >
                       {item.icon}
