@@ -21,7 +21,7 @@ import { Progress } from "@/components/ui/progress";
 //   BreadcrumbSeparator,
 // } from "@/components/ui/breadcrumb";
 
-import DashboardLayout from './Layout/DashboardLayout';
+import DashboardLayout from './layout/DashboardLayout';
 import { AnyNaptrRecord } from 'dns';
 
 

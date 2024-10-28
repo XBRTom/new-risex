@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useWallet } from '@/providers/Wallet';
 import TransactionsTable from './transactions/TransactionsTable';
-import DashboardLayout from './Layout/DashboardLayout';
+import DashboardLayout from './layout/DashboardLayout';
 // import {
 //   Breadcrumb,
 //   BreadcrumbItem,
