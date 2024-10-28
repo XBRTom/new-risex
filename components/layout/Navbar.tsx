@@ -249,7 +249,7 @@ export default function Navbar() {
                     )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
-                      <Link href="/dashboard" className="flex items-center text-xs">
+                      <Link href="/dashboard/overview" className="flex items-center text-xs">
                         <User className="mr-2 h-3 w-3" />
                         <span>Dashboard</span>
                       </Link>

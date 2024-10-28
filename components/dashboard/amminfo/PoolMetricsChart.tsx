@@ -395,7 +395,7 @@ export default function PoolMetricsChart({ metrics }: PoolMetricsChartProps) {
 
     return (
       <ResponsiveContainer width="100%" height={300}>
-        <ComposedChart data={processedMetrics} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        <ComposedChart data={processedMetrics} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.5} />
           <XAxis 
             dataKey="date" 
@@ -412,7 +412,7 @@ export default function PoolMetricsChart({ metrics }: PoolMetricsChartProps) {
             domain={domain}
             tick={{ fill: '#ffffff', fontSize: 12 }}
             tickLine={{ stroke: '#ffffff' }}
-            width={80}
+            width={50}
           />
           {showPercentageChange && (
             <YAxis
@@ -423,7 +423,7 @@ export default function PoolMetricsChart({ metrics }: PoolMetricsChartProps) {
               domain={percentageChangeDomain}
               tick={{ fill: '#ffffff', fontSize: 12 }}
               tickLine={{ stroke: '#ffffff' }}
-              width={80}
+              width={50}
             />
           )}
           <Tooltip 

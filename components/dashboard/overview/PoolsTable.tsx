@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowUpDown, ArrowUp, ArrowDown, Plus, Minus } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, Plus, Minus, ChevronRight, ChevronLeft } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -18,8 +18,8 @@ import {
 } from '@/components/ui/tooltip';
 import AddLiquidityModal from '@/components/dashboard/global/AddLiquidityModal';
 import WithdrawLiquidityModal from '@/components/dashboard/global/WithdrawLiquidityModal';
+import { useMediaQuery } from '@/hooks/use-media-query';
 
-// Define the shape of a pool object
 interface Pool {
   account: string;
   asset_currency: string;
@@ -40,13 +40,13 @@ interface PoolsTableProps {
   onPageChange: (page: number) => void;
 }
 
-const PoolsTable: React.FC<PoolsTableProps> = ({
+export default function PoolsTable({
   pools = [],
   itemsPerPage,
   totalItems,
   currentPage,
   onPageChange,
-}) => {
+}: PoolsTableProps) {
   const [sortConfig, setSortConfig] = useState<{ key: string | null; direction: string | null }>({
     key: null,
     direction: null,
@@ -54,6 +54,12 @@ const PoolsTable: React.FC<PoolsTableProps> = ({
   const [isAddLiquidityModalOpen, setIsAddLiquidityModalOpen] = useState(false);
   const [isWithdrawLiquidityModalOpen, setIsWithdrawLiquidityModalOpen] = useState(false);
   const [selectedPool, setSelectedPool] = useState<Pool | null>(null);
+  const [visibleColumns, setVisibleColumns] = useState<string[]>([
+    'Pair', 'TradingFee', 'LiquidityXRP', 'TotalVolume', 'InstantAPR', 'Actions'
+  ]);
+
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const isTablet = useMediaQuery("(min-width: 768px)");
 
   const headers = [
     { label: 'Pools', key: 'Pair', sortable: true },
@@ -136,6 +142,17 @@ const PoolsTable: React.FC<PoolsTableProps> = ({
 
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
+  // Adjust visible columns based on screen size
+  React.useEffect(() => {
+    if (isDesktop) {
+      setVisibleColumns(['Pair', 'TradingFee', 'LiquidityXRP', 'TotalVolume', 'baseVolume', 'counterVolume', 'InstantAPR', 'Actions']);
+    } else if (isTablet) {
+      setVisibleColumns(['Pair', 'TradingFee', 'LiquidityXRP', 'TotalVolume', 'InstantAPR', 'Actions']);
+    } else {
+      setVisibleColumns(['Pair', 'LiquidityXRP', 'InstantAPR', 'Actions']);
+    }
+  }, [isDesktop, isTablet]);
+
   return (
     <Card className="w-full bg-gradient-to-br from-gray-900 to-black border-gray-800 shadow-lg rounded-xl overflow-hidden">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -146,7 +163,7 @@ const PoolsTable: React.FC<PoolsTableProps> = ({
           <Table>
             <TableHeader>
               <TableRow className="border-b border-gray-800">
-                {headers.map((header, index) => (
+                {headers.filter(header => visibleColumns.includes(header.key)).map((header, index) => (
                   <TableHead key={index} className="text-gray-400">
                     <Button
                       variant="ghost"
@@ -167,73 +184,89 @@ const PoolsTable: React.FC<PoolsTableProps> = ({
                   className="border-b border-gray-800 hover:bg-gray-800/50"
                   onClick={() => (window.location.href = `/dashboard/pool/${pool.account}`)}
                 >
-                  <TableCell className="font-medium text-white">
-                    {pool.asset_currency} / {pool.asset2_currency}
-                  </TableCell>
-                  <TableCell className="text-white">
-                    {(pool.tradingFee / 1000).toFixed(2)}%
-                  </TableCell>
-                  <TableCell className="text-white">
-                    {formatCurrency(parseFloat(pool.totalValueLocked?.toString() || '0'))}
-                  </TableCell>
-                  <TableCell className="text-white">
-                    {formatCurrency(parseFloat(pool.totalPoolVolume?.toString() || '0'))}
-                  </TableCell>
-                  <TableCell className="text-white">
-                    {(pool.baseVolume ?? 0).toFixed(2)} {pool.asset_currency}
-                  </TableCell>
-                  <TableCell className="text-white">
-                    {(pool.counterVolume ?? 0).toFixed(2)} {pool.asset2_currency}
-                  </TableCell>
-                  <TableCell className="text-white">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <span className="flex items-center space-x-1">
-                            {parseFloat(pool.relativeAPR?.toString() || '0').toFixed(2)}%
-                            {parseFloat(pool.relativeAPR?.toString() || '0') > 0 ? (
-                              <ArrowUp className="h-4 w-4 text-green-500" />
-                            ) : parseFloat(pool.relativeAPR?.toString() || '0') < 0 ? (
-                              <ArrowDown className="h-4 w-4 text-red-500" />
-                            ) : null}
-                          </span>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Annual Percentage Rate</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </TableCell>
-                  <TableCell className="text-white">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="mr-2 bg-transparent hover:bg-gray-700/50 text-green-400 border border-green-400 hover:border-green-300"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openAddLiquidityModal(pool);
-                      }}
-                    >
-                      <Plus className="h-4 w-4 mr-1" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="bg-transparent hover:bg-gray-700/50 text-red-400 border border-red-400 hover:border-red-300"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openWithdrawLiquidityModal(pool);
-                      }}
-                    >
-                      <Minus className="h-4 w-4 mr-1" />
-                    </Button>
-                  </TableCell>
+                  {visibleColumns.includes('Pair') && (
+                    <TableCell className="font-medium text-white">
+                      {pool.asset_currency} / {pool.asset2_currency}
+                    </TableCell>
+                  )}
+                  {visibleColumns.includes('TradingFee') && (
+                    <TableCell className="text-white">
+                      {(pool.tradingFee / 1000).toFixed(2)}%
+                    </TableCell>
+                  )}
+                  {visibleColumns.includes('LiquidityXRP') && (
+                    <TableCell className="text-white">
+                      {formatCurrency(parseFloat(pool.totalValueLocked?.toString() || '0'))}
+                    </TableCell>
+                  )}
+                  {visibleColumns.includes('TotalVolume') && (
+                    <TableCell className="text-white">
+                      {formatCurrency(parseFloat(pool.totalPoolVolume?.toString() || '0'))}
+                    </TableCell>
+                  )}
+                  {visibleColumns.includes('baseVolume') && (
+                    <TableCell className="text-white">
+                      {(pool.baseVolume ?? 0).toFixed(2)} {pool.asset_currency}
+                    </TableCell>
+                  )}
+                  {visibleColumns.includes('counterVolume') && (
+                    <TableCell className="text-white">
+                      {(pool.counterVolume ?? 0).toFixed(2)} {pool.asset2_currency}
+                    </TableCell>
+                  )}
+                  {visibleColumns.includes('InstantAPR') && (
+                    <TableCell className="text-white">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="flex items-center space-x-1">
+                              {parseFloat(pool.relativeAPR?.toString() || '0').toFixed(2)}%
+                              {parseFloat(pool.relativeAPR?.toString() || '0') > 0 ? (
+                                <ArrowUp className="h-4 w-4 text-green-500" />
+                              ) : parseFloat(pool.relativeAPR?.toString() || '0') < 0 ? (
+                                <ArrowDown className="h-4 w-4 text-red-500" />
+                              ) : null}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Annual Percentage Rate</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </TableCell>
+                  )}
+                  {visibleColumns.includes('Actions') && (
+                    <TableCell className="text-white">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mr-2 bg-transparent hover:bg-gray-700/50 text-green-400 border border-green-400 hover:border-green-300"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openAddLiquidityModal(pool);
+                        }}
+                      >
+                        <Plus className="h-4 w-4 mr-1" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-transparent hover:bg-gray-700/50 text-red-400 border border-red-400 hover:border-red-300"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openWithdrawLiquidityModal(pool);
+                        }}
+                      >
+                        <Minus className="h-4 w-4 mr-1" />
+                      </Button>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </div>
-        <div className="flex justify-between items-center mt-4">
+        <div className="flex flex-col sm:flex-row justify-between items-center mt-4 space-y-2 sm:space-y-0">
           <div className="text-sm text-gray-400">
             Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
             {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
@@ -245,6 +278,7 @@ const PoolsTable: React.FC<PoolsTableProps> = ({
               onClick={() => onPageChange(currentPage - 1)}
               disabled={currentPage === 1}
             >
+              <ChevronLeft className="h-4 w-4 mr-1" />
               Previous
             </Button>
             <Button
@@ -254,6 +288,7 @@ const PoolsTable: React.FC<PoolsTableProps> = ({
               disabled={currentPage === totalPages}
             >
               Next
+              <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           </div>
         </div>
@@ -266,6 +301,4 @@ const PoolsTable: React.FC<PoolsTableProps> = ({
       )}
     </Card>
   );
-};
-
-export default PoolsTable;
+}
