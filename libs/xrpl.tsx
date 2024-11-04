@@ -1,16 +1,11 @@
 import { Client, dropsToXrp, xrpToDrops } from 'xrpl';
 import { AMM } from 'xrpl/dist/npm/models/ledger';
+import XRPLClient from '@/libs/xrplClient';
 
-const client = new Client('wss://s1.ripple.com', {
-  connectionTimeout: 10000, // Increase connection timeout to 10 seconds
-});
-
-const connectClient = async (): Promise<void> => {
-  if (!client.isConnected()) {
-    console.log('Connecting to XRPL Ledger...');
-    await client.connect();
-    console.log('Connected to XRPL Ledger');
-  }
+const useXRPLClient = async (): Promise<Client> => {
+  const xrplClient = XRPLClient.getInstance();
+  const client = await xrplClient.getClient();
+  return client;
 };
 
 interface AmmDetails {
@@ -20,12 +15,11 @@ interface AmmDetails {
 
 const fetchAmmDetails = async (ammAccount: string): Promise<AmmDetails> => {
   try {
-    await connectClient();
-    const accountInfoResponse = await client.request({
+    const accountInfoResponse = await (await useXRPLClient()).request({
       command: 'account_info',
       account: ammAccount,
     });
-    const ammInfoResponse = await client.request({
+    const ammInfoResponse = await (await useXRPLClient()).request({
       command: 'amm_info',
       amm_account: ammAccount,
     });
@@ -41,8 +35,7 @@ const fetchAmmDetails = async (ammAccount: string): Promise<AmmDetails> => {
 };
 
 const fetchAllAmms = async (): Promise<string[]> => {
-  await connectClient();
-  const response = await client.request({
+  const response = await (await useXRPLClient()).request({
     command: 'ledger_entry',
     type: 'amm',
   });
@@ -73,11 +66,10 @@ const fetchTransactions = async (address: string): Promise<Transaction[]> => {
   let marker: string | null = null;
 
   try {
-    await connectClient();
     let response: any;
 
     do {
-      response = await client.request({
+      response = await (await useXRPLClient()).request({
         command: 'account_tx',
         account: address,
         ledger_index_min: -1,
@@ -176,8 +168,7 @@ const fetchAmmTransactionsWithRetries = async (ammAccount: string, retries = 5, 
 };
 
 export {
-  client,
-  connectClient,
+  useXRPLClient,
   fetchAmmDetails,
   fetchAllAmms,
   fetchTransactions,

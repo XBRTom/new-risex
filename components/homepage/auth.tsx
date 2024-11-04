@@ -61,13 +61,13 @@ export function SignInMagicLink({
   )
 }
 
-export function SignOut(props: React.ComponentPropsWithRef<typeof Button>) {
+export function SignOut({ onSignOut, ...props }: { onSignOut: () => void } & React.ComponentPropsWithRef<typeof Button>) {
 
   const handleSignOutSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log('=====SIGN OUT ===== ')
-    const resp = await handleSignOut()
-    console.log('====END SIGN OUT====', resp)
+    const resp = await handleSignOut();
+    onSignOut();
+    window.location.href = '/';
   };
 
   return (

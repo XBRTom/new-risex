@@ -1,6 +1,6 @@
 import * as React from "react"
 import Script from "next/script";
-import { WalletProvider } from "@/providers/Wallet";
+import { WalletProvider } from "@/context";
 import Navbar from "@/components/layout/Navbar";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react"
@@ -27,7 +27,9 @@ export default async function RootLayout(
           
         </head>
         <body>
-          <Script src="https://xumm.app/assets/cdn/xumm.min.js" strategy='beforeInteractive' />
+          {
+            /*
+            <Script src="https://xumm.app/assets/cdn/xumm.min.js" strategy='beforeInteractive' />
           <Script id='xumm-setup'>
            {`
             var xumm = new Xumm('5ea5cad0-1d8e-4cee-a31e-96a8f2297dea')
@@ -45,6 +47,9 @@ export default async function RootLayout(
             })
             `}
           </Script>
+            */
+          }
+          
           <SessionProvider session={session}>
             <WalletProvider>
               <Navbar />
