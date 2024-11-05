@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowUpRight, ArrowDownRight, Wallet, BarChart3, Percent, Coins, Scale, Info } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Wallet, BarChart3, Percent, Coins, Info, ArrowLeftRight } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface PoolInfoCardProps {
@@ -11,7 +10,13 @@ interface PoolInfoCardProps {
   amount2Currency: string;
   ammInfo: {
     account: string;
-    trading_fee?: number;
+    pool: {
+      tradingFee: number;
+      asset_currency: number;
+      asset2_currency: number;
+      lastRate1: number;
+      lastRate2: number;
+    };
   };
   latestMetrics: {
     totalValueLocked: number;
@@ -27,12 +32,42 @@ interface PoolInfoCardProps {
   counterExchangeRate: number | null;
 }
 
-const convertTradingFeeToPercentage = (tradingFee: number | undefined): string => {
-  if (typeof tradingFee !== 'number') return 'N/A';
+const convertTradingFeeToPercentage = (tradingFee: number): string => {
   return (tradingFee / 1000).toFixed(2) + '%';
 };
 
-export default function PoolInfoCard({
+const AssetBalanceBar: React.FC<{ balance1: number; balance2: number; currency1: string; currency2: string }> = ({ balance1, balance2, currency1, currency2 }) => {
+  const total = balance1 + balance2;
+  const percentage1 = (balance1 / total) * 100;
+  const percentage2 = 100 - percentage1;
+
+  return (
+    <div className="mt-4">
+      <div className="flex justify-between text-xs text-gray-400 mb-1">
+        <span>{currency1}</span>
+        <span>{currency2}</span>
+      </div>
+      <div className="h-4 bg-gray-700 rounded-full overflow-hidden">
+        <div
+          className="h-full bg-gradient-to-r from-blue-500 to-green-500"
+          style={{ width: `${percentage1}%` }}
+          role="progressbar"
+          aria-valuenow={percentage1}
+          aria-valuemin={0}
+          aria-valuemax={100}
+        >
+          <span className="sr-only">{`${percentage1.toFixed(2)}% ${currency1}`}</span>
+        </div>
+      </div>
+      <div className="flex justify-between text-xs text-gray-400 mt-1">
+        <span>{percentage1.toFixed(2)}%</span>
+        <span>{percentage2.toFixed(2)}%</span>
+      </div>
+    </div>
+  );
+};
+
+export default function Component({
   amountCurrency,
   amount2Currency,
   ammInfo,
@@ -46,7 +81,7 @@ export default function PoolInfoCard({
   counterExchangeRate
 }: PoolInfoCardProps) {
   const isPositiveAPR = latestMetrics.relativeAPR >= 0;
-  const tradingFeePercentage = convertTradingFeeToPercentage(ammInfo.trading_fee);
+  const tradingFeePercentage = convertTradingFeeToPercentage(ammInfo.pool.tradingFee);
 
   return (
     <Card className="bg-gradient-to-br from-gray-900 to-black border-gray-800 shadow-lg rounded-xl overflow-hidden w-full md:w-[480px]">
@@ -73,17 +108,17 @@ export default function PoolInfoCard({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-sm text-gray-400 mb-1">Total Value Locked</p>
-              <p className="text-xl font-bold text-white">${latestMetrics?.totalValueLocked.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+              <p className="text-xl font-bold text-white">${latestMetrics.totalValueLocked.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
             </div>
             <div>
               <p className="text-sm text-gray-400 mb-1">24h Trading Volume</p>
-              <p className="text-xl font-bold text-white">${latestMetrics?.totalPoolVolume.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+              <p className="text-xl font-bold text-white">${latestMetrics.totalPoolVolume.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
             </div>
             <div>
               <p className="text-sm text-gray-400 mb-1">APR</p>
               <p className={`flex items-center ${isPositiveAPR ? 'text-green-400' : 'text-red-400'}`}>
                 {isPositiveAPR ? <ArrowUpRight className="h-4 w-4 mr-1" /> : <ArrowDownRight className="h-4 w-4 mr-1" />}
-                <span className="text-lg font-bold">{latestMetrics?.relativeAPR.toFixed(2)}%</span>
+                <span className="text-lg font-bold">{latestMetrics.relativeAPR.toFixed(2)}%</span>
               </p>
             </div>
             <div>
@@ -106,20 +141,24 @@ export default function PoolInfoCard({
             </div>
           </div>
           <Separator className="bg-gray-800" />
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-400">Base Currency</span>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <ArrowLeftRight className="h-4 w-4 text-blue-400 mr-2" />
+                <span className="text-xs text-gray-400">Exchange Rate</span>
+              </div>
+              <span className="text-sm font-medium text-blue-400">
+                1 {amount2Currency} = {(1 / ammInfo.pool.lastRate2).toFixed(6)} {amountCurrency}
+              </span>
             </div>
-            <div>
-              <span className="text-lg font-bold">{baseCurrency ?? 'N/A'}</span>
-            </div>
-          </div>
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-400">Counter Currency</span>
-            </div>
-            <div>
-              <span className="text-lg font-bold">{counterCurrency ?? 'N/A'}</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <ArrowLeftRight className="h-4 w-4 text-green-400 mr-2" />
+                <span className="text-xs text-gray-400">Exchange Rate</span>
+              </div>
+              <span className="text-sm font-medium text-green-400">
+                1 {amountCurrency} = {ammInfo.pool.lastRate2.toFixed(6)} {amount2Currency}
+              </span>
             </div>
           </div>
           <Separator className="bg-gray-800" />
@@ -132,6 +171,12 @@ export default function PoolInfoCard({
               <span className="text-sm text-gray-400">Pool Balance ({amount2Currency})</span>
               <span className="text-sm font-medium text-white">{poolBalance2.toLocaleString(undefined, {minimumFractionDigits: 6, maximumFractionDigits: 6})}</span>
             </div>
+            <AssetBalanceBar
+              balance1={poolBalance1}
+              balance2={poolBalance2}
+              currency1={amountCurrency}
+              currency2={amount2Currency}
+            />
           </div>
           <Separator className="bg-gray-800" />
           <div className="flex justify-between items-center">

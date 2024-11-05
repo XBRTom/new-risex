@@ -91,6 +91,8 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
     }
   }, [account, ammInfo.poolId])
 
+  console.log(ammInfo)
+
   useEffect(() => {
     if (historicalMetrics.length > 0) {
       setFilteredMetrics(filterMetricsByTimeRange(historicalMetrics, timeRange))
