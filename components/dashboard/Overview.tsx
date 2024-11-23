@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useEffect, useState, useRef } from 'react';
-import { useWallet } from '@/providers/Wallet'; // Adjust path based on your project structure
 import PoolsTable from '@/components/dashboard/overview/PoolsTable';
 import Pagination from '@/components/dashboard/global/Pagination';
 // import SearchBar from '@/components/SearchBar';
@@ -60,7 +59,6 @@ const Dashboard: React.FC = () => {
 
   const hasFetchedData = useRef<boolean>(false);
 
-  const { account, handleLogin, handleLogout }:any = useWallet() || {}; // Getting account status and login handler from Wallet provider
   // const [isModalOpen, setIsModalOpen] = useState(false);
   // const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Dropdown state
 

@@ -17,14 +17,14 @@ export const POST = auth(async (req) => {
     return Response.json({ message: "Not authenticated" }, { status: 401 });
   }
 
-  const { transaction } = await req.json();
+  const { transaction, return_url } = await req.json();
 
   try {
     const payload = await xumm.payload?.create({
         txjson: transaction,
         options: {
           return_url: {
-            web: frontAppUrl
+            web: return_url ?? frontAppUrl
           },
           force_network: "DEVNET", // MAINNET // DEVNET // TESTNET
           submit: true,

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { useWallet } from '@/providers/Wallet';
+import { useWallet } from "@/context"
 import TransactionsTable from './transactions/TransactionsTable';
 import DashboardLayout from './layout/DashboardLayout';
 // import {
@@ -16,17 +16,20 @@ import * as xrpl from 'xrpl';
   // Start of Selection
 
 const Transactions: React.FC = () => {
-  const wallet = useWallet();
-  const account = wallet ? wallet.account : null;
+  const walletContext = useWallet()
+    if (!walletContext) {
+        throw new Error("Wallet context is not available")
+    }
+  const { walletAddress } = walletContext
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const loadTransactions = useCallback(async () => {
-    if (account) {
+    if (walletAddress) {
       setLoading(true);
       try {
-        const txs = await fetchTransactions(account);
+        const txs = await fetchTransactions(walletAddress);
         console.log('Fetched transactions:', txs);
         setTransactions(txs);
         localStorage.setItem('cachedTransactions', JSON.stringify(txs));
@@ -40,21 +43,21 @@ const Transactions: React.FC = () => {
       setTransactions([]);
       setLoading(false);
     }
-  }, [account]);
+  }, [walletAddress]);
 
   useEffect(() => {
-    if (account) {
+    if (walletAddress) {
       loadTransactions();
 
       const client = new xrpl.Client('wss://s.altnet.rippletest.net:51233');
       client.connect().then(() => {
         client.request({
           command: 'subscribe',
-          accounts: [account]
+          accounts: [walletAddress]
         });
 
         client.on('transaction', (tx) => {
-          if (tx.transaction.Account === account) {
+          if (tx.transaction.Account === walletAddress) {
             loadTransactions();
           }
         });
@@ -68,7 +71,7 @@ const Transactions: React.FC = () => {
       localStorage.removeItem('cachedTransactions');
       setTransactions([]);
     }
-  }, [account, loadTransactions]);
+  }, [walletAddress, loadTransactions]);
 
   return (
     <DashboardLayout>
@@ -93,7 +96,7 @@ const Transactions: React.FC = () => {
               transactions={transactions} 
               loading={loading} 
               error={error} 
-              isWalletConnected={!!account}
+              isWalletConnected={!!walletAddress}
             />
           </main>
         </div>

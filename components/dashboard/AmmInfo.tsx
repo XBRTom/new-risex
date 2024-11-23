@@ -7,7 +7,6 @@ import GlobalPoolMetricsTable from './amminfo/GlobalPoolMetricsTable'
 import PoolMetricsChart from './amminfo/PoolMetricsChart'
 import apiClient from '../../libs/api'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-// import { useWallet } from '@/providers/Wallet'
 import WalletPoolHoldingTable from './pool-details/WalletPoolHoldingTable'
 // import TransactionTable from './pool-details/TransactionTable'
 import DashboardLayout from './layout/DashboardLayout'
@@ -42,7 +41,6 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
   const [currencyAmount1, setCurrencyAmount1] = useState('')
   const [currencyAmount2, setCurrencyAmount2] = useState('')
   const [tradingFeeVote, setTradingFeeVote] = useState('')
-  // const { lpTokenDetails, xumm, fetchLpTokenDetails, transactions } = useWallet()
   const [currentTokenAmount, setCurrentTokenAmount] = useState('-')
   const [transactionStatus, setTransactionStatus] = useState('')
   const [baseExchangeRate, setBaseExchangeRate] = useState<number | null>(null)

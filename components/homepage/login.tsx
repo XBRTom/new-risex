@@ -15,13 +15,17 @@ import {
     CardHeader,
     CardTitle,
   } from "@/components/ui/card";
-// import { auth } from "@/auth"
 import { SignInGoogle, SignInMagicLink, SignOut } from "@/components/homepage/auth"
 import { useWallet } from "@/context";
 import { useSession } from "next-auth/react"
 import { Button } from "../ui/button";
-import { useEffect } from "react";
-
+import { truncateAddress } from "@/lib/utils"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+  } from "@/components/ui/tooltip"
 const Login = () => {
     //const session = await auth()
     const { data: session, status } = useSession()
@@ -71,7 +75,16 @@ const Login = () => {
                         (
                             <div className="flex flex-col gap-4">
                                 <p className="text-white">Connected wallet to {walletAppName} with {walletType}</p>
-                                <p className="text-white">Account : {walletAddress}</p>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <p className="text-white cursor-pointer">Account : {truncateAddress(walletAddress)}</p>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>{walletAddress}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
                                 <Button onClick={() => handleDisconnect()}>Disconnect</Button>
                             </div>
                         ):(
