@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from 'next/navigation'
-import { useWallet } from '@/providers/Wallet'
+import { useWallet } from "@/context";
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { ChevronDown, User, Settings, HelpCircle, LogOut, Wallet, CreditCard, Gift, X, Menu } from 'lucide-react'
@@ -86,7 +86,21 @@ ListItem.displayName = "ListItem"
 
 export default function Navbar() {
   const { data: session, status } = useSession()
-  const { account, handleLogin, handleLogout } = useWallet() || {}
+  const walletContext = useWallet()
+
+  if (!walletContext) {
+      throw new Error("Wallet context is not available");
+  }
+
+  const { connectWallet, disconnectWallet, walletType, walletAddress, walletAppName } = walletContext;
+
+  const handleConnect = (type: 'xumm' | 'gemwallet' | 'ledger' | 'crossmark' | null) => {
+      connectWallet(type);
+  }
+
+  const handleDisconnect = () => {
+      disconnectWallet();
+  }
   const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -224,15 +238,15 @@ export default function Navbar() {
                   </DropdownMenuItem>
                 ) : (
                   <>
-                    {account ? (
+                    {(walletType && walletAddress) ? (
                       <>
                         <DropdownMenuItem>
                           <span className="text-xs flex items-center">
                             <Wallet className="mr-2 h-3 w-3" />
-                            Wallet: {truncateAddress(account)}
+                            Wallet: {truncateAddress(walletAddress)}
                           </span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onSelect={handleLogout}>
+                        <DropdownMenuItem onSelect={() => handleDisconnect()}>
                           <span className="text-xs flex items-center text-red-600">
                             <X className="mr-2 h-3 w-3" />
                             Disconnect Wallet
@@ -240,7 +254,7 @@ export default function Navbar() {
                         </DropdownMenuItem>
                       </>
                     ) : (
-                      <DropdownMenuItem onSelect={handleLogin}>
+                      <DropdownMenuItem onSelect={() => handleConnect('xumm')}>
                         <span className="text-xs flex items-center">
                           <Wallet className="mr-2 h-3 w-3" />
                           Connect Wallet
