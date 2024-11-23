@@ -4,7 +4,7 @@ import { Xumm } from "xumm";
 const apiKey = process.env.NEXT_PUBLIC_XUMM_API_KEY || '';
 const apiSecret = process.env.NEXT_PUBLIC_XUMM_API_SECRET || '';
 const frontAppUrl = process.env.NEXT_PUBLIC_FRONT_APP_URL || 'http://localhost:3000'
-
+console.log('apiKey', apiKey, 'apiSecret', apiSecret)
 const xumm = new Xumm(apiKey, apiSecret);
 
 export const POST = auth(async (req) => {
@@ -18,7 +18,8 @@ export const POST = auth(async (req) => {
   }
 
   const { transaction, return_url } = await req.json();
-
+  console.log('transaction', transaction)
+  console.log('return_url', return_url)
   try {
     const payload = await xumm.payload?.create({
         txjson: transaction,
@@ -35,6 +36,7 @@ export const POST = auth(async (req) => {
           instruction: "Thank you for signing this transaction using the xaman wallet"
         }
       })
+      console.log('After payload create', payload)
     return Response.json({ payload});
   } catch (error) {
     console.error('Failed to sign transaction:', error);

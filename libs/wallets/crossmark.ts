@@ -20,7 +20,7 @@ export const getAppName = async () => {
   return ''
 }
 
-export const signTransaction = async (transaction: any) => {
+export const signTransaction = async (transaction: any, return_url: string|null|undefined) => {
   const res = await sdk.async.signAndWait(transaction);
 
   return res.response.data.txBlob;

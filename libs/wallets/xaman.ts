@@ -23,8 +23,8 @@ export const getAppName = async () => {
     return await xumm?.environment?.jwt?.then(j => j?.app_name ?? '') ?? ''
 }
 
-export const signTransaction = async (transaction: any) => {
-    return await apiClient.post(`/account/wallets`, { transaction })
+export const signTransaction = async (transaction: any, return_url: string|null|undefined) => {
+    return await apiClient.post(`/account/wallets`, { transaction, return_url })
 };
 
 export const handleLogOut = async () => {

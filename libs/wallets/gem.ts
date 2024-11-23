@@ -16,7 +16,7 @@ import {
     return true;
   };
   
-  export const signTransaction = async (transaction: any) => {
+  export const signTransaction = async (transaction: any, return_url: string|null|undefined) => {
     const signResult = await signTransactionGem({ transaction });
     return signResult.result?.signature ?? null;
   };

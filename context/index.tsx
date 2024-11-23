@@ -17,7 +17,7 @@ interface WalletContextProps {
   setWalletAddress: React.Dispatch<React.SetStateAction<string | null>>;
   setWalletAppName: React.Dispatch<React.SetStateAction<string | null>>;
   setWalletType: React.Dispatch<React.SetStateAction<WalletType>>;
-  signTransactionWallet: (transaction: any) => void;
+  signTransactionWallet: (transaction: any, return_url: string|null|undefined) => void;
 }
 
 const WalletContext = createContext<WalletContextProps | undefined>(undefined);
@@ -69,9 +69,9 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     localStorage.removeItem('walletAppName');
   };
 
-  const signTransactionWallet = async (transaction: any) => {
+  const signTransactionWallet = async (transaction: any, return_url: string|null|undefined) => {
     if (walletType && walletHandlers[walletType]) {
-      await walletHandlers[walletType].signTransaction(transaction);
+      await walletHandlers[walletType].signTransaction(transaction, return_url);
     }
   };
 

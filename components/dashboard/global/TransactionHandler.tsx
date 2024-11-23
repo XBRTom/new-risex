@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useWallet } from '@/providers/Wallet';
+import { useWallet } from "@/context";
 import { xrpToDrops } from '@/libs/xrpl';
 
 interface Pool {
@@ -29,32 +29,23 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
   onCancel,
 }) => {
   const walletContext = useWallet();
-  const { xumm, account, handleLogin } = walletContext || {};
+  if (!walletContext) {
+      throw new Error("Wallet context is not available");
+  }
+  const { signTransactionWallet, walletType, walletAddress } = walletContext;
   const [status, setStatus] = useState<string>('');
 
   const handleTransaction = async () => {
-    if (!account) {
-      try {
-        if (handleLogin)
-          await handleLogin();
-      } catch (error) {
-        console.error(error);
-        // setStatus(walletError || 'Sign in was canceled.');
-        if (onCancel) onCancel();
-        return;
-      }
-    }
-  
     // Log the account and issuer values before constructing the payload
-    console.log('Account:', account);  // Log the account to check if it's valid
-    console.log('Issuer (Asset2):', pool.asset2_issuer);  // Log the issuer to check if it's valid
+    console.log('Account:', walletAddress);  // Log the account to check if it's valid
+    console.log('Pool:', pool);  // Log the issuer to check if it's valid
   
     try {
       setStatus('Creating transaction payload...');
 
       const payload = {
         TransactionType: transactionType,
-        Account: account,
+        Account: walletAddress,
         Amount: pool.asset_currency === 'XRP' ? xrpToDrops(amount1) : {
           currency: pool.asset_currency,
           value: String(amount1),
@@ -77,40 +68,10 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
       };
 
       console.log('Payload:', JSON.stringify(payload, null, 2)); // For debugging
+      const signRequest = await signTransactionWallet(payload, 'http://localhost:3000/dashboard/overview?request_signature=123')
+      console.log(signRequest)
 
-      const createdPayload = await xumm.payload.createAndSubscribe(payload, (event: any) => {
-        if (event.data.signed) {
-          return true;
-        }
-      });
-
-      const payloadUUID = createdPayload?.created?.uuid;
-
-      if (!payloadUUID) {
-        throw new Error('Failed to create payload');
-      }
-
-      const payloadURL = `https://xumm.app/sign/${payloadUUID}`;
-      const newPopup = window.open(payloadURL, 'XummSign', 'width=500,height=600');
-
-      if (!newPopup) {
-        throw new Error('Failed to open popup window');
-      }
-
-      const interval = setInterval(async () => {
-        if (newPopup && newPopup.closed) {
-          clearInterval(interval);
-          const resolvedPayload = await createdPayload.resolved;
-          console.log(resolvedPayload);
-          if (resolvedPayload) {
-            setStatus('Transaction successful!');
-            onSuccess();
-          } else {
-            setStatus('Transaction was not signed.');
-            onError();
-          }
-        }
-      }, 1000);
+      
     } catch (err) {
       setStatus('Failed to complete transaction: ' + (err as Error).message);
       console.error('Error completing transaction:', err);
@@ -120,10 +81,16 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
 
   return (
     <div>
-      <button onClick={handleTransaction} className="bg-blue-500 text-white px-4 py-2 rounded">
-        {transactionType === 'AMMDeposit' ? 'Add Liquidity' : 'Withdraw Liquidity'}
-      </button>
-      {status && <p className="text-sm text-gray-500 mt-2">{status}</p>}
+      {(walletType && walletAddress) ? (
+        <>
+          <button onClick={handleTransaction} className="bg-blue-500 text-white px-4 py-2 rounded">
+            {transactionType === 'AMMDeposit' ? 'Add Liquidity' : 'Withdraw Liquidity'}
+          </button>
+          {status && <p className="text-sm text-gray-500 mt-2">{status}</p>}
+        </>
+      ) : (
+        <p>Connect your wallet</p>
+      )}
     </div>
   );
 };
