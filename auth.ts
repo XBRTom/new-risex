@@ -8,7 +8,7 @@ import prisma from '@/libs/prisma';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   debug: !!process.env.AUTH_DEBUG,
-  theme: { logo: "https://authjs.dev/img/logo-sm.png" },
+  theme: { logo: "/logo_white.svg" },
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
@@ -25,6 +25,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Resend({
         apiKey: process.env.AUTH_RESEND_KEY,
         from: process.env.AUTH_RESEND_FROM,
+        name: 'E-mail'
     }),
   ],
   session: { strategy: "database" },
