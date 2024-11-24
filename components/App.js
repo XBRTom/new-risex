@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Transactions from './Transactions';
 import ProvideLiquidity from './ProvideLiquidity';
 import SendXRP from './SendXrp'; // Import SendXRP component
-import { Xumm } from 'xumm';
+//import { Xumm } from 'xumm';
 import { useWallet } from './WalletContext'; // Import useWallet hook
 
 // const xumm = new Xumm('5ea5cad0-1d8e-4cee-a31e-96a8f2297dea');

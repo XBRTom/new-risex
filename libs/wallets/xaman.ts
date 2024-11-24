@@ -2,8 +2,9 @@ import { Xumm } from "xumm";
 import apiClient from '../../libs/api'
 
 const apiKey = process.env.NEXT_PUBLIC_XUMM_API_KEY || '';
+const apiSecret = process.env.NEXT_PUBLIC_XUMM_API_SECRET || '';
 
-const xumm = new Xumm(apiKey, '');
+const xumm = new Xumm(apiKey, apiSecret);
 
 export const handleLogin = async () => {
     //const response = await signTransaction({TransactionType: "SignIn"});
@@ -25,6 +26,10 @@ export const getAppName = async () => {
 
 export const signTransaction = async (transaction: any, return_url: string|null|undefined) => {
     return await apiClient.post(`/account/wallets`, { transaction, return_url })
+};
+
+export const getInfoTransaction = async (uuid: string) => {
+    return await apiClient.get(`/account/wallets/${uuid}`)
 };
 
 export const handleLogOut = async () => {

@@ -17,7 +17,8 @@ interface WalletContextProps {
   setWalletAddress: React.Dispatch<React.SetStateAction<string | null>>;
   setWalletAppName: React.Dispatch<React.SetStateAction<string | null>>;
   setWalletType: React.Dispatch<React.SetStateAction<WalletType>>;
-  signTransactionWallet: (transaction: any, return_url: string|null|undefined) => void;
+  signTransactionWallet: (transaction: any, return_url: string|null|undefined) => any;
+  getInfoTransactionWallet: (uuid: string) => any;
 }
 
 const WalletContext = createContext<WalletContextProps | undefined>(undefined);
@@ -71,7 +72,13 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
 
   const signTransactionWallet = async (transaction: any, return_url: string|null|undefined) => {
     if (walletType && walletHandlers[walletType]) {
-      await walletHandlers[walletType].signTransaction(transaction, return_url);
+      return await walletHandlers[walletType].signTransaction(transaction, return_url);
+    }
+  };
+
+  const getInfoTransactionWallet = async (uuid: string) => {
+    if (walletType && walletHandlers[walletType]) {
+      return await walletHandlers[walletType].getInfoTransaction(uuid);
     }
   };
 
@@ -102,6 +109,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
         setWalletType,
         setWalletAppName,
         signTransactionWallet,
+        getInfoTransactionWallet
       }}
     >
       {children}

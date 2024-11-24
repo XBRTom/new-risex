@@ -24,4 +24,8 @@ export const signTransaction = async (transaction: any, return_url: string|null|
   const res = await sdk.async.signAndWait(transaction);
 
   return res.response.data.txBlob;
-};
+}
+
+export const getInfoTransaction = async (uuid: string) => {
+  return true
+}

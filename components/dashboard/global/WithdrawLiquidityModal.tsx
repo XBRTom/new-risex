@@ -95,7 +95,7 @@ export default function WithdrawLiquidityModal({ pool, closeModal }: WithdrawLiq
               />
             </div>
             <Separator className="bg-gray-800" />
-            <div className="flex justify-end space-x-4">
+            <div className="flex items-start justify-end space-x-4">
               <button
                 onClick={closeModal}
                 className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
@@ -110,17 +110,7 @@ export default function WithdrawLiquidityModal({ pool, closeModal }: WithdrawLiq
                 onSuccess={handleSuccess}
                 onError={handleError}
                 onCancel={handleCancel}
-              >
-                {/*({ onClick }) => (
-                  <button
-                    onClick={onClick}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors flex items-center"
-                  >
-                    <Minus size={18} className="mr-2" />
-                    Withdraw Liquidity
-                  </button>
-                )*/}
-              </XummTransactionHandler>
+              />
             </div>
           </div>
         </CardContent>

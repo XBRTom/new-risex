@@ -47,4 +47,8 @@ import {
     if (!publicKey.result) return;
   
     return verifySignature(signedTransactionResult, publicKey.result.publicKey);
-  };
+  }
+
+  export const getInfoTransaction = async (uuid: string) => {
+    return true
+  }

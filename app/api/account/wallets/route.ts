@@ -4,7 +4,6 @@ import { Xumm } from "xumm";
 const apiKey = process.env.NEXT_PUBLIC_XUMM_API_KEY || '';
 const apiSecret = process.env.NEXT_PUBLIC_XUMM_API_SECRET || '';
 const frontAppUrl = process.env.NEXT_PUBLIC_FRONT_APP_URL || 'http://localhost:3000'
-console.log('apiKey', apiKey, 'apiSecret', apiSecret)
 const xumm = new Xumm(apiKey, apiSecret);
 
 export const POST = auth(async (req) => {
@@ -33,7 +32,7 @@ export const POST = auth(async (req) => {
           expire: 300
         },
         custom_meta: {
-          instruction: "Thank you for signing this transaction using the xaman wallet"
+          instruction: "Sign your transaction using the xaman wallet"
         }
       })
       console.log('After payload create', payload)

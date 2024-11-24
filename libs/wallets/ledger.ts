@@ -28,3 +28,7 @@ export const getAppName = async () => {
 export const signTransaction = async (transaction: any, return_url: string|null|undefined) => {
   return true
 }
+
+export const getInfoTransaction = async (uuid: string) => {
+  return true
+}
