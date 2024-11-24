@@ -20,12 +20,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           access_type: "offline",
           response_type: "code",
         } 
+      },
+      profile(profile) {
+        return { role: "user" }
       }
     }),
     Resend({
         apiKey: process.env.AUTH_RESEND_KEY,
         from: process.env.AUTH_RESEND_FROM,
-        name: 'E-mail'
+        name: 'E-mail',
     }),
   ],
   session: { strategy: "database" },
@@ -44,6 +47,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           ...session.user,
           id: user.id,
           phoneNumber: user.phoneNumber,
+          role: user.role,
         },
       }
     }
@@ -56,11 +60,13 @@ declare module "next-auth" {
     accessToken?: string
     user: {
       phoneNumber: string
+      role?: string
     } & DefaultSession["user"]
   }
 
   interface User {
     phoneNumber?: string
+    role?: string
   }
 }
 
