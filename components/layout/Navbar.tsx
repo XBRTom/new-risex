@@ -254,11 +254,13 @@ export default function Navbar() {
                         </DropdownMenuItem>
                       </>
                     ) : (
-                      <DropdownMenuItem onSelect={() => handleConnect('xumm')}>
-                        <span className="text-xs flex items-center">
-                          <Wallet className="mr-2 h-3 w-3" />
-                          Connect Wallet
-                        </span>
+                      <DropdownMenuItem>
+                        <Link href="/" className="flex items-center text-xs">
+                          <span className="text-xs flex items-center">
+                            <Wallet className="mr-2 h-3 w-3" />
+                            Connect Wallet
+                          </span>
+                        </Link>
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator />
