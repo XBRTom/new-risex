@@ -23,8 +23,8 @@ type WalletProvider = {
 
 const walletProviders: WalletProvider[] = [
     { name: 'Xaman', code: 'xumm', icon: <XamanIcon className="w-8 h-8" /> },
-    { name: 'GemWallet', code: 'gemwallet', icon: <GemWalletIcon className="w-8 h-8" /> },
-    { name: 'Ledger', code: 'ledger', icon: <LedgerIcon className="w-8 h-8" /> },
+    { name: 'GemWallet', code: 'gemwallet', icon: <GemWalletIcon className="w-8 h-8" />, disabled: true },
+    { name: 'Ledger', code: 'ledger', icon: <LedgerIcon className="w-8 h-8" />, disabled: true },
     { name: 'CroosMark', code: 'crossmark', icon: <CroosMarkIcon className="w-8 h-8" />, disabled: true },
 ]
 
@@ -76,7 +76,7 @@ export function WalletConnect() {
                                     <Button
                                     key={provider.name}
                                     variant={selectedWallet === provider.name ? "default" : "outline"}
-                                    className={`h-auto py-4 px-2 relative ${provider.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    className={`h-auto py-4 px-2 relative ${provider.disabled ? 'cursor-not-allowed' : ''}`}
                                     onClick={() => !provider.disabled && handleConnect(provider.code)}
                                     disabled={provider.disabled}
                                     >
@@ -85,7 +85,7 @@ export function WalletConnect() {
                                         <span className="mt-2 text-sm">{provider.name}</span>
                                     </div>
                                     {provider.disabled && (
-                                        <div className="absolute inset-0 bg-background/60 flex items-center justify-center rounded-md"></div>
+                                        <div className="absolute inset-0 bg-background/40 flex items-center justify-center rounded-md"></div>
                                     )}
                                     </Button>
                                 ))}
