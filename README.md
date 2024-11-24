@@ -19,6 +19,7 @@ This repo contains a git submodule
 
 ## Database
 
+To generate migration file execute : `prisma migrate dev --name init`
 ## Deployment
 
 ### Vercel
