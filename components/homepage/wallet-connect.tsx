@@ -22,8 +22,8 @@ type WalletProvider = {
 }
 
 const walletProviders: WalletProvider[] = [
-    { name: 'Xaman', code: 'xumm', icon: <XamanIcon className="w-8 h-8" /> },
-    { name: 'GemWallet', code: 'gemwallet', icon: <GemWalletIcon className="w-8 h-8" />, disabled: true },
+    { name: 'Xaman', code: 'xumm', icon: <XamanIcon className="w-8 h-8" />, disabled: false },
+    { name: 'GemWallet', code: 'gemwallet', icon: <GemWalletIcon className="w-8 h-8" />, disabled: false },
     { name: 'Ledger', code: 'ledger', icon: <LedgerIcon className="w-8 h-8" />, disabled: true },
     { name: 'CroosMark', code: 'crossmark', icon: <CroosMarkIcon className="w-8 h-8" />, disabled: true },
 ]

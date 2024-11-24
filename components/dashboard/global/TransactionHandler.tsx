@@ -65,51 +65,54 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
         Flags: 1048576,
       };
 
-      console.log('Payload:', JSON.stringify(payload, null, 2)); // For debugging
       const signRequest = await signTransactionWallet(payload, 'http://localhost:3000/dashboard/overview?request_signature=123')
-      console.log(signRequest)
-      if (signRequest?.payload?.uuid)
-        setUuid(signRequest?.payload?.uuid)
-
-      if (signRequest?.payload?.refs?.qr_png) {
-        setStatus('Scan this QR code to sign the transaction.')
-        setPng(signRequest.payload.refs.qr_png)
-      }
-
-    if (signRequest?.payload?.refs?.websocket_status) {
-        const ws = new WebSocket(signRequest.payload.refs.websocket_status);
-
-        ws.onopen = () => {
-            console.log('WebSocket connection opened')
-        };
-
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            console.log('WebSocket message received:', data)
-
-            if (data.pre_signed) {
-              setStatus('Transaction presigned')
-            } else if (data.signed) {
-                setStatus('Transaction signed successfully')
-                onSuccess()
-                ws.close()
-            } else if (data.rejected) {
-                setStatus('Transaction was rejected')
-                onError()
-                ws.close()
-            }
-        };
-
-        ws.onerror = (error) => {
-            console.error('WebSocket error:', error)
-            setStatus('WebSocket error occurred')
-            onError();
-        };
-
-        ws.onclose = () => {
-            console.log('WebSocket connection closed')
-        };
-    }
+      if (walletType === 'xumm') {
+        if (signRequest?.payload?.uuid)
+          setUuid(signRequest?.payload?.uuid)
+  
+        if (signRequest?.payload?.refs?.qr_png) {
+          setStatus('Scan this QR code to sign the transaction.')
+          setPng(signRequest.payload.refs.qr_png)
+        }
+  
+        if (signRequest?.payload?.refs?.websocket_status) {
+            const ws = new WebSocket(signRequest.payload.refs.websocket_status);
+  
+            ws.onopen = () => {
+                console.log('WebSocket connection opened')
+            };
+  
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                // console.log('WebSocket message received:', data)
+  
+                if (data.pre_signed) {
+                  setStatus('Transaction presigned')
+                } else if (data.signed) {
+                    setStatus('Transaction signed successfully')
+                    onSuccess()
+                    ws.close()
+                } else if (data.rejected) {
+                    setStatus('Transaction was rejected')
+                    onError()
+                    ws.close()
+                }
+            };
+  
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error)
+                setStatus('WebSocket error occurred')
+                onError();
+            };
+  
+            ws.onclose = () => {
+                console.log('WebSocket connection closed')
+            };
+        }
+      } else if(walletType === 'gemwallet') {
+        setUuid(signRequest)
+        setStatus('Transaction signed successfully')
+      }      
 
     } catch (err) {
       setStatus('Failed to complete transaction: ' + (err as Error).message)

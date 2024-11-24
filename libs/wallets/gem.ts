@@ -32,11 +32,12 @@ import {
   };
 
   export const getAccount = async () => {
-    return ''
+    const address = await getAddressGem();
+    return address.result?.address ?? null;
   }
   
   export const getAppName = async () => {
-    return ''
+    return 'LiquidX'
   }
   
   export const validateSignedTransactionResult = async (
