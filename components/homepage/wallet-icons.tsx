@@ -1,42 +1,40 @@
 export function XamanIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
-      <svg viewBox="0 0 24 24" fill="none" {...props}>
-        <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke="#00AEEF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M12 22V12" stroke="#00AEEF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M12 12L21 7" stroke="#00AEEF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M12 12L3 7" stroke="#00AEEF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <path d="M200 0L0 200L200 400L400 200L200 0Z" fill="#00B4F0"/>
+        <path d="M200 72L72 200L200 328L328 200L200 72Z" fill="white"/>
       </svg>
     )
   }
   
   export function GemWalletIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
-      <svg viewBox="0 0 24 24" fill="none" {...props}>
-        <path d="M16 2H8L2 8V16L8 22H16L22 16V8L16 2Z" stroke="#FF5E00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M12 8V16" stroke="#FF5E00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M8 12H16" stroke="#FF5E00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <rect width="400" height="400" rx="80" fill="#1D2028"/>
+        <path d="M100 200C100 144.772 144.772 100 200 100V100C255.228 100 300 144.772 300 200V200C300 255.228 255.228 300 200 300V300C144.772 300 100 255.228 100 200V200Z" fill="#00E599"/>
+        <path d="M200 260C232.032 260 258 234.032 258 202C258 169.968 232.032 144 200 144C167.968 144 142 169.968 142 202C142 234.032 167.968 260 200 260Z" fill="#1D2028"/>
       </svg>
     )
   }
   
   export function LedgerIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
-      <svg viewBox="0 0 24 24" fill="none" {...props}>
-        <rect x="2" y="2" width="20" height="20" rx="2" stroke="#000000" strokeWidth="2"/>
-        <path d="M7 12H17" stroke="#000000" strokeWidth="2" strokeLinecap="round"/>
-        <path d="M12 7V17" stroke="#000000" strokeWidth="2" strokeLinecap="round"/>
+      <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <rect width="400" height="400" fill="black"/>
+        <path d="M80 80H320V320H80V80Z" fill="white"/>
+        <path d="M120 120H280V280H120V120Z" fill="black"/>
       </svg>
     )
   }
   
   export function CroosMarkIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
-      <svg viewBox="0 0 24 24" fill="none" {...props}>
-        <circle cx="12" cy="12" r="10" stroke="#1E3A8A" strokeWidth="2"/>
-        <path d="M15 9L9 15" stroke="#1E3A8A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M9 9L15 15" stroke="#1E3A8A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <circle cx="200" cy="200" r="200" fill="#FF5000"/>
+        <path d="M100 200L180 280L300 120" stroke="white" strokeWidth="40" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     )
   }
+  
   
   

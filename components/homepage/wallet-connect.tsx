@@ -74,19 +74,18 @@ export function WalletConnect() {
                             <div className="grid grid-cols-2 gap-4">
                                 {walletProviders.map((provider) => (
                                     <Button
-                                    key={provider.name}
-                                    variant={selectedWallet === provider.name ? "default" : "outline"}
-                                    className={`h-auto py-4 px-2 relative ${provider.disabled ? 'cursor-not-allowed' : ''}`}
-                                    onClick={() => !provider.disabled && handleConnect(provider.code)}
-                                    disabled={provider.disabled}
+                                        key={provider.name}
+                                        className={`h-auto py-4 px-2 relative ${provider.disabled ? 'cursor-not-allowed' : ''}`}
+                                        onClick={() => !provider.disabled && handleConnect(provider.code)}
+                                        disabled={provider.disabled}
                                     >
-                                    <div className="flex flex-col items-center">
-                                        {provider.icon}
-                                        <span className="mt-2 text-sm">{provider.name}</span>
-                                    </div>
-                                    {provider.disabled && (
-                                        <div className="absolute inset-0 bg-background/40 flex items-center justify-center rounded-md"></div>
-                                    )}
+                                        <div className="flex flex-col items-center">
+                                            {provider.icon}
+                                            <span className="mt-2 text-sm">{provider.name}</span>
+                                        </div>
+                                        {provider.disabled && (
+                                            <div className="absolute inset-0 bg-background/40 flex items-center justify-center rounded-md"></div>
+                                        )}
                                     </Button>
                                 ))}
                             </div>
