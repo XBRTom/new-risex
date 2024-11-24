@@ -61,7 +61,7 @@ export default function ResponsiveSidebar() {
     { name: 'Staking', href: '/staking', icon: <Database className="h-5 w-5" /> },
     { name: 'APIs', href: '/apis', icon: <Settings className="h-5 w-5" /> },
     { name: 'Documentation', href: '/docs', icon: <FileText className="h-5 w-5" /> },
-    { name: 'Account', href: '/account', icon: <User className="h-5 w-5" /> },
+    { name: 'Account', href: '/dashboard/account', icon: <User className="h-5 w-5" /> },
   ]
 
   useEffect(() => {

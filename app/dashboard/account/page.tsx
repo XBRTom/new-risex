@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import DashboardLayout from '@/components/dashboard/layout/DashboardLayout';
 
 export interface ISVGProps extends React.SVGProps<SVGSVGElement> {
     size?: number;
@@ -97,69 +98,71 @@ export default function ProfileForm() {
     }
 
     return (
-        <div className="container py-16">
-            <Card className="w-1/2 mx-auto shadow-lg rounded-xl overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-xl font-bold">Edit your account</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                        <FormField
-                            control={form.control}
-                            name="fullName"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Full Name</FormLabel>
-                                <FormControl>
-                                <Input placeholder="John Doe" {...field} disabled={isLoading} />
-                                </FormControl>
-                                <FormDescription>
-                                This is your full name.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Email</FormLabel>
-                                <FormControl>
-                                <Input placeholder="email@example.com" {...field} disabled />
-                                </FormControl>
-                                <FormDescription>
-                                This is your email address.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="phoneNumber"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Phone Number</FormLabel>
-                                <FormControl>
-                                <Input placeholder="123-456-7890" {...field} disabled={isLoading} />
-                                </FormControl>
-                                <FormDescription>
-                                This is your phone number.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                        <Button type="submit" disabled={isLoading}>
-                            {isLoading ? <LoadingSpinner className="mr-2" /> : "Submit"}
-                        </Button>
-                        </form>
-                    </Form>
-                </CardContent>
-            </Card>
-        </div>
+        <DashboardLayout>
+            <div className="container py-16 bg-black text-white h-screen">
+                <Card className="w-1/2 mx-auto shadow-lg rounded-xl overflow-hidden bg-gradient-to-br from-gray-900 to-black border-gray-800 shadow-lg">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-xl font-bold text-white">Edit your account</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-white">
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                            <FormField
+                                control={form.control}
+                                name="fullName"
+                                render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Full Name</FormLabel>
+                                    <FormControl>
+                                    <Input placeholder="John Doe" {...field} disabled={isLoading} />
+                                    </FormControl>
+                                    <FormDescription>
+                                    This is your full name.
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Email</FormLabel>
+                                    <FormControl>
+                                    <Input placeholder="email@example.com" {...field} disabled />
+                                    </FormControl>
+                                    <FormDescription>
+                                    This is your email address.
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="phoneNumber"
+                                render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Phone Number</FormLabel>
+                                    <FormControl>
+                                    <Input placeholder="123-456-7890" {...field} disabled={isLoading} />
+                                    </FormControl>
+                                    <FormDescription>
+                                    This is your phone number.
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                                )}
+                            />
+                            <Button type="submit" disabled={isLoading}>
+                                {isLoading ? <LoadingSpinner className="mr-2" /> : "Submit"}
+                            </Button>
+                            </form>
+                        </Form>
+                    </CardContent>
+                </Card>
+            </div>
+        </DashboardLayout>
     )
 }
