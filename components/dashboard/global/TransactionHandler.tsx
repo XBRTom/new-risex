@@ -133,7 +133,7 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
           {status && <p className="text-sm text-gray-500 mt-2">{status}</p>}
         </>
       ) : (
-        <p>Connect your wallet</p>
+        <p className="text-sm text-gray-500 mt-2">Connect your wallet</p>
       )}
     </div>
   );
