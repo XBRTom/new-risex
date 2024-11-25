@@ -1,5 +1,6 @@
 import { auth } from "@/auth"
 import prisma from '@/libs/prisma';
+import { NextResponse } from "next/server";
 
 export const POST = auth(async (req) => {
   if (!req.auth) {
@@ -9,7 +10,7 @@ export const POST = auth(async (req) => {
   console.log(req.auth);
   const currentUser = req.auth.user;
   if (!currentUser?.email)
-    return Response.json({ message: "Not authenticated 2" }, { status: 401 });
+    return NextResponse.json({ message: "Not authenticated 2" }, { status: 401 });
 
   const { email, fullName, phoneNumber } = await req.json();
 
@@ -22,9 +23,9 @@ export const POST = auth(async (req) => {
       },
     });
 
-    return Response.json({ user: updatedUser });
+    return NextResponse.json({ user: updatedUser });
   } catch (error) {
     console.error('Failed to update user data:', error);
-    return Response.json({ message: "Failed to update user data" }, { status: 500 });
+    return NextResponse.json({ message: "Failed to update user data" }, { status: 500 });
   }
-}) as any // TODO: Fix `auth()` return type
+}) as any

@@ -99,8 +99,8 @@ export default function ProfileForm() {
 
     return (
         <DashboardLayout>
-            <div className="container py-16 bg-black text-white h-screen">
-                <Card className="w-1/2 mx-auto shadow-lg rounded-xl overflow-hidden bg-gradient-to-br from-gray-900 to-black border-gray-800 shadow-lg">
+            <div className="container p-6 bg-black text-white h-screen">
+                <Card className="w-1/2 shadow-lg rounded-xl overflow-hidden bg-gradient-to-br from-gray-900 to-black border-gray-800 shadow-lg">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-xl font-bold text-white">Edit your account</CardTitle>
                     </CardHeader>

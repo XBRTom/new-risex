@@ -271,10 +271,10 @@ export default function Navbar() {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                      <span className="flex items-center text-xs">
+                      <Link href="/dashboard/billing" className="flex items-center text-xs">
                         <CreditCard className="mr-2 h-3 w-3" />
                         <span>Billing</span>
-                      </span>
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
                       <span className="flex items-center text-xs">
