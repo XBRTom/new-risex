@@ -5,7 +5,6 @@ import GoogleProvider from "next-auth/providers/google"
 import Resend from "next-auth/providers/resend"
 import prisma from '@/libs/prisma';
 
-
 export const { handlers, auth, signIn, signOut } = NextAuth({
   debug: !!process.env.AUTH_DEBUG,
   theme: { logo: "/logo_white.svg" },
@@ -21,9 +20,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           response_type: "code",
         } 
       },
-      profile(profile) {
-        return { role: "user" }
-      }
     }),
     Resend({
         apiKey: process.env.AUTH_RESEND_KEY,
@@ -50,10 +46,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           role: user.role,
         },
       }
-    }
+    },
+    async signIn({ user, account, profile }) {
+      if (user && !user.role) {
+        user.role = "user";
+      }
+      return true;
+    },
   },
 })
-
 
 declare module "next-auth" {
   interface Session {
