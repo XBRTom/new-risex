@@ -1,4 +1,4 @@
 {
-  "installCommand": "git submodule update --init --recursive && npm install",
+  "installCommand": "bash ./vercel-submodule-workaround.sh && npm install",
   "buildCommand": "npm run build"
 }
