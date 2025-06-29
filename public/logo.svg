@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="86.9579 88.8751 166.0842 68.0938" xmlns="http://www.w3.org/2000/svg">
+  <g data-v-0dd9719b="" fill="#16214d" class="newinitialsvg-g newinitialsvg" transform="matrix(1, 0, 0, 1, 86.9532241821289, 88.8751220703125)">
+    <g class="tp-name" transform="matrix(1,0,0,1,0,0)" opacity="1">
+      <g transform="translate(0, 0)">
+        <g data-gra="path-name" fill="#16214d" transform="translate(0,15)">
+          <g transform="scale(1)">
+            <path d="M10.22-31.96L2.70-31.96L2.70 0L31.85 0L31.85-7.52L10.22-7.52L10.22-31.96Z" transform="translate(-2.6953125, 31.984375)" style="fill: rgb(35, 41, 47);"/>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(33.154296875, 0)">
+        <g data-gra="path-name" fill="#16214d" transform="translate(0,15)">
+          <g transform="scale(1)">
+            <path d="M2.70-31.96L2.70 0L10.22 0L10.22-31.96L2.70-31.96Z" transform="translate(-2.6953125, 31.984375)" style="fill: rgb(35, 41, 47);"/>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(44.6787109375, 0)">
+        <g data-gra="path-name" fill="#16214d" transform="translate(0,15)">
+          <g transform="scale(1)">
+            <path d="M10.22-7.52L10.22-24.46L27.13-24.46L27.13-7.52L25.29-7.52L22.57-13.16L14.06-13.16L16.87-7.52L10.22-7.52ZM8.33 0L20.60 0L23.63 6.11L31.85 6.11L28.91 0L29.02 0Q31.36 0 33.02-1.66L33.02-1.66Q34.66-3.30 34.66-5.64L34.66-5.64L34.66-26.32Q34.66-28.66 33.02-30.32L33.02-30.32Q31.36-31.98 29.02-31.98L29.02-31.98L8.33-31.98Q6.00-31.98 4.36-30.32L4.36-30.32Q2.70-28.66 2.70-26.32L2.70-26.32L2.70-5.64Q2.70-3.30 4.36-1.66L4.36-1.66Q6.00 0 8.33 0L8.33 0Z" transform="translate(-2.6953125, 31.984375)" style="fill: rgb(35, 41, 47);"/>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(80.640625, 0)">
+        <g data-gra="path-name" fill="#16214d" transform="translate(0,15)">
+          <g transform="scale(1)">
+            <path d="M8.33 0L29.02 0Q31.36 0 33.02-1.66L33.02-1.66Q34.66-3.30 34.66-5.64L34.66-5.64L34.66-31.96L27.13-31.96L27.13-7.52L10.22-7.52L10.22-31.96L2.70-31.96L2.70-5.64Q2.70-3.30 4.36-1.66L4.36-1.66Q6.00 0 8.33 0L8.33 0Z" transform="translate(-2.6953125, 31.984375)" style="fill: rgb(35, 41, 47);"/>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(116.6025390625, 0)">
+        <g data-gra="path-name" fill="#16214d" transform="translate(0,15)">
+          <g transform="scale(1)">
+            <path d="M2.70-31.96L2.70 0L10.22 0L10.22-31.96L2.70-31.96Z" transform="translate(-2.6953125, 31.984375)" style="fill: rgb(35, 41, 47);"/>
+          </g>
+        </g>
+      </g>
+      <g class="tp-graph" transform="translate(128.126953125, 0)" mask="url(#81699b4a-08bc-4841-b35c-b550aafc4131)">
+        <polyline data-gra="graph-name" fill-opacity="1" x="0" y="0" width="37.9619140625" height="44.09375" points="0,12 37.9619140625,0 37.9619140625,68.09375 0,56.09375 0,12" style="fill: rgb(35, 41, 47);"/>
+        <g data-gra="path-name" fill="#feffff" transform="translate(3.000957489013672,15)">
+          <g transform="scale(1)" fill="#16214d">
+            <path d="M27.13-24.44L27.13-7.52L10.22-7.52L10.22-24.44L27.13-24.44ZM34.66-5.64L34.66-26.32Q34.66-28.66 33.02-30.32L33.02-30.32Q31.36-31.96 29.02-31.96L29.02-31.96L2.70-31.96L2.70 0L29.02 0Q31.36 0 33.02-1.66L33.02-1.66Q34.66-3.30 34.66-5.64L34.66-5.64Z" transform="translate(-2.6953125, 31.984375)" style="fill: rgb(35, 41, 47);"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g data-gra="path-slogan" fill-rule="" class="tp-slogan" fill="#16214d" transform="matrix(1,0,0,1,51.06209182739258,64.09375)" opacity="1">
+      <g transform="scale(1, 1)">
+        <g transform="scale(1)"/>
+      </g>
+    </g>
+    <mask id="81699b4a-08bc-4841-b35c-b550aafc4131">
+      <polyline data-gra="graph-name" fill-opacity="1" x="0" y="0" width="37.9619140625" height="44.09375" points="0,12 37.9619140625,0 37.9619140625,68.09375 0,56.09375 0,12" fill="white"/>
+      <g data-gra="path-name" transform="translate(3.000957489013672,15)" fill="black">
+        <g transform="scale(1)">
+          <path d="M27.13-24.44L27.13-7.52L10.22-7.52L10.22-24.44L27.13-24.44ZM34.66-5.64L34.66-26.32Q34.66-28.66 33.02-30.32L33.02-30.32Q31.36-31.96 29.02-31.96L29.02-31.96L2.70-31.96L2.70 0L29.02 0Q31.36 0 33.02-1.66L33.02-1.66Q34.66-3.30 34.66-5.64L34.66-5.64Z" transform="translate(-2.6953125, 31.984375)"/>
+        </g>
+      </g>
+    </mask>
+    <defs v-gra="od"/>
+  </g>
+</svg>

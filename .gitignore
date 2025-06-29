@@ -6,6 +6,9 @@
 .pnp.js
 .yarn/install-state.gz
 
+#folder
+frontend
+
 # testing
 /coverage
 
@@ -27,7 +30,7 @@ yarn-error.log*
 
 # local env files
 .env*.local
-
+.env
 # vercel
 .vercel
 
@@ -35,20 +38,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# frontend
-/frontend/node_modules
-/frontend/.next/
-/frontend/.vercel
-/frontend/.yarn/install-state.gz
-/frontend/.yarn/cache
-/frontend/.env*.local
-/frontend/npm-debug.log*
-/frontend/*.tsbuildinfo
-/frontend/next-env.d.ts
-/frontend/.DS_Store
-/frontend/*.pem
-/frontend/.pnp
-/frontend/.pnp.js
-/frontend/out/
-/frontend/coverage
-/frontend/build
+node_modules/*
+.next/*
