@@ -1,4 +1,4 @@
-import type { Stripe } from "stripe";
+/* import type { Stripe } from "stripe";
 
 import { NextResponse } from "next/server";
 
@@ -62,4 +62,4 @@ export async function POST(req: Request) {
   }
   
   return NextResponse.json({ message: "Received" }, { status: 200 });
-}
+} */
