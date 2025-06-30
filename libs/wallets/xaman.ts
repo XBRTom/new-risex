@@ -1,23 +1,22 @@
-import { Xumm } from "xumm";
 import apiClient from '../../libs/api'
 
-// Initialize XUMM only when needed to avoid build-time errors
+// Get browser XUMM instance
 function getXummInstance() {
-  const apiKey = process.env.NEXT_PUBLIC_XUMM_API_KEY;
-  const apiSecret = process.env.NEXT_PUBLIC_XUMM_API_SECRET;
-  
-  if (!apiKey || !apiSecret) {
-    throw new Error('XUMM API credentials not configured');
+  if (typeof window === 'undefined') {
+    throw new Error('XUMM browser SDK only available in browser environment');
   }
   
-  return new Xumm(apiKey, apiSecret);
+  const xumm = (window as any).xumm;
+  if (!xumm) {
+    throw new Error('XUMM browser SDK not loaded. Make sure the script is loaded first.');
+  }
+  
+  return xumm;
 }
 
 export const handleLogin = async () => {
-    //const response = await signTransaction({TransactionType: "SignIn"});
-    //return response.data?.refs?.qr_png ?? null;
     const xumm = getXummInstance();
-    await xumm.authorize()
+    return await xumm.authorize();
 };
 
 export const handleLoginTransaction = async () => {
