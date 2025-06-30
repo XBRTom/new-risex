@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, memo, useCallback } from 'react';
 import {
   Table,
   TableBody,
@@ -40,7 +40,7 @@ interface PoolsTableProps {
   onPageChange: (page: number) => void;
 }
 
-export default function PoolsTable({
+const PoolsTable = memo(function PoolsTable({
   pools = [],
   itemsPerPage,
   totalItems,
@@ -108,37 +108,41 @@ export default function PoolsTable({
     return sortablePools;
   }, [pools, sortConfig]);
 
-  const requestSort = (key: string) => {
+  const requestSort = useCallback((key: string) => {
     let direction = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc';
     }
     setSortConfig({ key, direction });
-  };
+  }, [sortConfig.key, sortConfig.direction]);
 
-  const formatCurrency = (value: number) => {
+  const formatCurrency = useCallback((value: number) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
-  };
+  }, []);
 
-  const openAddLiquidityModal = (pool: Pool) => {
+  const openAddLiquidityModal = useCallback((pool: Pool) => {
     setSelectedPool(pool);
     setIsAddLiquidityModalOpen(true);
-  };
+  }, []);
 
-  const closeAddLiquidityModal = () => {
+  const closeAddLiquidityModal = useCallback(() => {
     setIsAddLiquidityModalOpen(false);
     setSelectedPool(null);
-  };
+  }, []);
 
-  const openWithdrawLiquidityModal = (pool: Pool) => {
+  const openWithdrawLiquidityModal = useCallback((pool: Pool) => {
     setSelectedPool(pool);
     setIsWithdrawLiquidityModalOpen(true);
-  };
+  }, []);
 
-  const closeWithdrawLiquidityModal = () => {
+  const closeWithdrawLiquidityModal = useCallback(() => {
     setIsWithdrawLiquidityModalOpen(false);
     setSelectedPool(null);
-  };
+  }, []);
+
+  const handleRowClick = useCallback((account: string) => {
+    window.location.href = `/dashboard/pool/${account}`;
+  }, []);
 
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
@@ -180,9 +184,9 @@ export default function PoolsTable({
             <TableBody>
               {sortedPools.map((pool, index) => (
                 <TableRow
-                  key={index}
-                  className="border-b border-gray-800 hover:bg-gray-800/50"
-                  onClick={() => (window.location.href = `/dashboard/pool/${pool.account}`)}
+                  key={pool.account || index}
+                  className="border-b border-gray-800 hover:bg-gray-800/50 cursor-pointer"
+                  onClick={() => handleRowClick(pool.account)}
                 >
                   {visibleColumns.includes('Pair') && (
                     <TableCell className="font-medium text-white">
@@ -301,4 +305,6 @@ export default function PoolsTable({
       )}
     </Card>
   );
-}
+});
+
+export default PoolsTable;
