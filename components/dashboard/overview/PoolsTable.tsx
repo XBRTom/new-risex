@@ -9,7 +9,8 @@ import {
 } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowUpDown, ArrowUp, ArrowDown, Plus, Minus, ChevronRight, ChevronLeft } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, Plus, Minus, ChevronRight, ChevronLeft, AlertCircle } from 'lucide-react';
+import Loader from '@/components/ui/loader';
 import {
   Tooltip,
   TooltipContent,
@@ -38,6 +39,8 @@ interface PoolsTableProps {
   totalItems: number;
   currentPage: number;
   onPageChange: (page: number) => void;
+  loading?: boolean;
+  error?: string | null;
 }
 
 const PoolsTable = memo(function PoolsTable({
@@ -46,6 +49,8 @@ const PoolsTable = memo(function PoolsTable({
   totalItems,
   currentPage,
   onPageChange,
+  loading = false,
+  error = null,
 }: PoolsTableProps) {
   const [sortConfig, setSortConfig] = useState<{ key: string | null; direction: string | null }>({
     key: null,
@@ -144,6 +149,129 @@ const PoolsTable = memo(function PoolsTable({
     window.location.href = `/dashboard/pool/${account}`;
   }, []);
 
+  const renderTableContent = () => {
+    if (loading) {
+      return (
+        <TableRow>
+          <TableCell colSpan={visibleColumns.length} className="h-24 text-center">
+            <Loader size={32} className="mx-auto" />
+            <p className="mt-2 text-lg font-semibold text-white">Loading Pools...</p>
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    if (error) {
+      return (
+        <TableRow>
+          <TableCell colSpan={visibleColumns.length} className="h-24 text-center">
+            <AlertCircle className="mx-auto h-8 w-8 text-red-500 mb-2" />
+            <p className="text-lg font-semibold text-white">Error Loading Pools</p>
+            <p className="text-sm text-red-300">{error}</p>
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    if (sortedPools.length === 0) {
+      return (
+        <TableRow>
+          <TableCell colSpan={visibleColumns.length} className="h-24 text-center">
+            <AlertCircle className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+            <p className="text-lg font-semibold text-white">No Pools Found</p>
+            <p className="text-sm text-gray-400">There are no liquidity pools to display.</p>
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    return sortedPools.map((pool, index) => (
+      <TableRow
+        key={pool.account || index}
+        className="border-b border-gray-800 hover:bg-gray-800/50 cursor-pointer"
+        onClick={() => handleRowClick(pool.account)}
+      >
+        {visibleColumns.includes('Pair') && (
+          <TableCell className="font-medium text-white">
+            {pool.asset_currency} / {pool.asset2_currency}
+          </TableCell>
+        )}
+        {visibleColumns.includes('TradingFee') && (
+          <TableCell className="text-white">
+            {(pool.tradingFee / 1000).toFixed(2)}%
+          </TableCell>
+        )}
+        {visibleColumns.includes('LiquidityXRP') && (
+          <TableCell className="text-white">
+            {formatCurrency(parseFloat(pool.totalValueLocked?.toString() || '0'))}
+          </TableCell>
+        )}
+        {visibleColumns.includes('TotalVolume') && (
+          <TableCell className="text-white">
+            {formatCurrency(parseFloat(pool.totalPoolVolume?.toString() || '0'))}
+          </TableCell>
+        )}
+        {visibleColumns.includes('baseVolume') && (
+          <TableCell className="text-white">
+            {(pool.baseVolume ?? 0).toFixed(2)} {pool.asset_currency}
+          </TableCell>
+        )}
+        {visibleColumns.includes('counterVolume') && (
+          <TableCell className="text-white">
+            {(pool.counterVolume ?? 0).toFixed(2)} {pool.asset2_currency}
+          </TableCell>
+        )}
+        {visibleColumns.includes('InstantAPR') && (
+          <TableCell className="text-white">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="flex items-center space-x-1">
+                    {parseFloat(pool.relativeAPR?.toString() || '0').toFixed(2)}%
+                    {parseFloat(pool.relativeAPR?.toString() || '0') > 0 ? (
+                      <ArrowUp className="h-4 w-4 text-green-500" />
+                    ) : parseFloat(pool.relativeAPR?.toString() || '0') < 0 ? (
+                      <ArrowDown className="h-4 w-4 text-red-500" />
+                    ) : null}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Annual Percentage Rate</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </TableCell>
+        )}
+        {visibleColumns.includes('Actions') && (
+          <TableCell className="text-white">
+            <Button
+              variant="outline"
+              size="sm"
+              className="mr-2 bg-transparent hover:bg-gray-700/50 text-green-400 border border-green-400 hover:border-green-300"
+              onClick={(e) => {
+                e.stopPropagation();
+                openAddLiquidityModal(pool);
+              }}
+            >
+              <Plus className="h-4 w-4 mr-1" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-transparent hover:bg-gray-700/50 text-red-400 border border-red-400 hover:border-red-300"
+              onClick={(e) => {
+                e.stopPropagation();
+                openWithdrawLiquidityModal(pool);
+              }}
+            >
+              <Minus className="h-4 w-4 mr-1" />
+            </Button>
+          </TableCell>
+        )}
+      </TableRow>
+    ));
+  };
+
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   // Adjust visible columns based on screen size
@@ -182,91 +310,7 @@ const PoolsTable = memo(function PoolsTable({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedPools.map((pool, index) => (
-                <TableRow
-                  key={pool.account || index}
-                  className="border-b border-gray-800 hover:bg-gray-800/50 cursor-pointer"
-                  onClick={() => handleRowClick(pool.account)}
-                >
-                  {visibleColumns.includes('Pair') && (
-                    <TableCell className="font-medium text-white">
-                      {pool.asset_currency} / {pool.asset2_currency}
-                    </TableCell>
-                  )}
-                  {visibleColumns.includes('TradingFee') && (
-                    <TableCell className="text-white">
-                      {(pool.tradingFee / 1000).toFixed(2)}%
-                    </TableCell>
-                  )}
-                  {visibleColumns.includes('LiquidityXRP') && (
-                    <TableCell className="text-white">
-                      {formatCurrency(parseFloat(pool.totalValueLocked?.toString() || '0'))}
-                    </TableCell>
-                  )}
-                  {visibleColumns.includes('TotalVolume') && (
-                    <TableCell className="text-white">
-                      {formatCurrency(parseFloat(pool.totalPoolVolume?.toString() || '0'))}
-                    </TableCell>
-                  )}
-                  {visibleColumns.includes('baseVolume') && (
-                    <TableCell className="text-white">
-                      {(pool.baseVolume ?? 0).toFixed(2)} {pool.asset_currency}
-                    </TableCell>
-                  )}
-                  {visibleColumns.includes('counterVolume') && (
-                    <TableCell className="text-white">
-                      {(pool.counterVolume ?? 0).toFixed(2)} {pool.asset2_currency}
-                    </TableCell>
-                  )}
-                  {visibleColumns.includes('InstantAPR') && (
-                    <TableCell className="text-white">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span className="flex items-center space-x-1">
-                              {parseFloat(pool.relativeAPR?.toString() || '0').toFixed(2)}%
-                              {parseFloat(pool.relativeAPR?.toString() || '0') > 0 ? (
-                                <ArrowUp className="h-4 w-4 text-green-500" />
-                              ) : parseFloat(pool.relativeAPR?.toString() || '0') < 0 ? (
-                                <ArrowDown className="h-4 w-4 text-red-500" />
-                              ) : null}
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Annual Percentage Rate</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </TableCell>
-                  )}
-                  {visibleColumns.includes('Actions') && (
-                    <TableCell className="text-white">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="mr-2 bg-transparent hover:bg-gray-700/50 text-green-400 border border-green-400 hover:border-green-300"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openAddLiquidityModal(pool);
-                        }}
-                      >
-                        <Plus className="h-4 w-4 mr-1" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="bg-transparent hover:bg-gray-700/50 text-red-400 border border-red-400 hover:border-red-300"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openWithdrawLiquidityModal(pool);
-                        }}
-                      >
-                        <Minus className="h-4 w-4 mr-1" />
-                      </Button>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))}
+              {renderTableContent()}
             </TableBody>
           </Table>
         </div>

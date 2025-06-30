@@ -207,21 +207,6 @@ const Dashboard: React.FC = () => {
     fetchPoolsData(pageNumber);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-black text-white">
-        <div className="text-center">
-          <Loader size={48} />
-          <h1 className="text-2xl font-bold mt-4">Loading...</h1>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return <div className="text-red-500 text-center">{error}</div>;
-  }
-
   return (
     <DashboardLayout>
     <div className="flex h-screen bg-black text-white">
@@ -256,6 +241,8 @@ const Dashboard: React.FC = () => {
             totalItems={totalItems}
             currentPage={currentPage}
             onPageChange={paginate}
+            loading={loading}
+            error={error}
           />
           <Pagination
             currentPage={currentPage}
