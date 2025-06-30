@@ -3,7 +3,7 @@
 import Overview from '@/components/dashboard/Overview';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import Loader from '@/components/ui/loader';
+import Loader from '@/components/ui/Loader';
 
 export default function UserPanel() {
   const { data: session, status } = useSession();
@@ -11,7 +11,12 @@ export default function UserPanel() {
 
   // Handle loading state with a refined loading indicator
   if (status === 'loading') {
-    return <div className="w-full h-screen bg-black text-white flex flex-col gap-2 items-center justify-center"><span>Loading</span><Loader size={32} /></div>
+    return (
+      <div className="w-full h-screen bg-black text-white flex flex-col items-center justify-center space-y-3">
+        <Loader size={32} />
+        <span className="text-lg font-semibold">Loading Dashboard...</span>
+      </div>
+    )
   }
 
   // Redirect if unauthenticated, with null return to avoid rendering
