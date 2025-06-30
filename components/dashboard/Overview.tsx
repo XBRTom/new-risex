@@ -77,10 +77,75 @@ const Dashboard: React.FC = () => {
     }
   }, []);
 
-  // New function to fetch pools with pagination
+  // Smart caching function
+  const getCachedData = (page: number) => {
+    const cacheKey = `pools_page_${page}_${itemsPerPage}`;
+    const timestampKey = `${cacheKey}_timestamp`;
+    
+    const cachedData = localStorage.getItem(cacheKey);
+    const cachedTimestamp = localStorage.getItem(timestampKey);
+    
+    // Shorter cache time: 5 minutes for financial data
+    const cacheExpirationTime = 5 * 60 * 1000; // 5 minutes
+    
+    if (cachedData && cachedTimestamp) {
+      const isValid = (new Date().getTime() - new Date(cachedTimestamp).getTime()) < cacheExpirationTime;
+      if (isValid) {
+        console.log(`Using cached data for page ${page}`);
+        return JSON.parse(cachedData);
+      } else {
+        console.log(`Cache expired for page ${page}, removing...`);
+        localStorage.removeItem(cacheKey);
+        localStorage.removeItem(timestampKey);
+      }
+    }
+    return null;
+  };
+
+  const setCachedData = (page: number, data: any) => {
+    const cacheKey = `pools_page_${page}_${itemsPerPage}`;
+    const timestampKey = `${cacheKey}_timestamp`;
+    
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify(data));
+      localStorage.setItem(timestampKey, new Date().toISOString());
+      console.log(`Cached data for page ${page}`);
+    } catch (error) {
+      console.warn('Failed to cache data:', error);
+      // If localStorage is full, clear old cache
+      clearOldCache();
+    }
+  };
+
+  const clearOldCache = () => {
+    console.log('Clearing old cache data...');
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('pools_page_')) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+  };
+
+  // New function to fetch pools with smart caching
   const fetchPoolsData = async (page: number = 1) => {
     try {
       setLoading(true);
+      
+      // Check cache first
+      const cachedData = getCachedData(page);
+      if (cachedData) {
+        const { pools, totalPools, currentPage, totalPages } = cachedData;
+        setPools(pools);
+        setFilteredPools(pools);
+        setTotalItems(totalPools);
+        setCurrentPage(currentPage);
+        console.log(`Loaded ${pools.length} pools from cache (page ${currentPage}/${totalPages})`);
+        setLoading(false);
+        return;
+      }
       
       console.log(`Fetching page ${page} with ${itemsPerPage} items per page`);
       
@@ -93,6 +158,9 @@ const Dashboard: React.FC = () => {
       setFilteredPools(pools);
       setTotalItems(totalPools);
       setCurrentPage(currentPage);
+      
+      // Cache the successful response
+      setCachedData(page, { pools, totalPools, currentPage, totalPages });
       
       console.log(`Loaded ${pools.length} pools (page ${currentPage}/${totalPages})`);
       
