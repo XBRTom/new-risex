@@ -25,12 +25,12 @@ export const handleLoginTransaction = async () => {
 
 export const getAccount = async () => {
     const xumm = getXummInstance();
-    return xumm?.user?.account.then(a => a ?? '')
+    return xumm?.user?.account.then((a: string | null | undefined) => a ?? '')
 }
 
 export const getAppName = async () => {
     const xumm = getXummInstance();
-    return await xumm?.environment?.jwt?.then(j => j?.app_name ?? '') ?? ''
+    return await xumm?.environment?.jwt?.then((j: any) => j?.app_name ?? '') ?? ''
 }
 
 export const signTransaction = async (transaction: any, return_url: string|null|undefined) => {
