@@ -233,88 +233,84 @@ const Dashboard: React.FC = () => {
             </span>
             <span>Refresh</span>
           </button>
-        /header
-          {/* Beautiful Summary Cards */}
-          {!loading  pools.length  0  (
-            div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6"
-              div className="bg-gradient-to-br from-blue-900/20 to-blue-600/10 border border-blue-500/20 rounded-xl p-4"
-                div className="flex items-center justify-between"
-                  div
-                    p className="text-sm text-blue-400"Total Pools/p
-                    p className="text-2xl font-bold text-white"{totalItems.toLocaleString()}/p
-                  /div
-                  div className="h-12 w-12 bg-blue-500/20 rounded-lg flex items-center justify-center"
-                    span className="text-blue-400 text-xl"🏊/span
-                  /div
-                /div
-              /div
-              
-              div className="bg-gradient-to-br from-green-900/20 to-green-600/10 border border-green-500/20 rounded-xl p-4"
-                div className="flex items-center justify-between"
-                  div
-                    p className="text-sm text-green-400"Total TVL/p
-                    p className="text-2xl font-bold text-white"
-                      {new Intl.NumberFormat('en-US', { 
-                        style: 'currency', 
-                        currency: 'USD',
-                        notation: 'compact',
-                        maximumFractionDigits: 1
-                      }).format(
-                        pools.reduce((sum, pool)  sum + parseFloat(pool.totalValueLocked?.toString() || '0'), 0)
-                      )}
-                    /p
-                  /div
-                  div className="h-12 w-12 bg-green-500/20 rounded-lg flex items-center justify-center"
-                    span className="text-green-400 text-xl"💰/span
-                  /div
-                /div
-              /div
-              
-              div className="bg-gradient-to-br from-purple-900/20 to-purple-600/10 border border-purple-500/20 rounded-xl p-4"
-                div className="flex items-center justify-between"
-                  div
-                    p className="text-sm text-purple-400"24h Volume/p
-                    p className="text-2xl font-bold text-white"
-                      {new Intl.NumberFormat('en-US', { 
-                        style: 'currency', 
-                        currency: 'USD',
-                        notation: 'compact',
-                        maximumFractionDigits: 1
-                      }).format(
-                        pools.reduce((sum, pool)  sum + parseFloat(pool.totalPoolVolume?.toString() || '0'), 0)
-                      )}
-                    /p
-                  /div
-                  div className="h-12 w-12 bg-purple-500/20 rounded-lg flex items-center justify-center"
-                    span className="text-purple-400 text-xl"📊/span
-                  /div
-                /div
-              /div
-              
-              div className="bg-gradient-to-br from-orange-900/20 to-orange-600/10 border border-orange-500/20 rounded-xl p-4"
-                div className="flex items-center justify-between"
-                  div
-                    p className="text-sm text-orange-400"Avg APR/p
-                    p className="text-2xl font-bold text-white"
-                      {(
-                        pools.reduce((sum, pool)  sum + parseFloat(pool.relativeAPR?.toString() || '0'), 0) / pools.length || 0
-                      ).toFixed(2)}%
-                    /p
-                  /div
-                  div className="h-12 w-12 bg-orange-500/20 rounded-lg flex items-center justify-center"
-                    span className="text-orange-400 text-xl"📈/span
-                  /div
-                /div
-              /div
-            /div
-          )}
+        </header>
         <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
-          {/* <ChartContainer>
-            <BarChart data={data}>
-              <Bar dataKey="value" />
-              <ChartTooltip content={<ChartTooltipContent />} />
-            </BarChart>
-          </ChartContainer> */}
+          {/* Beautiful Summary Cards */}
+          {!loading && pools.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <div className="bg-gradient-to-br from-blue-900/20 to-blue-600/10 border border-blue-500/20 rounded-xl p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-blue-400">Total Pools</p>
+                    <p className="text-2xl font-bold text-white">{totalItems.toLocaleString()}</p>
+                  </div>
+                  <div className="h-12 w-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                    <span className="text-blue-400 text-xl">🏊</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-br from-green-900/20 to-green-600/10 border border-green-500/20 rounded-xl p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-green-400">Total TVL</p>
+                    <p className="text-2xl font-bold text-white">
+                      {new Intl.NumberFormat('en-US', { 
+                        style: 'currency', 
+                        currency: 'USD',
+                        notation: 'compact',
+                        maximumFractionDigits: 1
+                      }).format(
+                        pools.reduce((sum, pool) => sum + parseFloat(pool.totalValueLocked?.toString() || '0'), 0)
+                      )}
+                    </p>
+                  </div>
+                  <div className="h-12 w-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                    <span className="text-green-400 text-xl">💰</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-br from-purple-900/20 to-purple-600/10 border border-purple-500/20 rounded-xl p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-purple-400">24h Volume</p>
+                    <p className="text-2xl font-bold text-white">
+                      {new Intl.NumberFormat('en-US', { 
+                        style: 'currency', 
+                        currency: 'USD',
+                        notation: 'compact',
+                        maximumFractionDigits: 1
+                      }).format(
+                        pools.reduce((sum, pool) => sum + parseFloat(pool.totalPoolVolume?.toString() || '0'), 0)
+                      )}
+                    </p>
+                  </div>
+                  <div className="h-12 w-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                    <span className="text-purple-400 text-xl">📊</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-br from-orange-900/20 to-orange-600/10 border border-orange-500/20 rounded-xl p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-orange-400">Avg APR</p>
+                    <p className="text-2xl font-bold text-white">
+                      {(
+                        pools.reduce((sum, pool) => sum + parseFloat(pool.relativeAPR?.toString() || '0'), 0) / pools.length || 0
+                      ).toFixed(2)}%
+                    </p>
+                  </div>
+                  <div className="h-12 w-12 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                    <span className="text-orange-400 text-xl">📈</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Pools Table */}
           <PoolsTable 
             pools={filteredPools}
             itemsPerPage={itemsPerPage}
@@ -324,6 +320,8 @@ const Dashboard: React.FC = () => {
             loading={loading}
             error={error}
           />
+          
+          {/* Pagination */}
           <Pagination
             currentPage={currentPage}
             itemsPerPage={itemsPerPage}
