@@ -1,4 +1,5 @@
 import { fetchTransactions, Transaction } from '@/libs/xrpl';
+import apiClient from '@/libs/api';
 
 export interface LPHolding {
   id: string;
@@ -14,6 +15,7 @@ export interface LPHolding {
   totalDeposits: number;
   totalWithdrawals: number;
   netPosition: number;
+  estimatedFeesEarned?: number;
 }
 
 export const fetchWalletLPHoldings = async (walletAddress: string): Promise<LPHolding[]> => {
@@ -127,6 +129,31 @@ export const fetchWalletLPHoldings = async (walletAddress: string): Promise<LPHo
     }
 
     console.log(`Total active LP positions: ${holdings.length}`);
+    
+    // Fetch fee estimates for all holdings
+    try {
+      const feesResponse = await apiClient.post('/lp-fees-earned', { walletAddress });
+      const feesData = feesResponse.data.feesBreakdown || [];
+      
+      // Match fees to holdings by pool account
+      holdings.forEach(holding => {
+        const feeData = feesData.find((fee: any) => fee.poolAccount === holding.poolAccount);
+        if (feeData) {
+          holding.estimatedFeesEarned = feeData.estimatedFeesEarned;
+        } else {
+          holding.estimatedFeesEarned = 0;
+        }
+      });
+      
+      console.log('Added fee estimates to LP holdings');
+    } catch (error) {
+      console.warn('Failed to fetch fee estimates, continuing without fees:', error);
+      // Set fees to 0 if API call fails
+      holdings.forEach(holding => {
+        holding.estimatedFeesEarned = 0;
+      });
+    }
+    
     return holdings;
 
   } catch (error: any) {

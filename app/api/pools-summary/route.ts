@@ -5,17 +5,18 @@ export async function GET(req: NextRequest) {
   try {
     console.log('Fetching pools summary statistics...');
 
-    // Get summary statistics for all pools
+    // Get summary statistics for all pools using GlobalPoolMetrics
     const result = await prisma.$queryRaw`
       SELECT 
-        COUNT(*) as total_pools,
-        COALESCE(SUM(CAST(totalValueLocked AS DECIMAL)), 0) as total_tvl,
-        COALESCE(SUM(CAST(totalPoolVolume AS DECIMAL)), 0) as total_volume,
-        COALESCE(AVG(CAST(relativeAPR AS DECIMAL)), 0) as average_apr
-      FROM Pool
-      WHERE totalValueLocked IS NOT NULL 
-        AND totalPoolVolume IS NOT NULL 
-        AND relativeAPR IS NOT NULL
+        COUNT(DISTINCT p.id) as total_pools,
+        COALESCE(SUM(CAST(gpm.totalValueLocked AS DECIMAL)), 0) as total_tvl,
+        COALESCE(SUM(CAST(gpm.totalPoolVolume AS DECIMAL)), 0) as total_volume,
+        COALESCE(AVG(CAST(gpm.relativeAPR AS DECIMAL)), 0) as average_apr
+      FROM Pool p
+      LEFT JOIN GlobalPoolMetrics gpm ON p.id = gpm.poolId
+      WHERE gpm.totalValueLocked IS NOT NULL 
+        AND gpm.totalPoolVolume IS NOT NULL 
+        AND gpm.relativeAPR IS NOT NULL
     `;
 
     const summary = Array.isArray(result) ? result[0] : result;

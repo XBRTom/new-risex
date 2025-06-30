@@ -124,7 +124,7 @@ const HoldingsTable: React.FC<HoldingsTableProps> = ({
     <div className="space-y-6">
       {/* Summary Cards at Top */}
       {holdings.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="bg-gray-800 border-gray-700">
             <CardContent className="pt-6">
               <div className="text-2xl font-bold text-white">
@@ -157,6 +157,18 @@ const HoldingsTable: React.FC<HoldingsTableProps> = ({
               <p className="text-xs text-gray-400">Current LP Token Balance</p>
             </CardContent>
           </Card>
+          
+          <Card className="bg-gray-800 border-gray-700">
+            <CardContent className="pt-6">
+              <div className="text-2xl font-bold text-yellow-400">
+                ${formatNumber(
+                  holdings.reduce((sum, h) => sum + (h.estimatedFeesEarned || 0), 0),
+                  2
+                )}
+              </div>
+              <p className="text-xs text-gray-400">Total Estimated Fees Earned</p>
+            </CardContent>
+          </Card>
         </div>
       )}
       
@@ -178,6 +190,7 @@ const HoldingsTable: React.FC<HoldingsTableProps> = ({
                 <TableHead className="text-gray-300">Share %</TableHead>
                 <TableHead className="text-gray-300">Total Deposits</TableHead>
                 <TableHead className="text-gray-300">Total Withdrawals</TableHead>
+                <TableHead className="text-gray-300">Estimated Fees</TableHead>
                 <TableHead className="text-gray-300">First Deposit</TableHead>
                 <TableHead className="text-gray-300">Last Activity</TableHead>
               </TableRow>
@@ -211,6 +224,12 @@ const HoldingsTable: React.FC<HoldingsTableProps> = ({
                   </TableCell>
                   <TableCell className="text-red-400">
                     -{formatNumber(holding.totalWithdrawals, 6)}
+                  </TableCell>
+                  <TableCell className="text-yellow-400">
+                    {holding.estimatedFeesEarned !== undefined 
+                      ? `$${formatNumber(holding.estimatedFeesEarned, 2)}`
+                      : 'Calculating...'
+                    }
                   </TableCell>
                   <TableCell className="text-gray-400">
                     {formatDate(holding.firstDepositDate)}
