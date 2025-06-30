@@ -120,14 +120,53 @@ const HoldingsTable: React.FC<HoldingsTableProps> = ({
   };
 
   return (
-    <Card className="bg-gray-900 border-gray-700">
-      <CardHeader>
-        <CardTitle className="text-white">LP Holdings</CardTitle>
-        <CardDescription className="text-gray-400">
-          Your active liquidity provider positions ({holdings.length} pools)
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+    <div className="space-y-6">
+      {/* Summary Cards at Top */}
+      {holdings.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="bg-gray-800 border-gray-700">
+            <CardContent className="pt-6">
+              <div className="text-2xl font-bold text-white">
+                {holdings.length}
+              </div>
+              <p className="text-xs text-gray-400">Active Pools</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gray-800 border-gray-700">
+            <CardContent className="pt-6">
+              <div className="text-2xl font-bold text-green-400">
+                {formatNumber(
+                  holdings.reduce((sum, h) => sum + h.totalDeposits, 0),
+                  2
+                )}
+              </div>
+              <p className="text-xs text-gray-400">Total LP Tokens Deposited</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gray-800 border-gray-700">
+            <CardContent className="pt-6">
+              <div className="text-2xl font-bold text-blue-400">
+                {formatNumber(
+                  holdings.reduce((sum, h) => sum + h.lpTokenBalance, 0),
+                  2
+                )}
+              </div>
+              <p className="text-xs text-gray-400">Current LP Token Balance</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+      
+      <Card className="bg-gray-900 border-gray-700">
+        <CardHeader>
+          <CardTitle className="text-white">LP Holdings</CardTitle>
+          <CardDescription className="text-gray-400">
+            Your active liquidity provider positions ({holdings.length} pools)
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
         <div className="rounded-lg border border-gray-700 overflow-hidden">
           <Table>
             <TableHeader>
@@ -183,44 +222,9 @@ const HoldingsTable: React.FC<HoldingsTableProps> = ({
             </TableBody>
           </Table>
         </div>
-        
-        {/* Summary Card */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-gray-800 border-gray-700">
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-white">
-                {holdings.length}
-              </div>
-              <p className="text-xs text-gray-400">Active Pools</p>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-gray-800 border-gray-700">
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-green-400">
-                {formatNumber(
-                  holdings.reduce((sum, h) => sum + h.totalDeposits, 0),
-                  2
-                )}
-              </div>
-              <p className="text-xs text-gray-400">Total LP Tokens Deposited</p>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-gray-800 border-gray-700">
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-blue-400">
-                {formatNumber(
-                  holdings.reduce((sum, h) => sum + h.lpTokenBalance, 0),
-                  2
-                )}
-              </div>
-              <p className="text-xs text-gray-400">Current LP Token Balance</p>
-            </CardContent>
-          </Card>
-        </div>
       </CardContent>
     </Card>
+    </div>
   );
 };
 

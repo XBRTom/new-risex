@@ -287,22 +287,64 @@ export default function TransactionsTable({ transactions, loading, error, isWall
   };
 
   return (
-    <Card className="w-full bg-gradient-to-br from-gray-900 to-black border-gray-800 shadow-lg rounded-xl overflow-hidden">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-xl font-bold text-white">Transaction History</CardTitle>
-        <Select value={timeRange} onValueChange={setTimeRange}>
-          <SelectTrigger className="w-[180px] bg-gray-800 text-white border-gray-700 hover:bg-gray-700">
-            <SelectValue placeholder="Select time range" />
-          </SelectTrigger>
-          <SelectContent className="bg-gray-900 text-white border-gray-700">
-            {timeRanges.map((range) => (
-              <SelectItem key={range.value} value={range.value} className="hover:bg-gray-800">
-                {range.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </CardHeader>
+    <div className="space-y-6">
+      {/* Summary Cards at Top */}
+      {sortedTransactions.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card className="bg-gray-800 border-gray-700">
+            <CardContent className="pt-6">
+              <div className="text-2xl font-bold text-white">
+                {sortedTransactions.length}
+              </div>
+              <p className="text-xs text-gray-400">Total Transactions</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gray-800 border-gray-700">
+            <CardContent className="pt-6">
+              <div className="text-2xl font-bold text-green-400">
+                {sortedTransactions.filter(tx => tx.type === 'AMMDeposit').length}
+              </div>
+              <p className="text-xs text-gray-400">AMM Deposits</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gray-800 border-gray-700">
+            <CardContent className="pt-6">
+              <div className="text-2xl font-bold text-red-400">
+                {sortedTransactions.filter(tx => tx.type === 'AMMWithdraw').length}
+              </div>
+              <p className="text-xs text-gray-400">AMM Withdrawals</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gray-800 border-gray-700">
+            <CardContent className="pt-6">
+              <div className="text-2xl font-bold text-blue-400">
+                {sortedTransactions.filter(tx => tx.type === 'Payment').length}
+              </div>
+              <p className="text-xs text-gray-400">Payments</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+      
+      <Card className="w-full bg-gradient-to-br from-gray-900 to-black border-gray-800 shadow-lg rounded-xl overflow-hidden">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-xl font-bold text-white">Transaction History</CardTitle>
+          <Select value={timeRange} onValueChange={setTimeRange}>
+            <SelectTrigger className="w-[180px] bg-gray-800 text-white border-gray-700 hover:bg-gray-700">
+              <SelectValue placeholder="Select time range" />
+            </SelectTrigger>
+            <SelectContent className="bg-gray-900 text-white border-gray-700">
+              {timeRanges.map((range) => (
+                <SelectItem key={range.value} value={range.value} className="hover:bg-gray-800">
+                  {range.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
           <Table aria-label="Transactions history">
@@ -335,48 +377,8 @@ export default function TransactionsTable({ transactions, loading, error, isWall
             </TableBody>
           </Table>
         </div>
-        
-        {/* Summary Cards */}
-        {sortedTransactions.length > 0 && (
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card className="bg-gray-800 border-gray-700">
-              <CardContent className="pt-6">
-                <div className="text-2xl font-bold text-white">
-                  {sortedTransactions.length}
-                </div>
-                <p className="text-xs text-gray-400">Total Transactions</p>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-gray-800 border-gray-700">
-              <CardContent className="pt-6">
-                <div className="text-2xl font-bold text-green-400">
-                  {sortedTransactions.filter(tx => tx.type === 'AMMDeposit').length}
-                </div>
-                <p className="text-xs text-gray-400">AMM Deposits</p>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-gray-800 border-gray-700">
-              <CardContent className="pt-6">
-                <div className="text-2xl font-bold text-red-400">
-                  {sortedTransactions.filter(tx => tx.type === 'AMMWithdraw').length}
-                </div>
-                <p className="text-xs text-gray-400">AMM Withdrawals</p>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-gray-800 border-gray-700">
-              <CardContent className="pt-6">
-                <div className="text-2xl font-bold text-blue-400">
-                  {sortedTransactions.filter(tx => tx.type === 'Payment').length}
-                </div>
-                <p className="text-xs text-gray-400">Payments</p>
-              </CardContent>
-            </Card>
-          </div>
-        )}
       </CardContent>
     </Card>
+    </div>
   )
 }

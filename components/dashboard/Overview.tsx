@@ -212,22 +212,102 @@ const Dashboard: React.FC = () => {
     <div className="flex h-screen bg-black text-white">
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* <header className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4 border-b border-gray-800">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="">Dashboard</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/liquidity">Liquidity Pools</BreadcrumbLink>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-          {/* <div className="md:hidden">
-            <SearchBar handleSearch={handleSearch} />
-          </div> */}
-        {/* </header> */}
+        {/* Beautiful Header */}
+        <header className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4 border-b border-gray-800 bg-gradient-to-r from-gray-900/50 to-black/50">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+              <span className="text-lg font-semibold text-white">Liquidity Pools Overview</span>
+            </div>
+            <div className="text-sm text-gray-400">
+              {totalItems} pools available
+            </div>
+          </div>
+          <button
+            onClick={() => fetchPoolsData(currentPage)}
+            disabled={loading}
+            className="flex items-center space-x-2 px-3 py-1 text-sm bg-gray-800 hover:bg-gray-700 rounded-md transition-colors disabled:opacity-50"
+          >
+            <span className={loading ? 'animate-spin' : ''}>
+              🔄
+            </span>
+            <span>Refresh</span>
+          </button>
+        /header
+          {/* Beautiful Summary Cards */}
+          {!loading  pools.length  0  (
+            div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6"
+              div className="bg-gradient-to-br from-blue-900/20 to-blue-600/10 border border-blue-500/20 rounded-xl p-4"
+                div className="flex items-center justify-between"
+                  div
+                    p className="text-sm text-blue-400"Total Pools/p
+                    p className="text-2xl font-bold text-white"{totalItems.toLocaleString()}/p
+                  /div
+                  div className="h-12 w-12 bg-blue-500/20 rounded-lg flex items-center justify-center"
+                    span className="text-blue-400 text-xl"🏊/span
+                  /div
+                /div
+              /div
+              
+              div className="bg-gradient-to-br from-green-900/20 to-green-600/10 border border-green-500/20 rounded-xl p-4"
+                div className="flex items-center justify-between"
+                  div
+                    p className="text-sm text-green-400"Total TVL/p
+                    p className="text-2xl font-bold text-white"
+                      {new Intl.NumberFormat('en-US', { 
+                        style: 'currency', 
+                        currency: 'USD',
+                        notation: 'compact',
+                        maximumFractionDigits: 1
+                      }).format(
+                        pools.reduce((sum, pool)  sum + parseFloat(pool.totalValueLocked?.toString() || '0'), 0)
+                      )}
+                    /p
+                  /div
+                  div className="h-12 w-12 bg-green-500/20 rounded-lg flex items-center justify-center"
+                    span className="text-green-400 text-xl"💰/span
+                  /div
+                /div
+              /div
+              
+              div className="bg-gradient-to-br from-purple-900/20 to-purple-600/10 border border-purple-500/20 rounded-xl p-4"
+                div className="flex items-center justify-between"
+                  div
+                    p className="text-sm text-purple-400"24h Volume/p
+                    p className="text-2xl font-bold text-white"
+                      {new Intl.NumberFormat('en-US', { 
+                        style: 'currency', 
+                        currency: 'USD',
+                        notation: 'compact',
+                        maximumFractionDigits: 1
+                      }).format(
+                        pools.reduce((sum, pool)  sum + parseFloat(pool.totalPoolVolume?.toString() || '0'), 0)
+                      )}
+                    /p
+                  /div
+                  div className="h-12 w-12 bg-purple-500/20 rounded-lg flex items-center justify-center"
+                    span className="text-purple-400 text-xl"📊/span
+                  /div
+                /div
+              /div
+              
+              div className="bg-gradient-to-br from-orange-900/20 to-orange-600/10 border border-orange-500/20 rounded-xl p-4"
+                div className="flex items-center justify-between"
+                  div
+                    p className="text-sm text-orange-400"Avg APR/p
+                    p className="text-2xl font-bold text-white"
+                      {(
+                        pools.reduce((sum, pool)  sum + parseFloat(pool.relativeAPR?.toString() || '0'), 0) / pools.length || 0
+                      ).toFixed(2)}%
+                    /p
+                  /div
+                  div className="h-12 w-12 bg-orange-500/20 rounded-lg flex items-center justify-center"
+                    span className="text-orange-400 text-xl"📈/span
+                  /div
+                /div
+              /div
+            /div
+          )}
         <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
           {/* <ChartContainer>
             <BarChart data={data}>

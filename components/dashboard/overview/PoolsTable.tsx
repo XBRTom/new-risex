@@ -7,7 +7,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArrowUpDown, ArrowUp, ArrowDown, Plus, Minus, ChevronRight, ChevronLeft, AlertCircle } from 'lucide-react';
 import Loader from '@/components/ui/loader';
@@ -192,8 +193,16 @@ const PoolsTable = memo(function PoolsTable({
         onClick={() => handleRowClick(pool.account)}
       >
         {visibleColumns.includes('Pair') && (
-          <TableCell className="font-medium text-white">
-            {pool.asset_currency} / {pool.asset2_currency}
+          <TableCell>
+            <div className="flex items-center space-x-2">
+              <Badge variant="outline" className="text-blue-400 border-blue-400 bg-blue-500/10">
+                {pool.asset_currency}
+              </Badge>
+              <span className="text-gray-400">/</span>
+              <Badge variant="outline" className="text-green-400 border-green-400 bg-green-500/10">
+                {pool.asset2_currency}
+              </Badge>
+            </div>
           </TableCell>
         )}
         {visibleColumns.includes('TradingFee') && (
