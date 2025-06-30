@@ -20,10 +20,18 @@ const Transactions: React.FC = () => {
     if (!walletContext) {
         throw new Error("Wallet context is not available")
     }
-  const { walletAddress } = walletContext
+  const { walletAddress, walletType, walletAppName } = walletContext
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Debug logging
+  console.log('=== TRANSACTIONS DEBUG ===');
+  console.log('Wallet Address:', walletAddress);
+  console.log('Wallet Type:', walletType);
+  console.log('Wallet App Name:', walletAppName);
+  console.log('Is Wallet Connected:', !!walletAddress);
+  console.log('========================');
 
   const loadTransactions = useCallback(async () => {
     if (walletAddress) {
@@ -49,7 +57,7 @@ const Transactions: React.FC = () => {
     if (walletAddress) {
       loadTransactions();
 
-      const client = new xrpl.Client('wss://s.altnet.rippletest.net:51233');
+      const client = new xrpl.Client('wss://s1.ripple.com');
       client.connect().then(() => {
         client.request({
           command: 'subscribe',

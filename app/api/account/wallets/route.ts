@@ -37,7 +37,7 @@ export const POST = auth(async (req) => {
           return_url: {
             web: return_url ?? frontAppUrl
           },
-          force_network: "DEVNET", // MAINNET // DEVNET // TESTNET
+          force_network: "MAINNET", // MAINNET // DEVNET // TESTNET
           submit: true,
           multisign: false,
           expire: 300
