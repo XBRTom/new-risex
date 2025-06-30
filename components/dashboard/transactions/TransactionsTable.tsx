@@ -5,7 +5,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowUpDown, HelpCircle, AlertCircle, Loader2 } from "lucide-react"
+import { ArrowUpDown, HelpCircle, AlertCircle } from "lucide-react"
+import Loader from '@/components/ui/loader';
 import {
   Tooltip,
   TooltipContent,
@@ -137,7 +138,7 @@ export default function TransactionsTable({ transactions, loading, error, isWall
       return (
         <TableRow>
           <TableCell colSpan={7} className="h-24 text-center">
-            <Loader2 className="mx-auto h-8 w-8 animate-spin text-white" />
+            <Loader size={32} className="mx-auto" />
             <p className="mt-2 text-lg font-semibold text-white">Loading Transactions...</p>
           </TableCell>
         </TableRow>

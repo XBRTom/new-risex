@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { useSession } from "next-auth/react"
 import { useState } from "react"
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -19,35 +18,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import DashboardLayout from '@/components/dashboard/layout/DashboardLayout';
-
-export interface ISVGProps extends React.SVGProps<SVGSVGElement> {
-    size?: number;
-    className?: string;
-}
-  
-const LoadingSpinner = ({
-    size = 24,
-    className,
-    ...props
-}: ISVGProps) => {
-    return (
-        <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width={size}
-        height={size}
-        {...props}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className={cn("animate-spin", className)}
-        >
-        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-        </svg>
-    );
-};
+import Loader from '@/components/ui/loader';
 
 const formSchema = z.object({
   fullName: z.string().min(2, {
@@ -156,7 +127,7 @@ export default function ProfileForm() {
                                 )}
                             />
                             <Button type="submit" disabled={isLoading}>
-                                {isLoading ? <LoadingSpinner className="mr-2" /> : "Submit"}
+                                {isLoading ? <Loader size={16} className="mr-2" /> : "Submit"}
                             </Button>
                             </form>
                         </Form>

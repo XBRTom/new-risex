@@ -6,6 +6,7 @@ import Pagination from '@/components/dashboard/global/Pagination';
 // import SearchBar from '@/components/SearchBar';
 import apiClient from '@/libs/api';
 import { Progress } from "@/components/ui/progress";
+import Loader from '@/components/ui/loader';
 // import { Button } from "@/components/ui/button";
 // import { Separator } from "@/components/ui/separator";
 // import { Bar, BarChart } from "recharts";
@@ -156,9 +157,8 @@ const Dashboard: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
         <div className="text-center">
-          <h1 className="text-4xl font-bold">Loading...</h1>
-          <br/>
-          <Progress value={50} />
+          <Loader size={48} />
+          <h1 className="text-2xl font-bold mt-4">Loading...</h1>
         </div>
       </div>
     );
