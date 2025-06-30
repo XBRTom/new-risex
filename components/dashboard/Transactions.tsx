@@ -85,21 +85,31 @@ const Transactions: React.FC = () => {
     <DashboardLayout>
       <div className="flex h-screen bg-black text-white">
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* <header className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4 border-b border-gray-800">
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="">Dashboard</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/transactions">Transactions</BreadcrumbLink>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </header> */}
+          {/* Wallet Info Header */}
+          {walletAddress && (
+            <header className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4 border-b border-gray-800">
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-gray-400">Connected to {walletAppName || walletType}</span>
+                </div>
+                <div className="text-sm text-gray-500">
+                  {walletAddress.slice(0, 8)}...{walletAddress.slice(-6)}
+                </div>
+              </div>
+              <button
+                onClick={loadTransactions}
+                disabled={loading}
+                className="flex items-center space-x-2 px-3 py-1 text-sm bg-gray-800 hover:bg-gray-700 rounded-md transition-colors disabled:opacity-50"
+              >
+                <span className={loading ? 'animate-spin' : ''}>
+                  🔄
+                </span>
+                <span>Refresh</span>
+              </button>
+            </header>
+          )}
           <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
-            {/* <h3 className="text-2xl font-bold mb-4">Transactions</h3> */}
             <TransactionsTable 
               transactions={transactions} 
               loading={loading} 
