@@ -77,56 +77,38 @@ const Dashboard: React.FC = () => {
     }
   }, []);
 
+  // New function to fetch pools with pagination
+  const fetchPoolsData = async (page: number = 1) => {
+    try {
+      setLoading(true);
+      
+      console.log(`Fetching page ${page} with ${itemsPerPage} items per page`);
+      
+      const data: any = await apiClient.get(`/fetch-pools/${itemsPerPage}?page=${page}`);
+      console.log('Fetched paginated data from API:', data);
+      
+      const { pools, totalPools, currentPage, totalPages, hasMore } = data;
+      
+      setPools(pools);
+      setFilteredPools(pools);
+      setTotalItems(totalPools);
+      setCurrentPage(currentPage);
+      
+      console.log(`Loaded ${pools.length} pools (page ${currentPage}/${totalPages})`);
+      
+    } catch (err) {
+      console.error('Failed to fetch pools data:', err);
+      setError('Failed to fetch data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchAllPoolsData = async () => {
-      if (hasFetchedData.current) return;
+    if (!hasFetchedData.current) {
       hasFetchedData.current = true;
-  
-      try {
-        setLoading(true);
-        const currentDate = new Date().toISOString().split('T')[0];
-        const cacheKey = `poolsData_${currentDate}`;
-        const cachedPoolsData = localStorage.getItem(cacheKey);
-        const cachedTimestamp = localStorage.getItem(`${cacheKey}_timestamp`);
-  
-        // Define a threshold (e.g., 24 hours) for when the data is considered outdated
-        const cacheExpirationTime = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-  
-        const isCacheValid = cachedTimestamp && (new Date().getTime() - new Date(cachedTimestamp).getTime()) < cacheExpirationTime;
-  
-        // console.log('Cached pools data:', cachedPoolsData);
-        // console.log('Cached timestamp:', cachedTimestamp);
-        // console.log('Is cache valid?:', isCacheValid);
-  
-        if (!cachedPoolsData || !isCacheValid) {
-          const data: any = await apiClient.get(`/fetch-pools/${1100}`);
-          console.log('Fetched data from API:', data);
-  
-          const { pools, totalPools } = data;
-          setPools(pools);
-          setFilteredPools(pools);
-          setTotalItems(totalPools);
-  
-          // Store the fetched data and timestamp in localStorage
-          localStorage.setItem(cacheKey, JSON.stringify(pools));
-          localStorage.setItem(`${cacheKey}_timestamp`, new Date().toISOString());
-        } else {
-          const parsedPools = JSON.parse(cachedPoolsData);
-          console.log('Parsed pools from cache:', parsedPools);
-  
-          setPools(parsedPools);
-          setFilteredPools(parsedPools);
-          setTotalItems(parsedPools.length);
-        }
-      } catch (err) {
-        console.error('Failed to fetch initial data:', err);
-        setError('Failed to fetch data');
-      } finally {
-        setLoading(false);
-      }
-    };
-  
-    fetchAllPoolsData();
+      fetchPoolsData(currentPage);
+    }
   }, []);
   
   
@@ -150,7 +132,10 @@ const Dashboard: React.FC = () => {
   // };
 
   const paginate = (pageNumber: number) => {
+    console.log(`Navigating to page ${pageNumber}`);
     setCurrentPage(pageNumber);
+    hasFetchedData.current = false; // Allow refetch for new page
+    fetchPoolsData(pageNumber);
   };
 
   if (loading) {
@@ -197,7 +182,7 @@ const Dashboard: React.FC = () => {
             </BarChart>
           </ChartContainer> */}
           <PoolsTable 
-            pools={filteredPools.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)}
+            pools={filteredPools}
             itemsPerPage={itemsPerPage}
             totalItems={totalItems}
             currentPage={currentPage}

@@ -8,12 +8,28 @@ type Params = {
 
 export async function GET(req: NextRequest, context: {params: Params}) {
   try {
-    const limit = parseInt(context.params.limit || '10', 10);
-    //const currentDate = new Date().toISOString().split('T')[0] + '%';
-    // const pools = await prisma.$queryRawTyped(getPools(currentDate, currentDate, currentDate, currentDate, limit));
-    const pools = await prisma.$queryRawTyped(getPoolsMax(limit, 0));
+    const { searchParams } = new URL(req.url);
+    const limit = parseInt(context.params.limit || '15', 10);
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    const offset = (page - 1) * limit;
 
-    return NextResponse.json({ pools, totalPools: pools.length });
+    console.log(`Fetching pools: limit=${limit}, page=${page}, offset=${offset}`);
+
+    // Get paginated pools
+    const pools = await prisma.$queryRawTyped(getPoolsMax(limit, offset));
+    
+    // Get total count for pagination (we'll optimize this later)
+    const totalCount = await prisma.pool.count();
+
+    console.log(`Found ${pools.length} pools out of ${totalCount} total`);
+
+    return NextResponse.json({ 
+      pools, 
+      totalPools: totalCount,
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / limit),
+      hasMore: offset + pools.length < totalCount
+    });
   } catch (error) {
     console.error('Failed to fetch pools from the database:', error);
     return NextResponse.json({ error: 'Failed to fetch pools' }, { status: 500 });
