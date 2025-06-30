@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
     const ammTransactions = extractAMMTransactions(allTransactions, walletAddress);
     
     // Get unique pool accounts from AMM transactions
-    const poolAccounts = [...new Set(ammTransactions.map(tx => tx.destination).filter(Boolean))];
+    const poolAccounts = Array.from(new Set(ammTransactions.map(tx => tx.destination).filter(Boolean)));
     
     if (poolAccounts.length === 0) {
       return NextResponse.json({
