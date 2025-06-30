@@ -54,7 +54,7 @@ export default function ResponsiveSidebar() {
 
   const navItems: NavItem[] = [
     { name: 'Overview', href: '/dashboard/overview', icon: <LayoutDashboard className="h-5 w-5" /> },
-    { name: 'Holdings', href: '/holdings', icon: <PieChart className="h-5 w-5" /> },
+    { name: 'Holdings', href: '/dashboard/holdings', icon: <PieChart className="h-5 w-5" /> },
     { name: 'Pools', href: '/dashboard/pool', icon: <Database className="h-5 w-5" /> },
     { name: 'Transactions', href: '/dashboard/transactions', icon: <Clock className="h-5 w-5" /> },
     { name: 'Analytics', href: '/analytics', icon: <BarChart3 className="h-5 w-5" /> },
