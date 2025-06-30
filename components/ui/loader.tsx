@@ -1,5 +1,4 @@
 import React from 'react';
-import { cn } from "@/lib/utils";
 
 export interface LoaderProps {
   size?: number;
@@ -8,9 +7,12 @@ export interface LoaderProps {
 
 const Loader: React.FC<LoaderProps> = ({
   size = 24,
-  className,
+  className = '',
   ...props
 }) => {
+  const defaultClasses = 'animate-spin text-white';
+  const combinedClasses = className ? `${defaultClasses} ${className}` : defaultClasses;
+  
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -22,7 +24,7 @@ const Loader: React.FC<LoaderProps> = ({
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={cn("animate-spin text-white", className)}
+      className={combinedClasses}
       {...props}
     >
       <path d="M21 12a9 9 0 1 1-6.219-8.56" />
