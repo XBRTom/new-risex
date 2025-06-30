@@ -50,6 +50,11 @@ interface Pool {
 const Dashboard: React.FC = () => {
   const [pools, setPools] = useState<Pool[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [summary, setSummary] = useState<{ totalTVL: number; totalVolume: number; averageAPR: number }>({
+    totalTVL: 0,
+    totalVolume: 0,
+    averageAPR: 0,
+  });
   const [isPageLoading, setIsPageLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -207,6 +212,22 @@ const Dashboard: React.FC = () => {
     fetchPoolsData(pageNumber);
   };
 
+  useEffect(() => {
+    const fetchSummaryData = async () => {
+      try {
+        const response = await apiClient.get('/pools-summary');
+        setSummary({
+          totalTVL: response.data.totalTVL,
+          totalVolume: response.data.totalVolume,
+          averageAPR: response.data.averageAPR,
+        });
+      } catch (error) {
+        console.error('Failed to fetch summary data:', error);
+      }
+    };
+    fetchSummaryData();
+  }, []);
+
   return (
     <DashboardLayout>
     <div className="flex h-screen bg-black text-white">
@@ -263,7 +284,7 @@ const Dashboard: React.FC = () => {
                         notation: 'compact',
                         maximumFractionDigits: 1
                       }).format(
-                        pools.reduce((sum, pool) => sum + parseFloat(pool.totalValueLocked?.toString() || '0'), 0)
+                        summary.totalTVL
                       )}
                     </p>
                   </div>
@@ -284,7 +305,7 @@ const Dashboard: React.FC = () => {
                         notation: 'compact',
                         maximumFractionDigits: 1
                       }).format(
-                        pools.reduce((sum, pool) => sum + parseFloat(pool.totalPoolVolume?.toString() || '0'), 0)
+                        summary.totalVolume
                       )}
                     </p>
                   </div>
@@ -300,7 +321,7 @@ const Dashboard: React.FC = () => {
                     <p className="text-sm text-orange-400">Avg APR</p>
                     <p className="text-2xl font-bold text-white">
                       {(
-                        pools.reduce((sum, pool) => sum + parseFloat(pool.relativeAPR?.toString() || '0'), 0) / pools.length || 0
+                        summary.averageAPR
                       ).toFixed(2)}%
                     </p>
                   </div>
