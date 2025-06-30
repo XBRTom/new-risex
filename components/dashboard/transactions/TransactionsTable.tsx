@@ -6,7 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { AlertCircle, Clock, Send, ArrowDownLeft, ArrowUpRight, Waves, Loader, ArrowUpDown } from "lucide-react"
+import { AlertCircle, Clock, Send, ArrowDownLeft, ArrowUpRight, Waves, ArrowUpDown } from "lucide-react"
+import Loader from '@/components/ui/Loader';
 import { Transaction } from '@/libs/xrpl';
 
 interface TransactionsTableProps {
@@ -179,8 +180,8 @@ export default function TransactionsTable({ transactions, loading, error, isWall
       return (
         <TableRow>
           <TableCell colSpan={7} className="h-32 text-center">
-            <div className="flex flex-col items-center space-y-4">
-              <Loader className="h-8 w-8 animate-spin text-blue-500" />
+            <div className="flex flex-col items-center space-y-3">
+              <Loader size={32} />
               <div>
                 <p className="text-lg font-semibold text-white">Loading Transactions...</p>
                 <p className="text-gray-400">Fetching your transaction history...</p>

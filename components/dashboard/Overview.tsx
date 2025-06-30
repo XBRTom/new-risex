@@ -6,7 +6,7 @@ import Pagination from '@/components/dashboard/global/Pagination';
 // import SearchBar from '@/components/SearchBar';
 import apiClient from '@/libs/api';
 import { Progress } from "@/components/ui/progress";
-import Loader from '@/components/ui/loader';
+import Loader from '@/components/ui/Loader';
 // import { Button } from "@/components/ui/button";
 // import { Separator } from "@/components/ui/separator";
 // import { Bar, BarChart } from "recharts";
@@ -228,9 +228,11 @@ const Dashboard: React.FC = () => {
             disabled={loading}
             className="flex items-center space-x-2 px-3 py-1 text-sm bg-gray-800 hover:bg-gray-700 rounded-md transition-colors disabled:opacity-50"
           >
-            <span className={loading ? 'animate-spin' : ''}>
-              🔄
-            </span>
+            {loading ? (
+              <Loader size={16} />
+            ) : (
+              <span>🔄</span>
+            )}
             <span>Refresh</span>
           </button>
         </header>

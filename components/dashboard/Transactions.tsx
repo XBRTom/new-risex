@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useWallet } from "@/context"
 import TransactionsTable from './transactions/TransactionsTable';
 import DashboardLayout from './layout/DashboardLayout';
+import Loader from '@/components/ui/Loader';
 // import {
 //   Breadcrumb,
 //   BreadcrumbItem,
@@ -102,9 +103,11 @@ const Transactions: React.FC = () => {
                 disabled={loading}
                 className="flex items-center space-x-2 px-3 py-1 text-sm bg-gray-800 hover:bg-gray-700 rounded-md transition-colors disabled:opacity-50"
               >
-                <span className={loading ? 'animate-spin' : ''}>
-                  🔄
-                </span>
+                {loading ? (
+                  <Loader size={16} />
+                ) : (
+                  <span>🔄</span>
+                )}
                 <span>Refresh</span>
               </button>
             </header>

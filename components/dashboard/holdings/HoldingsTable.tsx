@@ -6,7 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Loader, RefreshCw, Wallet } from 'lucide-react';
+import { RefreshCw, Wallet } from 'lucide-react';
+import Loader from '@/components/ui/Loader';
 import { useWallet } from '@/context';
 
 interface HoldingsTableProps {
@@ -51,9 +52,9 @@ const HoldingsTable: React.FC<HoldingsTableProps> = ({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center py-8">
-            <Loader className="h-8 w-8 animate-spin text-blue-500" />
-            <span className="ml-2 text-gray-400">Calculating holdings from transactions...</span>
+          <div className="flex flex-col items-center justify-center py-8 space-y-3">
+            <Loader size={32} />
+            <span className="text-lg font-semibold text-white">Calculating LP Holdings...</span>
           </div>
         </CardContent>
       </Card>

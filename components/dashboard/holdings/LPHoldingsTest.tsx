@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader } from 'lucide-react';
+import Loader from '@/components/ui/Loader';
 
 const LPHoldingsTest: React.FC = () => {
   const [walletAddress, setWalletAddress] = useState('');
@@ -75,8 +75,8 @@ const LPHoldingsTest: React.FC = () => {
               >
                 {loading ? (
                   <>
-                    <Loader className="mr-2 h-4 w-4 animate-spin" />
-                    Testing...
+                    <Loader size={16} className="mr-2" />
+                    Testing LP Holdings...
                   </>
                 ) : (
                   'Test LP Holdings'

@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import WalletPoolHoldingTable from './pool-details/WalletPoolHoldingTable'
 // import TransactionTable from './pool-details/TransactionTable'
 import DashboardLayout from './layout/DashboardLayout'
-import Loader from '@/components/ui/loader';
+import Loader from '@/components/ui/Loader';
 // import {
 //   Breadcrumb,
 //   BreadcrumbItem,
@@ -260,7 +260,12 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
   }
 
   if (loading) {
-    return <div className="w-full h-screen bg-black text-white flex flex-col gap-2 items-center justify-center"><span>Loading</span><Loader size={32} /></div>
+    return (
+      <div className="w-full h-screen bg-black text-white flex flex-col gap-3 items-center justify-center">
+        <Loader size={32} />
+        <span className="text-lg font-semibold">Loading Pool Information...</span>
+      </div>
+    )
   }
 
   if (error) {

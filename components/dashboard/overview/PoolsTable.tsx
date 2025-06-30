@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArrowUpDown, ArrowUp, ArrowDown, Plus, Minus, ChevronRight, ChevronLeft, AlertCircle } from 'lucide-react';
-import Loader from '@/components/ui/loader';
+import Loader from '@/components/ui/Loader';
 import {
   Tooltip,
   TooltipContent,
@@ -155,8 +155,10 @@ const PoolsTable = memo(function PoolsTable({
       return (
         <TableRow>
           <TableCell colSpan={visibleColumns.length} className="h-24 text-center">
-            <Loader size={32} className="mx-auto" />
-            <p className="mt-2 text-lg font-semibold text-white">Loading Pools...</p>
+            <div className="flex flex-col items-center justify-center space-y-3">
+              <Loader size={32} className="mx-auto" />
+              <p className="text-lg font-semibold text-white">Loading Pools...</p>
+            </div>
           </TableCell>
         </TableRow>
       );

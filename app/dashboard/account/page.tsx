@@ -18,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import DashboardLayout from '@/components/dashboard/layout/DashboardLayout';
-import Loader from '@/components/ui/loader';
+import Loader from '@/components/ui/Loader';
 
 const formSchema = z.object({
   fullName: z.string().min(2, {
@@ -127,7 +127,14 @@ export default function ProfileForm() {
                                 )}
                             />
                             <Button type="submit" disabled={isLoading}>
-                                {isLoading ? <Loader size={16} className="mr-2" /> : "Submit"}
+                                {isLoading ? (
+                                    <>
+                                        <Loader size={16} className="mr-2" />
+                                        Updating...
+                                    </>
+                                ) : (
+                                    "Update Profile"
+                                )}
                             </Button>
                             </form>
                         </Form>

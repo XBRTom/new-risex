@@ -5,6 +5,7 @@ import { useWallet } from "@/context"
 import HoldingsTable from './holdings/HoldingsTable';
 import DashboardLayout from './layout/DashboardLayout';
 import { fetchWalletLPHoldings, LPHolding } from '@/libs/lpHoldings';
+import Loader from '@/components/ui/Loader';
 
 const Holdings: React.FC = () => {
   const walletContext = useWallet()
@@ -75,9 +76,11 @@ const Holdings: React.FC = () => {
                 disabled={loading}
                 className="flex items-center space-x-2 px-3 py-1 text-sm bg-gray-800 hover:bg-gray-700 rounded-md transition-colors disabled:opacity-50"
               >
-                <span className={loading ? 'animate-spin' : ''}>
-                  🔄
-                </span>
+                {loading ? (
+                  <Loader size={16} />
+                ) : (
+                  <span>🔄</span>
+                )}
                 <span>Refresh</span>
               </button>
             </header>
