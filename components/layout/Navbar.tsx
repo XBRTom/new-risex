@@ -166,14 +166,41 @@ export default function Navbar() {
   // Search state
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearchFocused, setIsSearchFocused] = useState(false)
+  const [pools, setPools] = useState<Pool[]>([])
   const [filteredNavItems, setFilteredNavItems] = useState<NavItem[]>([])
   const [filteredPages, setFilteredPages] = useState<AppPage[]>([])
+  const [isSearchingPools, setIsSearchingPools] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
 
-  // Search functionality
+  // Debounced pool search
+  const searchPools = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setPools([])
+      setIsSearchingPools(false)
+      return
+    }
+
+    setIsSearchingPools(true)
+    try {
+      const response = await apiClient.get(`/fetch-pools/20?search=${encodeURIComponent(query)}`)
+      if (response.data.error) {
+        console.error('API error:', response.data.error)
+        setPools([])
+      } else {
+        setPools(response.data.pools || [])
+      }
+    } catch (error: any) {
+      console.error('Failed to search pools:', error)
+      setPools([])
+    }
+    setIsSearchingPools(false)
+  }, [])
+
+  // Search functionality with debouncing
   useEffect(() => {
     if (!searchQuery.trim()) {
+      setPools([])
       setFilteredNavItems([])
       setFilteredPages([])
     } else {
@@ -191,8 +218,15 @@ export default function Navbar() {
         page.category.toLowerCase().includes(searchQuery.toLowerCase())
       )
       setFilteredPages(filteredPageResults)
+
+      // Search pools with debouncing
+      const timeoutId = setTimeout(() => {
+        searchPools(searchQuery)
+      }, 300)
+
+      return () => clearTimeout(timeoutId)
     }
-  }, [searchQuery])
+  }, [searchQuery, searchPools])
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
@@ -201,6 +235,7 @@ export default function Navbar() {
   const clearSearch = () => {
     setSearchQuery('')
     setIsSearchFocused(false)
+    setPools([])
     setFilteredNavItems([])
     setFilteredPages([])
     if (searchInputRef.current) {
@@ -408,7 +443,7 @@ export default function Navbar() {
 
                 {/* Search Results */}
                 <AnimatePresence>
-                  {searchQuery && searchQuery.trim() && (isSearchFocused || filteredNavItems.length > 0 || filteredPages.length > 0) && (
+                  {searchQuery && searchQuery.trim() && (isSearchFocused || pools.length > 0 || filteredNavItems.length > 0 || filteredPages.length > 0) && (
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -419,8 +454,11 @@ export default function Navbar() {
                         <div className="text-xs text-gray-500 mb-2 flex items-center justify-between">
                           <div className="flex items-center">
                             <Search className="h-3 w-3 mr-1" />
-                            {filteredNavItems.length + filteredPages.length} result(s) found
+                            {filteredNavItems.length + filteredPages.length + pools.length} result(s) found
                           </div>
+                          {isSearchingPools && (
+                            <div className="text-xs text-blue-500">Searching...</div>
+                          )}
                         </div>
                         
 <div className="space-y-3 max-h-96 overflow-y-auto">
@@ -478,13 +516,35 @@ export default function Navbar() {
                           )}
                           
                           
+                          {/* Pool Results */}
+                          {pools.length > 0 && (
+                            <div>
+                              <div className="text-xs text-gray-500 font-medium mb-2 px-1">Pools</div>
+                              <div className="space-y-1">
+                                {pools.map((pool) => (
+                                  <Link key={pool.id} href={`/dashboard/pool/${pool.account}`} onClick={clearSearch}>
+                                    <div className="flex items-center space-x-3 p-2 text-sm text-gray-700 hover:bg-gray-50 rounded cursor-pointer transition-colors">
+                                      <Layers className="h-4 w-4 text-purple-500" />
+                                      <div className="flex-1">
+                                        <div className="font-medium">{pool.asset_currency}/{pool.asset2_currency}</div>
+                                        <div className="text-xs text-gray-500">
+                                          {(pool.tradingFee / 1000).toFixed(2)}% trading fee
+                                        </div>
+                                      </div>
+                                      <div className="text-xs text-gray-500">
+                                        {pool.account.slice(0, 8)}...
+                                      </div>
+                                    </div>
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
                           {/* No Results */}
-                          {filteredNavItems.length === 0 && filteredPages.length === 0 && (
+                          {filteredNavItems.length === 0 && filteredPages.length === 0 && pools.length === 0 && !isSearchingPools && (
                             <div className="text-xs text-gray-500 py-4 text-center">
                               No results found for &quot;{searchQuery}&quot;
-                              <div className="text-xs text-gray-400 mt-1">
-                                Try searching for navigation items or pages
-                              </div>
                             </div>
                           )}
                         </div>

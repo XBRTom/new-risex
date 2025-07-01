@@ -11,6 +11,7 @@ export async function GET(req: NextRequest, context: {params: Params}) {
     const { searchParams } = new URL(req.url);
     const limit = parseInt(context.params.limit || '15', 10);
     const page = parseInt(searchParams.get('page') || '1', 10);
+    const search = searchParams.get('search');
     
     // Input validation and security limits
     if (limit > 100 || limit < 1) {
@@ -22,13 +23,74 @@ export async function GET(req: NextRequest, context: {params: Params}) {
     
     const offset = (page - 1) * limit;
 
-    console.log(`Fetching pools: limit=${limit}, page=${page}, offset=${offset}`);
+    console.log(`Fetching pools: limit=${limit}, page=${page}, offset=${offset}, search=${search}`);
 
-    // Get paginated pools
-    const pools = await prisma.$queryRawTyped(getPoolsMax(limit, offset));
-    
-    // Get total count for pagination (we'll optimize this later)
-    const totalCount = await prisma.pool.count();
+    let pools;
+    let totalCount;
+
+    if (search && search.trim()) {
+      // Search functionality using Prisma's findMany with search filters
+      const searchTerm = search.trim().toLowerCase();
+      
+      pools = await prisma.pool.findMany({
+        where: {
+          OR: [
+            {
+              asset_currency: {
+                contains: searchTerm,
+                mode: 'insensitive'
+              }
+            },
+            {
+              asset2_currency: {
+                contains: searchTerm,
+                mode: 'insensitive'
+              }
+            },
+            {
+              account: {
+                contains: searchTerm,
+                mode: 'insensitive'
+              }
+            }
+          ]
+        },
+        take: limit,
+        skip: offset,
+        orderBy: {
+          id: 'desc'
+        }
+      });
+      
+      totalCount = await prisma.pool.count({
+        where: {
+          OR: [
+            {
+              asset_currency: {
+                contains: searchTerm,
+                mode: 'insensitive'
+              }
+            },
+            {
+              asset2_currency: {
+                contains: searchTerm,
+                mode: 'insensitive'
+              }
+            },
+            {
+              account: {
+                contains: searchTerm,
+                mode: 'insensitive'
+              }
+            }
+          ]
+        }
+      });
+    } else {
+      // No search - use the existing optimized query
+      pools = await prisma.$queryRawTyped(getPoolsMax(limit, offset));
+      totalCount = await prisma.pool.count();
+    }
 
     console.log(`Found ${pools.length} pools out of ${totalCount} total`);
 
