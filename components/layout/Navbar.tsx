@@ -196,10 +196,10 @@ export default function Navbar() {
       } else {
         setPools(response.data.pools || [])
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to search pools:', error)
       // Handle different error types
-      if (error.response?.status === 401) {
+      if (error?.response?.status === 401) {
         console.error('Authentication error - user may need to re-login')
       }
       setPools([])
