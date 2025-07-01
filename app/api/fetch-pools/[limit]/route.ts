@@ -30,27 +30,24 @@ export async function GET(req: NextRequest, context: {params: Params}) {
 
     if (search && search.trim()) {
       // Search functionality using Prisma's findMany with search filters
-      const searchTerm = search.trim().toLowerCase();
+      const searchTerm = search.trim();
       
       pools = await prisma.pool.findMany({
         where: {
           OR: [
             {
               asset_currency: {
-                contains: searchTerm,
-                mode: 'insensitive'
+                contains: searchTerm
               }
             },
             {
               asset2_currency: {
-                contains: searchTerm,
-                mode: 'insensitive'
+                contains: searchTerm
               }
             },
             {
               account: {
-                contains: searchTerm,
-                mode: 'insensitive'
+                contains: searchTerm
               }
             }
           ]
@@ -67,20 +64,17 @@ export async function GET(req: NextRequest, context: {params: Params}) {
           OR: [
             {
               asset_currency: {
-                contains: searchTerm,
-                mode: 'insensitive'
+                contains: searchTerm
               }
             },
             {
               asset2_currency: {
-                contains: searchTerm,
-                mode: 'insensitive'
+                contains: searchTerm
               }
             },
             {
               account: {
-                contains: searchTerm,
-                mode: 'insensitive'
+                contains: searchTerm
               }
             }
           ]
