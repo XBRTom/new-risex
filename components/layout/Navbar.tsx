@@ -553,7 +553,7 @@ export default function Navbar() {
                           {/* No Results */}
                           {filteredNavItems.length === 0 && filteredPages.length === 0 && pools.length === 0 && !isSearchingPools && (
                             <div className="text-xs text-gray-500 py-4 text-center">
-                              No results found for "{searchQuery}"
+                              No results found for &quot;{searchQuery}&quot;
                             </div>
                           )}
                         </div>
