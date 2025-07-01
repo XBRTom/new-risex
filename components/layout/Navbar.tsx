@@ -174,13 +174,6 @@ export default function Navbar() {
 
   // Debounced pool search
   const searchPools = useCallback(async (query: string) => {
-    // Only search if user is authenticated
-    if (!session) {
-      setPools([])
-      setIsSearchingPools(false)
-      return
-    }
-
     if (!query.trim()) {
       setPools([])
       setIsSearchingPools(false)
@@ -198,14 +191,10 @@ export default function Navbar() {
       }
     } catch (error: any) {
       console.error('Failed to search pools:', error)
-      // Handle different error types
-      if (error?.response?.status === 401) {
-        console.error('Authentication error - user may need to re-login')
-      }
       setPools([])
     }
     setIsSearchingPools(false)
-  }, [session])
+  }, [])
 
   // Search functionality with debouncing
   useEffect(() => {
