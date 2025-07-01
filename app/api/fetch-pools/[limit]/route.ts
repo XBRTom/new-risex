@@ -1,16 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/libs/prisma';
 import { getPoolsMax } from '@prisma/client/sql'
+import { auth } from '@/auth'
 
 type Params = {
     limit: string;
 };
 
 export async function GET(req: NextRequest, context: {params: Params}) {
+  // Check authentication
+  const session = await auth();
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const { searchParams } = new URL(req.url);
     const limit = parseInt(context.params.limit || '15', 10);
     const page = parseInt(searchParams.get('page') || '1', 10);
+    
+    // Input validation and security limits
+    if (limit > 100 || limit < 1) {
+      return NextResponse.json({ error: 'Invalid limit. Must be between 1 and 100' }, { status: 400 });
+    }
+    if (page < 1) {
+      return NextResponse.json({ error: 'Invalid page. Must be 1 or greater' }, { status: 400 });
+    }
+    
     const offset = (page - 1) * limit;
 
     console.log(`Fetching pools: limit=${limit}, page=${page}, offset=${offset}`);

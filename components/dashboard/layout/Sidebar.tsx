@@ -17,7 +17,6 @@ import {
   FileText,
   User,
   LogOut,
-  Search,
   Menu,
   TrendingUp,
   Wallet,
@@ -29,7 +28,6 @@ import {
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import {
   Tooltip,
@@ -190,22 +188,6 @@ export default function ResponsiveSidebar() {
       
       <div className="flex-grow overflow-y-auto py-4">
         <div className="px-3">
-          <AnimatePresence>
-            {!collapsed && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="relative mb-6"
-              >
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500 pointer-events-none" />
-                <Input 
-                  placeholder="Search navigation..." 
-                  className="pl-10 bg-gray-800/50 border-gray-700 text-gray-100 placeholder-gray-500 focus:border-blue-500 transition-colors" 
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
           
           <div className="space-y-6">
             {navSections.map((section, sectionIndex) => (

@@ -1,12 +1,12 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from 'next/navigation'
 import { useWallet } from "@/context";
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
-import { ChevronDown, User, Settings, HelpCircle, LogOut, Wallet, CreditCard, Gift, X, Menu } from 'lucide-react'
+import { ChevronDown, User, Settings, HelpCircle, LogOut, Wallet, CreditCard, Gift, X, Menu, Search, Command, Layers } from 'lucide-react'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -23,7 +23,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import apiClient from "@/libs/api"
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -84,6 +86,63 @@ const ListItem = React.forwardRef<
 })
 ListItem.displayName = "ListItem"
 
+// Search interfaces
+interface Pool {
+  id: number
+  asset_currency: string
+  asset2_currency: string
+  account: string
+  tradingFee: number
+  balance?: number
+}
+
+interface NavItem {
+  name: string
+  href: string
+  icon: React.ReactNode
+  section: string
+  badge?: string
+  isNew?: boolean
+}
+
+interface AppPage {
+  name: string
+  href: string
+  description: string
+  category: string
+}
+
+// Move static data outside component to prevent re-creation
+const navItems: NavItem[] = [
+  // Dashboard
+  { name: 'Overview', href: '/dashboard/overview', icon: 'LayoutDashboard', section: 'Dashboard' },
+  { name: 'Analytics', href: '/analytics', icon: 'TrendingUp', section: 'Dashboard' },
+  // Portfolio
+  { name: 'Holdings', href: '/dashboard/holdings', icon: 'Wallet', section: 'Portfolio' },
+  { name: 'Transactions', href: '/dashboard/transactions', icon: 'ArrowRightLeft', section: 'Portfolio' },
+  { name: 'Staking', href: '/staking', icon: 'Target', section: 'Portfolio', badge: 'Beta' },
+  // DeFi
+  { name: 'Pools', href: '/dashboard/pool', icon: 'Layers', section: 'DeFi' },
+  { name: 'Liquid Pools', href: '/liquid-pools', icon: 'Database', section: 'DeFi', isNew: true },
+  // Developer
+  { name: 'APIs', href: '/apis', icon: 'Code2', section: 'Developer' },
+  { name: 'Documentation', href: '/docs', icon: 'BookOpen', section: 'Developer' },
+  // Account
+  { name: 'Account', href: '/dashboard/account', icon: 'User', section: 'Account' },
+]
+
+// App pages for search
+const appPages: AppPage[] = [
+  { name: 'Home', href: '/', description: 'Landing page and overview', category: 'Main' },
+  { name: 'Dashboard', href: '/dashboard', description: 'Main dashboard overview', category: 'Dashboard' },
+  { name: 'Dashboard Overview', href: '/dashboard/overview', description: 'Main dashboard overview with pools and analytics', category: 'Dashboard' },
+  { name: 'Holdings', href: '/dashboard/holdings', description: 'Portfolio holdings and balances', category: 'Portfolio' },
+  { name: 'Transactions', href: '/dashboard/transactions', description: 'Transaction history and details', category: 'Portfolio' },
+  { name: 'Account Settings', href: '/dashboard/account', description: 'User account and preferences', category: 'Settings' },
+  { name: 'API Documentation', href: '/api-documentation', description: 'Developer API reference', category: 'Developer' },
+  { name: 'Billing', href: '/dashboard/billing', description: 'Subscription and billing management', category: 'Account' },
+]
+
 export default function Navbar() {
   const { data: session, status } = useSession()
   const walletContext = useWallet()
@@ -103,6 +162,122 @@ export default function Navbar() {
   }
   const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isSearchFocused, setIsSearchFocused] = useState(false)
+  const [pools, setPools] = useState<Pool[]>([])
+  const [filteredNavItems, setFilteredNavItems] = useState<NavItem[]>([])
+  const [filteredPages, setFilteredPages] = useState<AppPage[]>([])
+  const [isSearchingPools, setIsSearchingPools] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  // Debounced pool search
+  const searchPools = useCallback(async (query: string) => {
+    // Only search if user is authenticated
+    if (!session) {
+      setPools([])
+      setIsSearchingPools(false)
+      return
+    }
+
+    if (!query.trim()) {
+      setPools([])
+      setIsSearchingPools(false)
+      return
+    }
+
+    setIsSearchingPools(true)
+    try {
+      const response = await apiClient.get(`/fetch-pools/20?search=${encodeURIComponent(query)}`)
+      if (response.error) {
+        console.error('API error:', response.error)
+        setPools([])
+      } else {
+        setPools(response.pools || [])
+      }
+    } catch (error) {
+      console.error('Failed to search pools:', error)
+      // Handle different error types
+      if (error.response?.status === 401) {
+        console.error('Authentication error - user may need to re-login')
+      }
+      setPools([])
+    }
+    setIsSearchingPools(false)
+  }, [session])
+
+  // Search functionality with debouncing
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setPools([])
+      setFilteredNavItems([])
+      setFilteredPages([])
+    } else {
+      // Filter navigation items
+      const filteredNav = navItems.filter(item => 
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.section.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      setFilteredNavItems(filteredNav)
+      
+      // Filter app pages
+      const filteredPageResults = appPages.filter(page => 
+        page.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        page.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        page.category.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      setFilteredPages(filteredPageResults)
+      
+      // Search pools with debouncing
+      const timeoutId = setTimeout(() => {
+        searchPools(searchQuery)
+      }, 300)
+
+      return () => clearTimeout(timeoutId)
+    }
+  }, [searchQuery, searchPools])
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+  }
+
+  const clearSearch = () => {
+    setSearchQuery('')
+    setIsSearchFocused(false)
+    setPools([])
+    setFilteredNavItems([])
+    setFilteredPages([])
+    if (searchInputRef.current) {
+      searchInputRef.current.blur()
+    }
+  }
+
+  // Keyboard shortcut for search (Cmd+K or Ctrl+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Handle global shortcuts only when not in input fields
+      if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
+        // Allow escape key to clear search when in search input
+        if (e.key === 'Escape' && document.activeElement === searchInputRef.current) {
+          clearSearch()
+        }
+        return
+      }
+
+      // Global shortcut to focus search
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        if (searchInputRef.current) {
+          searchInputRef.current.focus()
+          setIsSearchFocused(true)
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   const handleSignOutClick = async () => {
     try {
@@ -223,6 +398,172 @@ export default function Navbar() {
           </div>
           
           <div className="flex items-center space-x-2">
+            {/* Search Bar in Top Nav */}
+            {session && (
+              <div className="flex-shrink-0 w-60 relative hidden md:block">
+                <div className={cn(
+                  "relative flex items-center space-x-2 transition-all duration-200",
+                  isSearchFocused && "ring-2 ring-blue-500/30 rounded-md p-1"
+                )}>
+                  <Search className={cn(
+                    "h-4 w-4 transition-colors duration-200 flex-shrink-0",
+                    isSearchFocused ? "text-blue-500" : "text-gray-600"
+                  )} />
+                  <Input 
+                    ref={searchInputRef}
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    onFocus={() => setIsSearchFocused(true)}
+                    onBlur={(e) => {
+                      // Delay blur to allow clicks on search results
+                      setTimeout(() => setIsSearchFocused(false), 150)
+                    }}
+                    placeholder="Search..."
+                    className={cn(
+                      "h-7 w-full pl-3 pr-12 bg-white border-2 border-gray-300 text-gray-900 placeholder-gray-400 transition-all duration-200 text-sm",
+                      "focus:border-blue-500 focus:bg-white focus:ring-0 focus:ring-offset-0 focus:outline-none",
+                      "hover:border-gray-400",
+                      searchQuery && "border-gray-400"
+                    )}
+                  />
+                  <AnimatePresence>
+                    {searchQuery && (
+                      <motion.button
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        onClick={clearSearch}
+                        className="absolute right-8 top-1.5 h-3 w-3 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                      >
+                        <X className="h-4 w-4" />
+                      </motion.button>
+                    )}
+                  </AnimatePresence>
+                  {!searchQuery && (
+                    <div className="absolute right-1 top-1 flex items-center space-x-1">
+                      <kbd className="pointer-events-none h-4 select-none items-center gap-1 rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] font-medium text-gray-500 opacity-100 hidden lg:flex">
+                        <Command className="h-2 w-2" />
+                      </kbd>
+                      <kbd className="pointer-events-none h-4 select-none items-center gap-1 rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] font-medium text-gray-500 opacity-100 hidden lg:flex">
+                        K
+                      </kbd>
+                    </div>
+                  )}
+                </div>
+
+                {/* Search Results */}
+                <AnimatePresence>
+                  {searchQuery && searchQuery.trim() && (isSearchFocused || pools.length > 0 || filteredNavItems.length > 0 || filteredPages.length > 0) && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50"
+                    >
+                      <div className="p-3">
+                        <div className="text-xs text-gray-500 mb-2 flex items-center justify-between">
+                          <div className="flex items-center">
+                            <Search className="h-3 w-3 mr-1" />
+                            {filteredNavItems.length + filteredPages.length + pools.length} result(s) found
+                          </div>
+                          {isSearchingPools && (
+                            <div className="text-xs text-blue-500">Searching...</div>
+                          )}
+                        </div>
+                        
+<div className="space-y-3 max-h-96 overflow-y-auto">
+                          {/* Navigation Results */}
+                          {filteredNavItems.length > 0 && (
+                            <div>
+                              <div className="text-xs text-gray-500 font-medium mb-2 px-1">Navigation</div>
+                              <div className="space-y-1">
+                                {filteredNavItems.map((item) => (
+                                  <Link key={item.href} href={item.href} onClick={clearSearch}>
+                                    <div className="flex items-center space-x-3 p-2 text-sm text-gray-700 hover:bg-gray-50 rounded cursor-pointer transition-colors">
+                                      <div className="h-4 w-4 text-blue-500 flex items-center justify-center">
+                                        <span className="text-xs">📄</span>
+                                      </div>
+                                      <div className="flex-1">
+                                        <div className="font-medium">{item.name}</div>
+                                        <div className="text-xs text-gray-500">
+                                          {item.section}
+                                          {item.badge && ` • ${item.badge}`}
+                                          {item.isNew && ' • New'}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* App Pages Results */}
+                          {filteredPages.length > 0 && (
+                            <div>
+                              <div className="text-xs text-gray-500 font-medium mb-2 px-1">Pages</div>
+                              <div className="space-y-1">
+                                {filteredPages.map((page) => (
+                                  <Link key={page.href} href={page.href} onClick={clearSearch}>
+                                    <div className="flex items-center space-x-3 p-2 text-sm text-gray-700 hover:bg-gray-50 rounded cursor-pointer transition-colors">
+                                      <div className="h-4 w-4 text-green-500 flex items-center justify-center">
+                                        <span className="text-xs">🔗</span>
+                                      </div>
+                                      <div className="flex-1">
+                                        <div className="font-medium">{page.name}</div>
+                                        <div className="text-xs text-gray-500">
+                                          {page.description}
+                                        </div>
+                                      </div>
+                                      <div className="text-xs text-gray-500">
+                                        {page.category}
+                                      </div>
+                                    </div>
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Pool Results */}
+                          {pools.length > 0 && (
+                            <div>
+                              <div className="text-xs text-gray-500 font-medium mb-2 px-1">Pools</div>
+                              <div className="space-y-1">
+                                {pools.map((pool) => (
+                                  <Link key={pool.id} href={`/dashboard/pool/${pool.account}`} onClick={clearSearch}>
+                                    <div className="flex items-center space-x-3 p-2 text-sm text-gray-700 hover:bg-gray-50 rounded cursor-pointer transition-colors">
+                                      <Layers className="h-4 w-4 text-purple-500" />
+                                      <div className="flex-1">
+                                        <div className="font-medium">{pool.asset_currency}/{pool.asset2_currency}</div>
+                                        <div className="text-xs text-gray-500">
+                                          {(pool.tradingFee / 1000).toFixed(2)}% trading fee
+                                        </div>
+                                      </div>
+                                      <div className="text-xs text-gray-500">
+                                        {pool.account.slice(0, 8)}...
+                                      </div>
+                                    </div>
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* No Results */}
+                          {filteredNavItems.length === 0 && filteredPages.length === 0 && pools.length === 0 && !isSearchingPools && (
+                            <div className="text-xs text-gray-500 py-4 text-center">
+                              No results found for "{searchQuery}"
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
+            
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-8 px-2 text-xs">
