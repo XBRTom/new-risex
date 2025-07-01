@@ -216,10 +216,11 @@ const Dashboard: React.FC = () => {
     const fetchSummaryData = async () => {
       try {
         const response = await apiClient.get('/pools-summary');
+        console.log('Summary API response:', response);
         setSummary({
-          totalTVL: response.data.totalTVL,
-          totalVolume: response.data.totalVolume,
-          averageAPR: response.data.averageAPR,
+          totalTVL: response.totalTVL,
+          totalVolume: response.totalVolume,
+          averageAPR: response.averageAPR,
         });
       } catch (error) {
         console.error('Failed to fetch summary data:', error);
