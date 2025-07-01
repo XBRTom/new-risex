@@ -184,11 +184,11 @@ export default function Navbar() {
     setIsSearchingPools(true)
     try {
       const response = await apiClient.get(`/fetch-pools/20?search=${encodeURIComponent(query)}`)
-      if (response.data.error) {
-        console.error('API error:', response.data.error)
+      if (response.error) {
+        console.error('API error:', response.error)
         setPools([])
       } else {
-        setPools(response.data.pools || [])
+        setPools(response.pools || [])
       }
     } catch (error: any) {
       console.error('Failed to search pools:', error)
