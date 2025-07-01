@@ -1,16 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/libs/prisma';
 import { getPoolsMax } from '@prisma/client/sql'
-import { auth } from '@/auth'
+import { getToken } from 'next-auth/jwt'
 
 type Params = {
     limit: string;
 };
 
 export async function GET(req: NextRequest, context: {params: Params}) {
-  // Check authentication
-  const session = await auth();
-  if (!session) {
+  // Check authentication using JWT token (Edge Runtime compatible)
+  const token = await getToken({ 
+    req, 
+    secret: process.env.NEXTAUTH_SECRET 
+  });
+  
+  if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
