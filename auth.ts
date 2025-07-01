@@ -9,10 +9,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   debug: !!process.env.AUTH_DEBUG,
   theme: { logo: "/logo_white.svg" },
   adapter: PrismaAdapter(prisma),
-  pages: {
-    signIn: '/',
-    error: '/',
-  },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
@@ -56,14 +52,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         user.role = "user";
       }
       return true;
-    },
-    async redirect({ url, baseUrl }) {
-      // Redirect to dashboard overview after successful sign in
-      if (url.startsWith(baseUrl)) {
-        return url;
-      }
-      // Default redirect to dashboard overview
-      return `${baseUrl}/dashboard/overview`;
     },
   },
 })

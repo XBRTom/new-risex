@@ -1,43 +1,7 @@
-'use client'
-
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import { useEffect } from "react"
 import Login from "@/components/homepage/login";
 import Sections from "@/components/homepage/sections";
-import Loader from "@/components/ui/Loader";
 
 const HomePage = () => {
-  const { data: session, status } = useSession()
-  const router = useRouter()
-
-  // Redirect authenticated users to dashboard
-  useEffect(() => {
-    if (status === 'authenticated' && session) {
-      router.push('/dashboard/overview')
-    }
-  }, [status, session, router])
-
-  // Show loading while checking authentication
-  if (status === 'loading') {
-    return (
-      <div className="w-full h-screen bg-black text-white flex flex-col items-center justify-center space-y-3">
-        <Loader size={32} />
-        <span className="text-lg font-semibold">Loading...</span>
-      </div>
-    )
-  }
-
-  // Show loading while redirecting authenticated users
-  if (status === 'authenticated') {
-    return (
-      <div className="w-full h-screen bg-black text-white flex flex-col items-center justify-center space-y-3">
-        <Loader size={32} />
-        <span className="text-lg font-semibold">Redirecting to Dashboard...</span>
-      </div>
-    )
-  }
-
   return (
     <div className="w-full min-h-[calc(100vh-2.5rem)] flex flex-col lg:flex-row no-scrollbar">
       <div 
