@@ -20,6 +20,7 @@ export default function PoolDetailClient({ account }: PoolDetailClientProps) {
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [loadingStep, setLoadingStep] = useState('Connecting to database...');
   const router = useRouter();
 
   const fetchAmmData = async (isRetry = false) => {
@@ -31,6 +32,7 @@ export default function PoolDetailClient({ account }: PoolDetailClientProps) {
       setLoading(true);
       setError(null);
       setProgress(20);
+      setLoadingStep('Connecting to database...');
 
       console.log(`Fetching AMM info for account: ${account}${isRetry ? ` (retry ${retryCount + 1})` : ''}`);
       
@@ -39,13 +41,17 @@ export default function PoolDetailClient({ account }: PoolDetailClientProps) {
         setProgress(prev => Math.min(prev + 10, 80));
       }, 200);
 
+      setLoadingStep('Querying AMM data...');
       const response = await apiClient.get(`/fetch-amm-info/${account}`);
       
       clearInterval(progressInterval);
-      setProgress(100);
+      setProgress(90);
+      setLoadingStep('Loading pool metrics...');
       
-      if (response && response.data) {
-        setAmmInfo(response.data);
+      if (response) {
+        setAmmInfo(response);
+        setProgress(100);
+        setLoadingStep('Almost done...');
         console.log('Successfully loaded AMM info');
       } else {
         throw new Error('Invalid response data');
@@ -88,10 +94,7 @@ export default function PoolDetailClient({ account }: PoolDetailClientProps) {
               <div className="space-y-2">
                 <Progress value={progress} className="w-full" />
                 <p className="text-xs text-gray-500">
-                  {progress < 30 ? 'Connecting to database...' :
-                   progress < 60 ? 'Querying AMM data...' :
-                   progress < 90 ? 'Processing relationships...' :
-                   'Almost done...'}
+                  {loadingStep}
                 </p>
               </div>
             )}
@@ -197,7 +200,7 @@ export default function PoolDetailClient({ account }: PoolDetailClientProps) {
 
   // Success state - render the AmmInfo component
   if (ammInfo) {
-    return <AmmInfo account={account} ammInfo={ammInfo} />;
+    return <AmmInfo account={account} ammInfo={ammInfo} parentLoading={setLoading} parentProgress={setProgress} parentStep={setLoadingStep} />;
   }
 
   // Fallback state

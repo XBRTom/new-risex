@@ -30,8 +30,15 @@ interface ExchangeRatesResponse {
   exchangeRates: any; // Replace `any` with the actual type if available
 }
 
-export default function Component({ account, ammInfo }: { account: string, ammInfo: any }) {
-  const [loading, setLoading] = useState(true)
+interface AmmInfoProps {
+  account: string
+  ammInfo: any
+  parentLoading?: (loading: boolean) => void
+  parentProgress?: (progress: number) => void
+  parentStep?: (step: string) => void
+}
+
+export default function Component({ account, ammInfo, parentLoading, parentProgress, parentStep }: AmmInfoProps) {
   const [latestMetrics, setLatestMetrics] = useState<LatestMetrics | null>(null)
   const [historicalMetrics, setHistoricalMetrics] = useState<any[]>([])
   const [filteredMetrics, setFilteredMetrics] = useState<any[]>([])
@@ -55,7 +62,6 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
         if (!ammInfo || !ammInfo.pool || !ammInfo.pool.id) {
           console.error('Missing ammInfo or pool data:', { ammInfo })
           setError('Invalid pool data')
-          setLoading(false)
           return
         }
         
@@ -84,11 +90,11 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
         }));
         setHistoricalMetrics(historicalResponse)
 
-        setLoading(false)
+        // Loading handled by parent
       } catch (err) {
         console.error('Error fetching AMM info or latest metrics:', err)
         setError('Failed to fetch AMM info')
-        setLoading(false)
+        // Loading handled by parent
       }
     }
 
@@ -267,14 +273,7 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
     setTransactionStatus('Voting functionality not implemented yet')
   }
 
-  if (loading) {
-    return (
-      <div className="w-full h-screen bg-black text-white flex flex-col gap-3 items-center justify-center">
-        <Loader size={32} />
-        <span className="text-lg font-semibold">Loading Pool Information...</span>
-      </div>
-    )
-  }
+  // Loading is now handled by parent component
 
   if (error) {
     return <div className="text-red-500 text-sm">{error}</div>
