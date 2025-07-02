@@ -96,7 +96,7 @@ const CustomTooltip = ({ active, payload, label, aggregation }: any) => {
                     : 'text-gray-400'
               }`}>
                 <span className="w-3 h-3 inline-block mr-2 bg-[#007AFF]"></span>
-                <span className="text-white">Performance:</span> {tvlPercentageChange.toFixed(2)}%
+                <span className="text-white">Performance:</span> {tvlPercentageChange ? tvlPercentageChange.toFixed(2) : '0.00'}%
               </p>
             )}
           </div>
@@ -117,7 +117,7 @@ const CustomTooltip = ({ active, payload, label, aggregation }: any) => {
               }`}>
                 <span className="w-3 h-3 inline-block mr-2 bg-[#5856D6]"></span>
                 <span className="text-white">Performance: </span>  
-                {totalPoolVolumePercentageChange.toFixed(2)}%
+                {totalPoolVolumePercentageChange ? totalPoolVolumePercentageChange.toFixed(2) : '0.00'}%
               </p>
             )}
           </div>
@@ -138,7 +138,7 @@ const CustomTooltip = ({ active, payload, label, aggregation }: any) => {
               }`}>
                 <span className="w-3 h-3 inline-block mr-2 bg-[#AF52DE]"></span>
                 <span className="text-white">Performance: </span>  
-                {feesGeneratedPercentageChange.toFixed(2)}%
+                {feesGeneratedPercentageChange ? feesGeneratedPercentageChange.toFixed(2) : '0.00'}%
               </p>
             )}
           </div>
@@ -147,7 +147,7 @@ const CustomTooltip = ({ active, payload, label, aggregation }: any) => {
           <div className="mb-2">
             <p className="text-white text-sm font-medium flex items-center">
               <span className="w-3 h-3 inline-block mr-2 bg-[#FF9500]"></span>
-              Relative APR: {relativeAPRValue.toFixed(2)}%
+              Relative APR: {relativeAPRValue ? relativeAPRValue.toFixed(2) : '0.00'}%
             </p>
             {relativeAPRPercentageChange !== undefined && (
               <p className={`text-sm font-medium flex items-center ${
@@ -159,7 +159,7 @@ const CustomTooltip = ({ active, payload, label, aggregation }: any) => {
               }`}>
                 <span className="w-3 h-3 inline-block mr-2 bg-[#FF3B30]"></span>
                 <span className="text-white">Performance: </span>  
-                {relativeAPRPercentageChange.toFixed(2)}%
+                {relativeAPRPercentageChange ? relativeAPRPercentageChange.toFixed(2) : '0.00'}%
               </p>
             )}
           </div>
@@ -168,7 +168,7 @@ const CustomTooltip = ({ active, payload, label, aggregation }: any) => {
           <div>
             <p className="text-white text-sm font-medium flex items-center">
               <span className="w-3 h-3 inline-block mr-2 bg-[#FF9500]"></span>
-              Liquidity Utilization Rate: {liquidityUtilizationRateValue.toFixed(2)}%
+              Liquidity Utilization Rate: {liquidityUtilizationRateValue ? liquidityUtilizationRateValue.toFixed(2) : '0.00'}%
             </p>
             {liquidityUtilizationRatePercentageChange !== undefined && (
               <p className={`text-sm font-medium flex items-center ${
@@ -180,7 +180,7 @@ const CustomTooltip = ({ active, payload, label, aggregation }: any) => {
               }`}>
                 <span className="w-3 h-3 inline-block mr-2 bg-[#FF3B30]"></span>
                 <span className="text-white">Performance: </span>  
-                {liquidityUtilizationRatePercentageChange.toFixed(2)}%
+                {liquidityUtilizationRatePercentageChange ? liquidityUtilizationRatePercentageChange.toFixed(2) : '0.00'}%
               </p>
             )}
           </div>
@@ -420,7 +420,7 @@ export default function PoolMetricsChart({ metrics }: PoolMetricsChartProps) {
               yAxisId="right"
               orientation="right"
               stroke="#ffffff"
-              tickFormatter={(value) => `${value.toFixed(2)}%`}
+              tickFormatter={(value) => `${value ? value.toFixed(2) : '0.00'}%`}
               domain={percentageChangeDomain}
               tick={{ fill: '#ffffff', fontSize: 12 }}
               tickLine={{ stroke: '#ffffff' }}
