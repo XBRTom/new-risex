@@ -51,6 +51,14 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
   useEffect(() => {
     const fetchAmmInfo = async () => {
       try {
+        // Check if ammInfo and pool exist before accessing pool.id
+        if (!ammInfo || !ammInfo.pool || !ammInfo.pool.id) {
+          console.error('Missing ammInfo or pool data:', { ammInfo })
+          setError('Invalid pool data')
+          setLoading(false)
+          return
+        }
+        
         const metricsResponse: any = await apiClient.get(`/latest-metrics?poolId=${ammInfo.pool.id}`)
         const currentPoolMetrics = metricsResponse.find((metric: any) => metric.poolId === ammInfo.pool.id)
         if (currentPoolMetrics) {
@@ -84,10 +92,10 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
       }
     }
 
-    if (account) {
+    if (account && ammInfo && ammInfo.pool && ammInfo.pool.id) {
       fetchAmmInfo()
     }
-  }, [account, ammInfo.pool.id])
+  }, [account, ammInfo?.pool?.id])
 
   console.log(ammInfo)
 
@@ -273,7 +281,21 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
   }
 
   if (!ammInfo) {
-    return <div className="text-white text-sm">No AMM info available</div>
+    return (
+      <div className="w-full h-screen bg-black text-white flex flex-col gap-3 items-center justify-center">
+        <div className="text-red-400 text-lg font-semibold">No AMM info available</div>
+        <div className="text-gray-400 text-sm">Pool data could not be loaded</div>
+      </div>
+    )
+  }
+  
+  if (!ammInfo.pool) {
+    return (
+      <div className="w-full h-screen bg-black text-white flex flex-col gap-3 items-center justify-center">
+        <div className="text-red-400 text-lg font-semibold">Invalid pool data</div>
+        <div className="text-gray-400 text-sm">Pool information is missing or incomplete</div>
+      </div>
+    )
   }
 
   const getAmountValue = (amount: number) => {
