@@ -51,8 +51,8 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
   useEffect(() => {
     const fetchAmmInfo = async () => {
       try {
-        const metricsResponse: any = await apiClient.get(`/latest-metrics?poolId=${ammInfo.poolId}`)
-        const currentPoolMetrics = metricsResponse.find((metric: any) => metric.poolId === ammInfo.poolId)
+        const metricsResponse: any = await apiClient.get(`/latest-metrics?poolId=${ammInfo.pool.id}`)
+        const currentPoolMetrics = metricsResponse.find((metric: any) => metric.poolId === ammInfo.pool.id)
         if (currentPoolMetrics) {
           setLatestMetrics({
             totalValueLocked: parseFloat(currentPoolMetrics.totalValueLocked) || 0,
@@ -65,7 +65,7 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
           setLatestMetrics(null)
         }
 
-        let historicalResponse: any = await apiClient.get(`/historical-metrics?poolId=${ammInfo.poolId}`)
+        let historicalResponse: any = await apiClient.get(`/historical-metrics?poolId=${ammInfo.pool.id}`)
         console.log('Historical Metrics:', historicalResponse) // Log the historical metrics response
         historicalResponse = historicalResponse.map((histo: any) => ({
           ...histo,
@@ -87,7 +87,7 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
     if (account) {
       fetchAmmInfo()
     }
-  }, [account, ammInfo.poolId])
+  }, [account, ammInfo.pool.id])
 
   console.log(ammInfo)
 
