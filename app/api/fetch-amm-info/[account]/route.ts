@@ -2,6 +2,10 @@ import { NextResponse, NextRequest } from "next/server";
 import prisma from '@/libs/prisma'; // Adjust the path as necessary
 import {fetchAmmInfo} from '@/libs/db';
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic';
+export const revalidate = false;
+
 type Params = {
   account: string
 }
@@ -29,10 +33,10 @@ export async function GET(req: NextRequest, context: { params: Params }) {
     return NextResponse.json(ammInfo, {status: 200});
   } catch (error) {
     console.error('Failed to fetch AMM info from the database:', error);
-    // res.status(500).json({ error: 'Failed to fetch AMM info' });
-    return NextResponse.json({ error: 'Failed to fetch AMM info' }, {status: 500});
-  } finally {
-    // await prisma.$disconnect();
+    return NextResponse.json({ 
+      error: 'Failed to fetch AMM info', 
+      details: (error as Error).message 
+    }, {status: 500});
   }
 };
 
