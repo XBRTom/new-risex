@@ -1,3 +1,4 @@
+'use client'
 
 import React, { useMemo, useState, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"

@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/libs/prisma';
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic';
+export const revalidate = false;
+
 export async function GET(req: NextRequest) {
   try {
     console.log('Fetching pools summary statistics...');
