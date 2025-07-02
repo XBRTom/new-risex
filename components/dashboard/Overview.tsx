@@ -91,8 +91,8 @@ const Dashboard: React.FC = () => {
     const cachedData = localStorage.getItem(cacheKey);
     const cachedTimestamp = localStorage.getItem(timestampKey);
     
-    // Shorter cache time: 5 minutes for financial data
-    const cacheExpirationTime = 5 * 60 * 1000; // 5 minutes
+    // Extended cache time: 12 hours for improved performance
+    const cacheExpirationTime = 12 * 60 * 60 * 1000; // 12 hours
     
     if (cachedData && cachedTimestamp) {
       const isValid = (new Date().getTime() - new Date(cachedTimestamp).getTime()) < cacheExpirationTime;
