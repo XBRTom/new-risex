@@ -47,9 +47,10 @@ export default function GlobalPoolMetricsTable({ metrics, initialTimeRange }: Gl
   const [timeRange, setTimeRange] = useState(initialTimeRange)
   const [sortConfig, setSortConfig] = useState<{ key: keyof ProcessedMetric; direction: 'asc' | 'desc' } | null>(null)
 
-  const safeToFixed = (value: number | string, digits = 2) => {
+  const safeToFixed = (value: number | string | null | undefined, digits = 2) => {
+    if (value === null || value === undefined) return '-'
     const numberValue = typeof value === 'string' ? parseFloat(value) : value
-    return isNaN(numberValue) ? '-' : numberValue.toFixed(digits)
+    return isNaN(numberValue) || numberValue === null || numberValue === undefined ? '-' : numberValue.toFixed(digits)
   }
 
   const formatCurrency = (value: number) => {
