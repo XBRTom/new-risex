@@ -162,6 +162,7 @@ export default function Navbar() {
   }
   const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isSessionDropdownOpen, setIsSessionDropdownOpen] = useState(false)
   
   // Search state
   const [searchQuery, setSearchQuery] = useState('')
@@ -271,11 +272,17 @@ export default function Navbar() {
 
   const handleSignOutClick = async () => {
     try {
+      setIsSessionDropdownOpen(false)
       await signOut({ redirect: false })
       router.push('/')
     } catch (error) {
       console.error('Failed to sign out:', error)
     }
+  }
+
+  const handleNavigationClick = (href: string) => {
+    setIsSessionDropdownOpen(false)
+    router.push(href)
   }
 
   const handleSignInClick = () => {
@@ -555,7 +562,7 @@ export default function Navbar() {
               </div>
             )}
             
-            <DropdownMenu>
+            <DropdownMenu open={isSessionDropdownOpen} onOpenChange={setIsSessionDropdownOpen}>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-8 px-2 text-xs">
                   <User className="h-4 w-4 mr-1" />
@@ -586,35 +593,33 @@ export default function Navbar() {
                         </DropdownMenuItem>
                       </>
                     ) : (
-                      <DropdownMenuItem>
-                        <Link href="/" className="flex items-center text-xs">
-                          <span className="text-xs flex items-center">
-                            <Wallet className="mr-2 h-3 w-3" />
-                            Connect Wallet
-                          </span>
-                        </Link>
+                      <DropdownMenuItem onSelect={() => handleNavigationClick('/')}>
+                        <span className="text-xs flex items-center">
+                          <Wallet className="mr-2 h-3 w-3" />
+                          Connect Wallet
+                        </span>
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                      <Link href="/dashboard/overview" className="flex items-center text-xs">
+                    <DropdownMenuItem onSelect={() => handleNavigationClick('/dashboard/overview')}>
+                      <span className="flex items-center text-xs">
                         <User className="mr-2 h-3 w-3" />
                         <span>Dashboard</span>
-                      </Link>
+                      </span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Link href="/dashboard/billing" className="flex items-center text-xs">
+                    <DropdownMenuItem onSelect={() => handleNavigationClick('/dashboard/billing')}>
+                      <span className="flex items-center text-xs">
                         <CreditCard className="mr-2 h-3 w-3" />
                         <span>Billing</span>
-                      </Link>
+                      </span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => handleNavigationClick('/dashboard/rewards')}>
                       <span className="flex items-center text-xs">
                         <Gift className="mr-2 h-3 w-3" />
                         <span>Reward</span>
                       </span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => handleNavigationClick('/dashboard/settings')}>
                       <span className="flex items-center text-xs">
                         <Settings className="mr-2 h-3 w-3" />
                         <span>Settings</span>
