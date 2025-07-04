@@ -158,7 +158,7 @@ export function EmailVerificationModal({ isOpen, onClose, email }: EmailVerifica
               </h2>
               
               <p className="text-slate-300 text-sm">
-                We've sent a magic link to
+                We&apos;ve sent a magic link to
               </p>
               <p className="text-blue-400 font-medium text-sm break-all">
                 {email}
@@ -212,7 +212,7 @@ export function EmailVerificationModal({ isOpen, onClose, email }: EmailVerifica
               ) : (
                 <div className="text-center">
                   <p className="text-slate-400 text-sm">
-                    Can't find the email? Check your spam folder
+                    Can&apos;t find the email? Check your spam folder
                   </p>
                 </div>
               )}
