@@ -67,7 +67,7 @@ export default function WalletNotConnectedModal({
 
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center">
-      <Card className="bg-gray-900 border-gray-700 max-w-md w-full mx-4">
+      <Card className="bg-gray-900 border-gray-700 max-w-lg w-full mx-4">
         <CardHeader className="text-center">
           <CardTitle className="text-yellow-400 flex items-center justify-center gap-2">
             <Wallet className="h-6 w-6" />
@@ -129,20 +129,20 @@ export default function WalletNotConnectedModal({
                 </Button>
               </div>
               
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {walletProviders.map((provider) => (
                   <Button
                     key={provider.name}
-                    className={`h-auto py-4 px-2 relative ${
+                    className={`h-auto py-6 px-4 relative min-h-[80px] ${
                       provider.disabled ? 'cursor-not-allowed opacity-50' : ''
                     } ${connecting === provider.code ? 'opacity-50' : ''}`}
                     onClick={() => !provider.disabled && !connecting && handleConnectWallet(provider.code)}
                     disabled={provider.disabled || connecting === provider.code}
                     variant="outline"
                   >
-                    <div className="flex flex-col items-center">
+                    <div className="flex flex-col items-center space-y-2">
                       {provider.icon}
-                      <span className="mt-2 text-sm">
+                      <span className="text-sm font-medium">
                         {connecting === provider.code ? 'Connecting...' : provider.name}
                       </span>
                     </div>

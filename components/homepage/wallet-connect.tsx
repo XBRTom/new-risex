@@ -48,7 +48,7 @@ export function WalletConnect() {
     const [selectedWallet, setSelectedWallet] = useState<string | null>(null)
 
     return (
-        <Card className="bg-slate-800 bg-opacity-70 border-slate-900 w-3/4">
+        <Card className="bg-slate-800 bg-opacity-70 border-slate-900 w-[400px]">
             <CardContent className="p-6">
                 <p className="text-white mb-2">Hi 👋, <span className="font-bold">{session?.user?.name}</span></p>
                 {
@@ -75,13 +75,14 @@ export function WalletConnect() {
                                 {walletProviders.map((provider) => (
                                     <Button
                                         key={provider.name}
-                                        className={`h-auto py-4 px-2 relative ${provider.disabled ? 'cursor-not-allowed' : ''}`}
+                                        className={`h-auto py-6 px-4 relative min-h-[80px] ${provider.disabled ? 'cursor-not-allowed opacity-50' : ''}`}
                                         onClick={() => !provider.disabled && handleConnect(provider.code)}
                                         disabled={provider.disabled}
+                                        variant="outline"
                                     >
-                                        <div className="flex flex-col items-center">
+                                        <div className="flex flex-col items-center space-y-2">
                                             {provider.icon}
-                                            <span className="mt-2 text-sm">{provider.name}</span>
+                                            <span className="text-sm font-medium">{provider.name}</span>
                                         </div>
                                         {provider.disabled && (
                                             <div className="absolute inset-0 bg-background/40 flex items-center justify-center rounded-md"></div>
