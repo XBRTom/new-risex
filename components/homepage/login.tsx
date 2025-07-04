@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import {
     Tabs,
     TabsContent,
@@ -13,11 +14,19 @@ import {
   } from "@/components/ui/card";
 import { SignInGoogle, SignInMagicLink, SignOut } from "@/components/homepage/auth"
 import { useSession } from "next-auth/react"
+import { EmailVerificationModal } from "@/components/ui/EmailVerificationModal"
 
 import { WalletConnect } from '@/components/homepage/wallet-connect'
 
 const Login = () => {
     const { data: session, status } = useSession()
+    const [showVerifyModal, setShowVerifyModal] = useState(false)
+    const [verifyEmail, setVerifyEmail] = useState('')
+    
+    const handleEmailSubmitted = (email: string) => {
+        setVerifyEmail(email)
+        setShowVerifyModal(true)
+    }
 
     return (
         <>
@@ -31,7 +40,10 @@ const Login = () => {
                         <TabsContent value="Login" className="border-gray-400">
                             <Card className="bg-slate-800 bg-opacity-70 border-slate-900">
                                 <CardContent className="grid gap-4">
-                                    <SignInMagicLink provider="resend" />
+                                    <SignInMagicLink 
+                                        provider="resend" 
+                                        onEmailSubmitted={handleEmailSubmitted}
+                                    />
 
                                     <SignInGoogle 
                                         provider="google" 
@@ -46,6 +58,12 @@ const Login = () => {
                     <WalletConnect />
                 )
             }
+            
+            <EmailVerificationModal
+                isOpen={showVerifyModal}
+                onClose={() => setShowVerifyModal(false)}
+                email={verifyEmail}
+            />
         </>
     )
 }

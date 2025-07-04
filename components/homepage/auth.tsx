@@ -28,14 +28,22 @@ export function SignInGoogle({
 
 export function SignInMagicLink({
   provider,
+  onEmailSubmitted,
   ...props
-}: { provider?: string } & React.ComponentPropsWithRef<typeof Button>) {
+}: { 
+  provider?: string 
+  onEmailSubmitted?: (email: string) => void
+} & React.ComponentPropsWithRef<typeof Button>) {
 
   const handleSignInSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const email = formData.get('email');
-    await handleSignIn(provider, formData);
+    const email = formData.get('email') as string;
+    
+    // Show the modal immediately without triggering NextAuth
+    if (onEmailSubmitted && email) {
+      onEmailSubmitted(email);
+    }
   };
 
   return (
