@@ -22,7 +22,7 @@ function submodule_workaround {
   fi
 
   echo "Monkey patching..."
-  sed -i"$FEXT" "s/git@github.com:/https:\/\/oauth2:${GITHUB_REPO_CLONE_TOKEN}@github.com\//" "$GITMODULES"
+  sed -i"$FEXT" 's/git@github.com:/https:\/\/oauth2:'"${GITHUB_REPO_CLONE_TOKEN}"'@github.com\//' "$GITMODULES"
   echo "Done!"
 
   echo "Synchronising submodules' remote URL configuration..."
