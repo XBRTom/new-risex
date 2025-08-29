@@ -1,15 +1,22 @@
-import { Xumm } from "xumm";
 import apiClient from '../../libs/api'
 
-const apiKey = process.env.NEXT_PUBLIC_XUMM_API_KEY || '';
-const apiSecret = process.env.NEXT_PUBLIC_XUMM_API_SECRET || '';
-
-const xumm = new Xumm(apiKey, apiSecret);
+// Get browser XUMM instance
+function getXummInstance() {
+  if (typeof window === 'undefined') {
+    throw new Error('XUMM browser SDK only available in browser environment');
+  }
+  
+  const xumm = (window as any).xumm;
+  if (!xumm) {
+    throw new Error('XUMM browser SDK not loaded. Make sure the script is loaded first.');
+  }
+  
+  return xumm;
+}
 
 export const handleLogin = async () => {
-    //const response = await signTransaction({TransactionType: "SignIn"});
-    //return response.data?.refs?.qr_png ?? null;
-    await xumm.authorize()
+    const xumm = getXummInstance();
+    return await xumm.authorize();
 };
 
 export const handleLoginTransaction = async () => {
@@ -17,11 +24,13 @@ export const handleLoginTransaction = async () => {
 }
 
 export const getAccount = async () => {
-    return xumm?.user?.account.then(a => a ?? '')
+    const xumm = getXummInstance();
+    return xumm?.user?.account.then((a: string | null | undefined) => a ?? '')
 }
 
 export const getAppName = async () => {
-    return await xumm?.environment?.jwt?.then(j => j?.app_name ?? '') ?? ''
+    const xumm = getXummInstance();
+    return await xumm?.environment?.jwt?.then((j: any) => j?.app_name ?? '') ?? ''
 }
 
 export const signTransaction = async (transaction: any, return_url: string|null|undefined) => {
@@ -33,5 +42,6 @@ export const getInfoTransaction = async (uuid: string) => {
 };
 
 export const handleLogOut = async () => {
+    const xumm = getXummInstance();
     await xumm.logout()
 };

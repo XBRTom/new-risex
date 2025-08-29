@@ -1,3 +1,4 @@
+'use client'
 
 import React, { useMemo, useState, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -95,7 +96,7 @@ const CustomTooltip = ({ active, payload, label, aggregation }: any) => {
                     : 'text-gray-400'
               }`}>
                 <span className="w-3 h-3 inline-block mr-2 bg-[#007AFF]"></span>
-                <span className="text-white">Performance:</span> {tvlPercentageChange.toFixed(2)}%
+                <span className="text-white">Performance:</span> {tvlPercentageChange ? tvlPercentageChange.toFixed(2) : '0.00'}%
               </p>
             )}
           </div>
@@ -116,7 +117,7 @@ const CustomTooltip = ({ active, payload, label, aggregation }: any) => {
               }`}>
                 <span className="w-3 h-3 inline-block mr-2 bg-[#5856D6]"></span>
                 <span className="text-white">Performance: </span>  
-                {totalPoolVolumePercentageChange.toFixed(2)}%
+                {totalPoolVolumePercentageChange ? totalPoolVolumePercentageChange.toFixed(2) : '0.00'}%
               </p>
             )}
           </div>
@@ -137,7 +138,7 @@ const CustomTooltip = ({ active, payload, label, aggregation }: any) => {
               }`}>
                 <span className="w-3 h-3 inline-block mr-2 bg-[#AF52DE]"></span>
                 <span className="text-white">Performance: </span>  
-                {feesGeneratedPercentageChange.toFixed(2)}%
+                {feesGeneratedPercentageChange ? feesGeneratedPercentageChange.toFixed(2) : '0.00'}%
               </p>
             )}
           </div>
@@ -146,7 +147,7 @@ const CustomTooltip = ({ active, payload, label, aggregation }: any) => {
           <div className="mb-2">
             <p className="text-white text-sm font-medium flex items-center">
               <span className="w-3 h-3 inline-block mr-2 bg-[#FF9500]"></span>
-              Relative APR: {relativeAPRValue.toFixed(2)}%
+              Relative APR: {relativeAPRValue ? relativeAPRValue.toFixed(2) : '0.00'}%
             </p>
             {relativeAPRPercentageChange !== undefined && (
               <p className={`text-sm font-medium flex items-center ${
@@ -158,7 +159,7 @@ const CustomTooltip = ({ active, payload, label, aggregation }: any) => {
               }`}>
                 <span className="w-3 h-3 inline-block mr-2 bg-[#FF3B30]"></span>
                 <span className="text-white">Performance: </span>  
-                {relativeAPRPercentageChange.toFixed(2)}%
+                {relativeAPRPercentageChange ? relativeAPRPercentageChange.toFixed(2) : '0.00'}%
               </p>
             )}
           </div>
@@ -167,7 +168,7 @@ const CustomTooltip = ({ active, payload, label, aggregation }: any) => {
           <div>
             <p className="text-white text-sm font-medium flex items-center">
               <span className="w-3 h-3 inline-block mr-2 bg-[#FF9500]"></span>
-              Liquidity Utilization Rate: {liquidityUtilizationRateValue.toFixed(2)}%
+              Liquidity Utilization Rate: {liquidityUtilizationRateValue ? liquidityUtilizationRateValue.toFixed(2) : '0.00'}%
             </p>
             {liquidityUtilizationRatePercentageChange !== undefined && (
               <p className={`text-sm font-medium flex items-center ${
@@ -179,7 +180,7 @@ const CustomTooltip = ({ active, payload, label, aggregation }: any) => {
               }`}>
                 <span className="w-3 h-3 inline-block mr-2 bg-[#FF3B30]"></span>
                 <span className="text-white">Performance: </span>  
-                {liquidityUtilizationRatePercentageChange.toFixed(2)}%
+                {liquidityUtilizationRatePercentageChange ? liquidityUtilizationRatePercentageChange.toFixed(2) : '0.00'}%
               </p>
             )}
           </div>
@@ -419,7 +420,7 @@ export default function PoolMetricsChart({ metrics }: PoolMetricsChartProps) {
               yAxisId="right"
               orientation="right"
               stroke="#ffffff"
-              tickFormatter={(value) => `${value.toFixed(2)}%`}
+              tickFormatter={(value) => `${value ? value.toFixed(2) : '0.00'}%`}
               domain={percentageChangeDomain}
               tick={{ fill: '#ffffff', fontSize: 12 }}
               tickLine={{ stroke: '#ffffff' }}
@@ -475,38 +476,56 @@ export default function PoolMetricsChart({ metrics }: PoolMetricsChartProps) {
   }, [processedMetrics, aggregation, showPercentageChange, percentageChartType]);
 
   const renderSummaryStats = useCallback(() => {
+    // Check if we have enough data
+    if (!filteredMetrics || filteredMetrics.length === 0) {
+      return (
+        <Card className="bg-transparent border-none">
+          <CardContent>
+            <div className="text-center text-gray-400 py-4">
+              No metrics data available
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+
     const lastMetric = filteredMetrics[filteredMetrics.length - 1];
-    const prevMetric = filteredMetrics[filteredMetrics.length - 2];
+    const prevMetric = filteredMetrics.length > 1 ? filteredMetrics[filteredMetrics.length - 2] : null;
     const initialMetric = filteredMetrics[0];
 
     const calculateChange = (current: number, previous: number) => {
+      if (!previous || previous === 0) return 0;
       const change = ((current - previous) / previous) * 100;
-      return change.toFixed(2);
+      return change;
     };
 
     const averages = {
-      volume: filteredMetrics.reduce((sum, metric) => sum + metric.totalPoolVolume, 0) / filteredMetrics.length,
-      fees: filteredMetrics.reduce((sum, metric) => sum + metric.feesGenerated, 0) / filteredMetrics.length,
-      apr: filteredMetrics.reduce((sum, metric) => sum + metric.relativeAPR, 0) / filteredMetrics.length,
-      utilizationRate: filteredMetrics.reduce((sum, metric) => sum + (metric.totalPoolVolume / metric.totalValueLocked) * 100, 0) / filteredMetrics.length,
-      liquidity: filteredMetrics.reduce((sum, metric) => sum + metric.totalValueLocked, 0) / filteredMetrics.length,
+      volume: filteredMetrics.reduce((sum, metric) => sum + (metric.totalPoolVolume || 0), 0) / filteredMetrics.length,
+      fees: filteredMetrics.reduce((sum, metric) => sum + (metric.feesGenerated || 0), 0) / filteredMetrics.length,
+      apr: filteredMetrics.reduce((sum, metric) => sum + (metric.relativeAPR || 0), 0) / filteredMetrics.length,
+      utilizationRate: filteredMetrics.reduce((sum, metric) => {
+        const volume = metric.totalPoolVolume || 0;
+        const tvl = metric.totalValueLocked || 1; // Avoid division by zero
+        return sum + (volume / tvl) * 100;
+      }, 0) / filteredMetrics.length,
+      liquidity: filteredMetrics.reduce((sum, metric) => sum + (metric.totalValueLocked || 0), 0) / filteredMetrics.length,
     };
 
     const totals = {
-      volume: filteredMetrics.reduce((sum, metric) => sum + metric.totalPoolVolume, 0),
-      fees: filteredMetrics.reduce((sum, metric) => sum + metric.feesGenerated, 0),
+      volume: filteredMetrics.reduce((sum, metric) => sum + (metric.totalPoolVolume || 0), 0),
+      fees: filteredMetrics.reduce((sum, metric) => sum + (metric.feesGenerated || 0), 0),
     };
 
     const current = {
-      volume: lastMetric.totalPoolVolume,
-      tvl: lastMetric.totalValueLocked,
-      fees: lastMetric.feesGenerated,
-      apr: lastMetric.relativeAPR,
-      utilizationRate: (lastMetric.totalPoolVolume / lastMetric.totalValueLocked) * 100,
+      volume: lastMetric?.totalPoolVolume || 0,
+      tvl: lastMetric?.totalValueLocked || 0,
+      fees: lastMetric?.feesGenerated || 0,
+      apr: lastMetric?.relativeAPR || 0,
+      utilizationRate: lastMetric?.totalValueLocked ? (lastMetric.totalPoolVolume / lastMetric.totalValueLocked) * 100 : 0,
     };
 
-    const liquidityGrowth = current.tvl - initialMetric.totalValueLocked;
-    const liquidityGrowthPercentage = ((liquidityGrowth / initialMetric.totalValueLocked) * 100).toFixed(2);
+    const liquidityGrowth = current.tvl - (initialMetric?.totalValueLocked || 0);
+    const liquidityGrowthPercentage = initialMetric?.totalValueLocked ? ((liquidityGrowth / initialMetric.totalValueLocked) * 100).toFixed(2) : '0.00';
 
     const renderMetric = (label: string, value: number, change?: number) => (
       <div className="flex justify-between items-center py-1">
@@ -536,11 +555,11 @@ export default function PoolMetricsChart({ metrics }: PoolMetricsChartProps) {
             </div>
             <div className="space-y-1">
               <h4 className="text-sm font-medium text-white mb-1">Today Performance</h4>
-              {renderMetric("Value Locked", current.tvl, parseFloat(calculateChange(current.tvl, prevMetric.totalValueLocked)))}
-              {renderMetric("Trading Volume", current.volume, parseFloat(calculateChange(current.volume, prevMetric.totalPoolVolume)))}
-              {renderMetric("Daily Fees", current.fees, parseFloat(calculateChange(current.fees, prevMetric.feesGenerated)))}
-              {renderMetric("Relative APR", current.apr, parseFloat(calculateChange(current.apr, prevMetric.relativeAPR)))}
-              {renderMetric("Utilization Rate", current.utilizationRate, parseFloat(calculateChange(current.utilizationRate, (prevMetric.totalPoolVolume / prevMetric.totalValueLocked) * 100)))}
+              {renderMetric("Value Locked", current.tvl, prevMetric ? calculateChange(current.tvl, prevMetric.totalValueLocked || 0) : undefined)}
+              {renderMetric("Trading Volume", current.volume, prevMetric ? calculateChange(current.volume, prevMetric.totalPoolVolume || 0) : undefined)}
+              {renderMetric("Daily Fees", current.fees, prevMetric ? calculateChange(current.fees, prevMetric.feesGenerated || 0) : undefined)}
+              {renderMetric("Relative APR", current.apr, prevMetric ? calculateChange(current.apr, prevMetric.relativeAPR || 0) : undefined)}
+              {renderMetric("Utilization Rate", current.utilizationRate, prevMetric && prevMetric.totalValueLocked ? calculateChange(current.utilizationRate, (prevMetric.totalPoolVolume / prevMetric.totalValueLocked) * 100) : undefined)}
             </div>
             <div className="space-y-1">
               <h4 className="text-sm font-medium text-white mb-1">Daily Averages</h4>

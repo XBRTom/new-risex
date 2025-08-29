@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import WalletPoolHoldingTable from './pool-details/WalletPoolHoldingTable'
 // import TransactionTable from './pool-details/TransactionTable'
 import DashboardLayout from './layout/DashboardLayout'
-import { cn } from "@/lib/utils"
+import Loader from '@/components/ui/Loader';
 // import {
 //   Breadcrumb,
 //   BreadcrumbItem,
@@ -30,37 +30,15 @@ interface ExchangeRatesResponse {
   exchangeRates: any; // Replace `any` with the actual type if available
 }
 
-export interface ISVGProps extends React.SVGProps<SVGSVGElement> {
-  size?: number;
-  className?: string;
+interface AmmInfoProps {
+  account: string
+  ammInfo: any
+  parentLoading?: (loading: boolean) => void
+  parentProgress?: (progress: number) => void
+  parentStep?: (step: string) => void
 }
 
-const LoadingSpinner = ({
-  size = 24,
-  className,
-  ...props
-}: ISVGProps) => {
-  return (
-      <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      {...props}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={cn("animate-spin", className)}
-      >
-      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-      </svg>
-  );
-};
-
-export default function Component({ account, ammInfo }: { account: string, ammInfo: any }) {
-  const [loading, setLoading] = useState(true)
+export default function Component({ account, ammInfo, parentLoading, parentProgress, parentStep }: AmmInfoProps) {
   const [latestMetrics, setLatestMetrics] = useState<LatestMetrics | null>(null)
   const [historicalMetrics, setHistoricalMetrics] = useState<any[]>([])
   const [filteredMetrics, setFilteredMetrics] = useState<any[]>([])
@@ -80,8 +58,15 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
   useEffect(() => {
     const fetchAmmInfo = async () => {
       try {
-        const metricsResponse: any = await apiClient.get(`/latest-metrics?poolId=${ammInfo.poolId}`)
-        const currentPoolMetrics = metricsResponse.find((metric: any) => metric.poolId === ammInfo.poolId)
+        // Check if ammInfo and pool exist before accessing pool.id
+        if (!ammInfo || !ammInfo.pool || !ammInfo.pool.id) {
+          console.error('Missing ammInfo or pool data:', { ammInfo })
+          setError('Invalid pool data')
+          return
+        }
+        
+        const metricsResponse: any = await apiClient.get(`/latest-metrics?poolId=${ammInfo.pool.id}`)
+        const currentPoolMetrics = metricsResponse.find((metric: any) => metric.poolId === ammInfo.pool.id)
         if (currentPoolMetrics) {
           setLatestMetrics({
             totalValueLocked: parseFloat(currentPoolMetrics.totalValueLocked) || 0,
@@ -94,7 +79,7 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
           setLatestMetrics(null)
         }
 
-        let historicalResponse: any = await apiClient.get(`/historical-metrics?poolId=${ammInfo.poolId}`)
+        let historicalResponse: any = await apiClient.get(`/historical-metrics?poolId=${ammInfo.pool.id}`)
         console.log('Historical Metrics:', historicalResponse) // Log the historical metrics response
         historicalResponse = historicalResponse.map((histo: any) => ({
           ...histo,
@@ -105,18 +90,18 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
         }));
         setHistoricalMetrics(historicalResponse)
 
-        setLoading(false)
+        // Loading handled by parent
       } catch (err) {
         console.error('Error fetching AMM info or latest metrics:', err)
         setError('Failed to fetch AMM info')
-        setLoading(false)
+        // Loading handled by parent
       }
     }
 
-    if (account) {
+    if (account && ammInfo && ammInfo.pool && ammInfo.pool.id) {
       fetchAmmInfo()
     }
-  }, [account, ammInfo.poolId])
+  }, [account, ammInfo?.pool?.id])
 
   console.log(ammInfo)
 
@@ -288,16 +273,28 @@ export default function Component({ account, ammInfo }: { account: string, ammIn
     setTransactionStatus('Voting functionality not implemented yet')
   }
 
-  if (loading) {
-    return <div className="w-full h-screen bg-black text-white flex flex-col gap-2 items-center justify-center"><span>Loading</span><LoadingSpinner className="mr-2" /></div>
-  }
+  // Loading is now handled by parent component
 
   if (error) {
     return <div className="text-red-500 text-sm">{error}</div>
   }
 
   if (!ammInfo) {
-    return <div className="text-white text-sm">No AMM info available</div>
+    return (
+      <div className="w-full h-screen bg-black text-white flex flex-col gap-3 items-center justify-center">
+        <div className="text-red-400 text-lg font-semibold">No AMM info available</div>
+        <div className="text-gray-400 text-sm">Pool data could not be loaded</div>
+      </div>
+    )
+  }
+  
+  if (!ammInfo.pool) {
+    return (
+      <div className="w-full h-screen bg-black text-white flex flex-col gap-3 items-center justify-center">
+        <div className="text-red-400 text-lg font-semibold">Invalid pool data</div>
+        <div className="text-gray-400 text-sm">Pool information is missing or incomplete</div>
+      </div>
+    )
   }
 
   const getAmountValue = (amount: number) => {

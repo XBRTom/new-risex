@@ -16,7 +16,8 @@ class XRPLClient {
   private isConnected: boolean = false;
 
   private constructor() {
-    this.client = new Client('wss://s.devnet.rippletest.net:51233/', {
+    // Switch to MAINNET to match wallet addresses
+    this.client = new Client('wss://s1.ripple.com', {
       connectionTimeout: 10000,
     });
   }

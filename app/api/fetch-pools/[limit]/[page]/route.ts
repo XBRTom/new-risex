@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/libs/prisma';
 import { getPoolsMax } from '@prisma/client/sql'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic';
+export const revalidate = false;
+
 type Params = {
     page: string;
     limit: string;

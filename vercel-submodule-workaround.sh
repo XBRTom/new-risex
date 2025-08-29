@@ -16,8 +16,8 @@ function cleanup {
 trap cleanup EXIT
 
 function submodule_workaround {
-  if [ "$GITHUB_REPO_CLONE_TOKEN" == "" ]; then
-    echo "GITHUB_REPO_CLONE_TOKEN is empty!"
+  if [ "${GITHUB_REPO_CLONE_TOKEN:-}" == "" ]; then
+    echo "GITHUB_REPO_CLONE_TOKEN is empty or not set!"
     exit 1
   fi
 

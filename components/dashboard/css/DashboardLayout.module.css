@@ -3,12 +3,21 @@
     display: flex;
     height: 100vh; /* Full height */
     position: relative;
+    background-color: #0f172a; /* Dark background */
 }
 
 .mainContent {
     flex: 1; /* Ensure it takes up the remaining space */
     padding: 0px; /* Adjust padding if needed */
     overflow-y: auto; /* Allow scrolling */
-    transition: margin-left 0.3s ease-in-out; /* Smooth transition */
-    margin-left: 250px; /* This is the default width of the sidebar */
+    background-color: #f8fafc; /* Light background for content */
+    position: relative;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .mainContent {
+        margin-left: 0;
+        padding-bottom: 80px; /* Space for bottom nav */
+    }
 }

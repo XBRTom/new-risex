@@ -2,87 +2,67 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useWallet } from "@/context"
-import TransactionsTable from './transactions/TransactionsTable';
+import HoldingsTable from './holdings/HoldingsTable';
 import DashboardLayout from './layout/DashboardLayout';
+import { fetchWalletLPHoldings, LPHolding } from '@/libs/lpHoldings';
 import Loader from '@/components/ui/Loader';
 import WalletNotConnectedModal from '@/components/ui/WalletNotConnectedModal';
-import { fetchTransactions, Transaction } from '@/libs/xrpl';
-import * as xrpl from 'xrpl';
-  // Start of Selection
 
-const Transactions: React.FC = () => {
+const Holdings: React.FC = () => {
   const walletContext = useWallet()
     if (!walletContext) {
         throw new Error("Wallet context is not available")
     }
   const { walletAddress, walletType, walletAppName } = walletContext
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [holdings, setHoldings] = useState<LPHolding[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Debug logging
-  console.log('=== TRANSACTIONS DEBUG ===');
+  console.log('=== HOLDINGS DEBUG ===');
   console.log('Wallet Address:', walletAddress);
   console.log('Wallet Type:', walletType);
   console.log('Wallet App Name:', walletAppName);
   console.log('Is Wallet Connected:', !!walletAddress);
-  console.log('========================');
+  console.log('======================');
 
-  const loadTransactions = useCallback(async () => {
+  const loadHoldings = useCallback(async () => {
     if (walletAddress) {
       setLoading(true);
       try {
-        const txs = await fetchTransactions(walletAddress);
-        console.log('Fetched transactions:', txs);
-        setTransactions(txs);
-        localStorage.setItem('cachedTransactions', JSON.stringify(txs));
+        const lpHoldings = await fetchWalletLPHoldings(walletAddress);
+        console.log('Fetched LP holdings:', lpHoldings);
+        setHoldings(lpHoldings);
+        localStorage.setItem('cachedHoldings', JSON.stringify(lpHoldings));
       } catch (error: any) {
-        console.error('Error fetching transactions:', error);
-        setError(error.message || 'Failed to fetch transactions');
+        console.error('Error fetching LP holdings:', error);
+        setError(error.message || 'Failed to fetch LP holdings');
       } finally {
         setLoading(false);
       }
     } else {
-      setTransactions([]);
+      setHoldings([]);
       setLoading(false);
     }
   }, [walletAddress]);
 
   useEffect(() => {
     if (walletAddress) {
-      loadTransactions();
-
-      const client = new xrpl.Client('wss://s1.ripple.com');
-      client.connect().then(() => {
-        client.request({
-          command: 'subscribe',
-          accounts: [walletAddress]
-        });
-
-        client.on('transaction', (tx) => {
-          if (tx.transaction.Account === walletAddress) {
-            loadTransactions();
-          }
-        });
-      });
-
-      return () => {
-        client.disconnect();
-      };
+      loadHoldings();
     } else {
       // Clear the cache when the wallet is disconnected
-      localStorage.removeItem('cachedTransactions');
-      setTransactions([]);
+      localStorage.removeItem('cachedHoldings');
+      setHoldings([]);
       setLoading(false); // Stop loading when wallet is not connected
     }
-  }, [walletAddress, loadTransactions]);
+  }, [walletAddress, loadHoldings]);
 
   // Show wallet not connected modal if no wallet is connected
   if (!walletAddress) {
     return (
       <WalletNotConnectedModal 
-        title="Transactions - Wallet Required"
-        description="Connect your wallet to view your transaction history and monitor your on-chain activity."
+        title="LP Holdings - Wallet Required"
+        description="Connect your wallet to view your liquidity provider positions and track your DeFi investments."
         backButtonHref="/dashboard/overview"
       />
     );
@@ -104,7 +84,7 @@ const Transactions: React.FC = () => {
               </div>
             </div>
             <button
-              onClick={loadTransactions}
+              onClick={loadHoldings}
               disabled={loading}
               className="flex items-center space-x-2 px-3 py-1 text-sm bg-gray-800 hover:bg-gray-700 rounded-md transition-colors disabled:opacity-50"
             >
@@ -117,8 +97,8 @@ const Transactions: React.FC = () => {
             </button>
           </header>
           <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
-            <TransactionsTable 
-              transactions={transactions} 
+            <HoldingsTable 
+              holdings={holdings} 
               loading={loading} 
               error={error} 
               isWalletConnected={!!walletAddress}
@@ -130,4 +110,4 @@ const Transactions: React.FC = () => {
   );
 };
 
-export default Transactions;
+export default Holdings;
